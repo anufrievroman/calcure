@@ -90,11 +90,11 @@ def create_config():
             "play":        "♟",
             "interview":   "♟",
             "date":        "♥",
-            "concert":     "♫",
-            "gig":         "♫",
-            "disco":       "♫",
-            "music":       "♫",
-            "rehersal":    "♫",
+            "concert":     "♪",
+            "gig":         "♪",
+            "disco":       "♪",
+            "music":       "♪",
+            "rehersal":    "♪",
             "call":        "☎",
             "phone":       "☎",
             "deadline":    "⚑",
@@ -495,7 +495,8 @@ def main(stdscr):
         dates = days_of_this_month(this_month, this_year)
         events_this_month = events_of_this_month(this_month, this_year, all_events)    
         day_number = 0
-        y_grid_max = 6
+        y_cell = ((y_max-2)//6)
+        x_cell = x_max//7
         number_of_event_this_month = 1
         for w in range(6):
             for d in range(7):
@@ -505,31 +506,33 @@ def main(stdscr):
                     day_type = 5 if d < 5 else 2
                     if current_year == this_year and current_month == this_month \
                             and current_day == this_date: day_type = 4 
-                    date_display = str(this_date)+TODAY_ICON*(day_type==4)+str(" "*(x_max//7-len(str(this_date))+1))
-                    stdscr.addstr(2+w*(y_max//y_grid_max), d*x_max//7, date_display, color_pair(day_type)) 
+                    icon = TODAY_ICON*(day_type==4) if DISPLAY_ICONS else "*"*(day_type==4)
+                    date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))+1))
+                    stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type)) 
 
                     number_of_event_this_day = 0
                     if BIRTHDAYS_FROM_ABOOK:
                         for index, name in enumerate(bd_names):
                             if bd_months[index] == this_month and bd_dates[index] == this_date:
                                 bd_display = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name
-                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//y_grid_max), \
-                                d*x_max//7, bd_display[:x_max//7], color_pair(7))
+                                stdscr.addstr(3+number_of_event_this_day+w*y_cell, \
+                                d*x_cell, bd_display[:x_cell], color_pair(7))
                                 number_of_event_this_day += 1
 
                     for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
                         if this_date == event_date:
-                            if number_of_event_this_day < y_max//y_grid_max-1: # If screen space is ok
+                            if number_of_event_this_day < y_cell - 1: # If screen space is ok
                                 icon = display_icon_for_event(event_name, delete_mode, edit_mode)
                                 number = ("("+str(number_of_event_this_month)+")")*(delete_mode or edit_mode)
                                 event_display = icon + number + event_name
-                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//y_grid_max), \
-                                d*x_max//7,event_display[:x_max//7], color_pair(1))
+                                stdscr.addstr(3+number_of_event_this_day+w*y_cell, \
+                                d*x_cell,event_display[:x_cell], color_pair(1))
 
                                 number_of_event_this_day += 1
                                 number_of_event_this_month += 1
                             else:
-                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//7), d*x_max//7,"...")
+                                hidden = "..."+" "*(x_cell - 3)
+                                stdscr.addstr(3+number_of_event_this_day+w*y_cell-1, d*x_cell, hidden , color_pair(1))
                 day_number += 1
         
         # stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
