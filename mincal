@@ -543,7 +543,7 @@ def main(stdscr):
                                 stdscr.addstr(3+number_of_event_this_day+w*y_cell-1, d*x_cell, hidden , color_pair(1))
                 day_number += 1
         
-        stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
+        # stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
 
         if show_hints:
             stdscr.addstr(y_max - 1, 0, HINT[:x_max-1], color_pair(3))
