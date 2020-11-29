@@ -1,7 +1,7 @@
 # Minimalist TUI Calendar
 Minimal calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/).
 
-![screenshot](screenshot.jpeg)
+![screenshot](screenshot1.jpeg)
 
 ## Instalation and running
 Simply copy the _mincal_ file into a directory with your binaries, for example into `home/user/.local/bin` 
