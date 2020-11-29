@@ -33,7 +33,7 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 
 `d` - delete event
 
-`i` - toggle footer
+`?` - toggle footer
 
 `q` - quit
 
@@ -54,7 +54,7 @@ minimal_today_indicator = Yes
 minimal_days_indicator = Yes
 minimal_weekend_indicator = Yes
 delete_confirmation = No
-display_icons = Yes
+use_unicode_icons = Yes
 event_icon = •
 today_icon = •
 birthday_icon = ★
