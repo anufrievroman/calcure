@@ -25,7 +25,7 @@ def create_config():
             "minimal_days_indicator":    "Yes",
             "minimal_weekend_indicator": "Yes",
             "delete_confirmation":       "No",
-            "display_icons":             "Yes",
+            "use_unicode_icons":         "Yes",
             "event_icon":                "•",
             "today_icon":                "•",
             "birthday_icon":             "★",
@@ -68,7 +68,7 @@ def create_config():
             }
 
     conf["Diologs"] = {
-            "hint": " n - next month • p - previous month • a - add event • d - delete • e - edit • q - quit • i - toggle hints"
+            "hint": " n - next month · p - previous month · a - add event · d - delete · e - edit · q - quit · ? - toggle hints"
             }
 
     conf["Event icons"] = {
@@ -123,41 +123,48 @@ def create_config():
 # Load configuration file
 if not os.path.exists(config_file):
     create_config()
-conf.read(config_file)
-SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings")
-SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names")
-MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
-MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
-MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
-ASK_DELETE_CONFIRMATION   = conf.getboolean("Parameters", "delete_confirmation")
-DISPLAY_ICONS             = conf.getboolean("Parameters", "display_icons")
-TODAY_ICON                = conf.get("Parameters", "today_icon")
-EVENT_ICON                = conf.get("Parameters", "event_icon")
-BIRTHDAYS_FROM_ABOOK      = conf.get("Parameters", "birthdays_from_abook")
-BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon")
 
-COLOR_TODAY         = int(conf.get("Colors", "color_today"))
-COLOR_DAYS          = int(conf.get("Colors", "color_days"))
-COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names"))
-COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
-COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
-COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
-COLOR_PROMTS        = int(conf.get("Colors", "color_promts"))
-COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
+try:
+    conf.read(config_file)
+    SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings")
+    SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names")
+    MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
+    MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
+    MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
+    ASK_DELETE_CONFIRMATION   = conf.getboolean("Parameters", "delete_confirmation")
+    DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons")
+    TODAY_ICON                = conf.get("Parameters", "today_icon")
+    EVENT_ICON                = conf.get("Parameters", "event_icon")
+    BIRTHDAYS_FROM_ABOOK      = conf.get("Parameters", "birthdays_from_abook")
+    BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon")
 
-MON = conf.get("Day names", "mon")
-TUE = conf.get("Day names", "tue")
-WED = conf.get("Day names", "wed")
-THU = conf.get("Day names", "thu")
-FRI = conf.get("Day names", "fri")
-SAT = conf.get("Day names", "sat")
-SUN = conf.get("Day names", "sun")
+    COLOR_TODAY         = int(conf.get("Colors", "color_today"))
+    COLOR_DAYS          = int(conf.get("Colors", "color_days"))
+    COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names"))
+    COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
+    COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
+    COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
+    COLOR_PROMTS        = int(conf.get("Colors", "color_promts"))
+    COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
 
-HINT = conf.get("Diologs", "hint")
-MONTH_NAMES = [name for (month, name) in conf.items("Month names")]
-ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
+    MON = conf.get("Day names", "mon")
+    TUE = conf.get("Day names", "tue")
+    WED = conf.get("Day names", "wed")
+    THU = conf.get("Day names", "thu")
+    FRI = conf.get("Day names", "fri")
+    SAT = conf.get("Day names", "sat")
+    SUN = conf.get("Day names", "sun")
 
-data_folder = conf.get("Parameters", "folder_with_datafile") 
+    HINT = conf.get("Diologs", "hint")
+    MONTH_NAMES = [name for (month, name) in conf.items("Month names")]
+    ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
+
+    data_folder = conf.get("Parameters", "folder_with_datafile") 
+except:
+    print("Error in the config.ini file. Try removing the config file and run the program again.")
+    exit()
+
+
 DATAFILE = data_folder + "/appointments.csv"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
@@ -416,19 +423,20 @@ def user_input(stdscr, r, c, prompt_string):
 def display_day_names(stdscr, x_max):
     '''Display day name depending on the screen available'''
     num = 2 if x_max < 80 else 10
-    stdscr.addstr(1, 0*x_max//7, MON[:num], color_pair(1))
-    stdscr.addstr(1, 1*x_max//7, TUE[:num], color_pair(1))
-    stdscr.addstr(1, 2*x_max//7, WED[:num], color_pair(1))
-    stdscr.addstr(1, 3*x_max//7, THU[:num], color_pair(1))
-    stdscr.addstr(1, 4*x_max//7, FRI[:num], color_pair(1))
-    stdscr.addstr(1, 5*x_max//7, SAT[:num], color_pair(6))
-    stdscr.addstr(1, 6*x_max//7, SUN[:num], color_pair(6))
+    x_cell = x_max//7
+    stdscr.addstr(1, 0*x_cell, MON[:num], color_pair(1))
+    stdscr.addstr(1, 1*x_cell, TUE[:num], color_pair(1))
+    stdscr.addstr(1, 2*x_cell, WED[:num], color_pair(1))
+    stdscr.addstr(1, 3*x_cell, THU[:num], color_pair(1))
+    stdscr.addstr(1, 4*x_cell, FRI[:num], color_pair(1))
+    stdscr.addstr(1, 5*x_cell, SAT[:num], color_pair(6))
+    stdscr.addstr(1, 6*x_cell, SUN[:num], color_pair(6))
 
 
 def display_icon_for_event(name, delete_mode, edit_mode):
     '''Check if event seems of certain type and return suatable icon'''
-    if not delete_mode and not edit_mode:
-        icon = EVENT_ICON*DISPLAY_ICONS+" "
+    if not delete_mode and not edit_mode and DISPLAY_ICONS:
+        icon = EVENT_ICON + " "
         for key in ICONS:
             if key in name.lower():
                 icon = ICONS[key]*DISPLAY_ICONS+" "
@@ -506,8 +514,8 @@ def main(stdscr):
                     day_type = 5 if d < 5 else 2
                     if current_year == this_year and current_month == this_month \
                             and current_day == this_date: day_type = 4 
-                    icon = TODAY_ICON*(day_type==4) if DISPLAY_ICONS else "*"*(day_type==4)
-                    date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))+1))
+                    icon = TODAY_ICON*(day_type==4) if DISPLAY_ICONS else "·"*(day_type==4)
+                    date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))-len(icon)))
                     stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type)) 
 
                     number_of_event_this_day = 0
@@ -535,7 +543,7 @@ def main(stdscr):
                                 stdscr.addstr(3+number_of_event_this_day+w*y_cell-1, d*x_cell, hidden , color_pair(1))
                 day_number += 1
         
-        # stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
+        stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
 
         if show_hints:
             stdscr.addstr(y_max - 1, 0, HINT[:x_max-1], color_pair(3))
@@ -569,7 +577,7 @@ def main(stdscr):
             if key == 97: add_event(stdscr, this_month, this_year)  # "a" for add event
             if key == 100: delete_mode = True                       # "d" for delete
             if key == 101: edit_mode = True	                    # "e" for edit
-            if key == 105: show_hints = not show_hints              # "i" for toggle hint
+            if key == 63: show_hints = not show_hints               # "?" for toggle hint
                 
     echo()
     curs_set(True)
