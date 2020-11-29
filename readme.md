@@ -3,10 +3,23 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 
 ![screenshot](screenshot1.jpeg)
 
+## Features
+- Vim keys
+- Event management with a least possible number of key presses
+- Birthdays from your abook contacts
+- Auto pictograms according to keywords from event title (fully customizible)
+- Simple plain text database in a desired location
+- Colors, icons, and other features are fully customizable
+- Resize friendly, can shrink to a small window
+
 ## Instalation and running
-Simply copy the _mincal_ file into a directory with your binaries, for example into `home/user/.local/bin` 
+Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
 
 Then, run by just typing `mincal` in a linux terminal.
+
+In case of permission error, you'll need to make the file executable `chmod =rwx mincal`.
+
+Also, it requires python 3 to run. If you don't have it, install `python` package from your standard repository.
 
 ## Key bindings
 
