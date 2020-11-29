@@ -1,0 +1,577 @@
+#!/usr/bin/env python
+from datetime import date, datetime
+from curses import *
+import csv
+import os
+from pathlib import Path
+from configparser import ConfigParser
+
+
+# Write configuration file if it does not exist
+config_folder = str(Path.home())+"/.config/mincal"
+if not os.path.exists(config_folder):
+    os.makedirs(config_folder)
+config_file = config_folder + "/config.ini"
+conf = ConfigParser()
+
+def create_config():
+    '''Create config file if it does not exist yet'''
+    conf["Parameters"] = {
+            "folder_with_datafile":      str(config_folder),
+            "birthdays_from_abook":      "Yes",
+            "show_keybindings":          "Yes",
+            "show_day_names":            "Yes",
+            "minimal_today_indicator":   "Yes",
+            "minimal_days_indicator":    "Yes",
+            "minimal_weekend_indicator": "Yes",
+            "delete_confirmation":       "No",
+            "display_icons":             "Yes",
+            "event_icon":                "•",
+            "today_icon":                "•",
+            "birthday_icon":             "★",
+            }
+
+    conf["Colors"] = {
+            "color_today":         "2",
+            "color_days":          "7",
+            "color_day_names":     "4",
+            "color_weekends":      "1",
+            "color_weekend_names": "1",
+            "color_hints":         "7",
+            "color_promts":        "7",
+            "color_birthdays":     "1",
+            }
+
+    conf["Day names"] = {
+            "mon": "MONDAY",
+            "tue": "TUESDAY",
+            "wed": "WEDNESDAY",
+            "thu": "THURSDAY",
+            "fri": "FRIDAY",
+            "sat": "SATURDAY",
+            "sun": "SUNDAY",
+            }
+
+    conf["Month names"] = {
+            "jan": "JANUARY",
+            "feb": "FEBRUARY",
+            "mar": "MARCH",
+            "apr": "APRIL",
+            "may": "MAY",
+            "jun": "JUNE",
+            "jul": "JULY",
+            "aug": "AUGUST",
+            "sep": "SEPTEMBER",
+            "oct": "OCTOBER",
+            "nov": "NOVEMBER",
+            "dec": "DECEMBER",
+            }
+
+    conf["Diologs"] = {
+            "hint": " n - next month • p - previous month • a - add event • d - delete • e - edit • q - quit • i - toggle hints"
+            }
+
+    conf["Event icons"] = {
+            "travel":      "✈",
+            "plane":       "✈",
+            "trip":        "✈",
+            "voyage":      "✈",
+            "flight":      "✈",
+            "airport":     "✈",
+            "vacation":    "⛱",
+            "holyday":     "⛱",
+            "day-off":     "⛱",
+            "hair":        "✂",
+            "barber":      "✂",
+            "beauty":      "✂",
+            "nails":       "✂",
+            "game":        "♟",
+            "match":       "♟",
+            "play":        "♟",
+            "interview":   "♟",
+            "date":        "♥",
+            "concert":     "♫",
+            "gig":         "♫",
+            "disco":       "♫",
+            "music":       "♫",
+            "rehersal":    "♫",
+            "call":        "☎",
+            "phone":       "☎",
+            "deadline":    "⚑",
+            "over":        "⚑",
+            "finish":      "⚑",
+            "end":         "⚑",
+            "appointment": "✔",
+            "task ":       "✔",
+            "doctor":      "⛑",
+            "dentist":     "⛑",
+            "medical":     "⛑",
+            "hospital":    "⛑",
+            "party":       "☘",
+            "museum":      "⛬",
+            "meet":        "⛬",
+            "talk":        "⛬",
+            "conference":  "⛬",
+            "hearing":     "⛬",
+            "sport":       "⛷",
+            "gym":         "⛷",
+            "training":    "⛷",
+            }
+    with open(config_file, 'w') as f:
+        conf.write(f)
+
+# Load configuration file
+if not os.path.exists(config_file):
+    create_config()
+conf.read(config_file)
+SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings")
+SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names")
+MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
+MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
+MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
+ASK_DELETE_CONFIRMATION   = conf.getboolean("Parameters", "delete_confirmation")
+DISPLAY_ICONS             = conf.getboolean("Parameters", "display_icons")
+TODAY_ICON                = conf.get("Parameters", "today_icon")
+EVENT_ICON                = conf.get("Parameters", "event_icon")
+BIRTHDAYS_FROM_ABOOK      = conf.get("Parameters", "birthdays_from_abook")
+BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon")
+
+COLOR_TODAY         = int(conf.get("Colors", "color_today"))
+COLOR_DAYS          = int(conf.get("Colors", "color_days"))
+COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names"))
+COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
+COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
+COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
+COLOR_PROMTS        = int(conf.get("Colors", "color_promts"))
+COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
+
+MON = conf.get("Day names", "mon")
+TUE = conf.get("Day names", "tue")
+WED = conf.get("Day names", "wed")
+THU = conf.get("Day names", "thu")
+FRI = conf.get("Day names", "fri")
+SAT = conf.get("Day names", "sat")
+SUN = conf.get("Day names", "sun")
+
+HINT = conf.get("Diologs", "hint")
+MONTH_NAMES = [name for (month, name) in conf.items("Month names")]
+ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
+
+data_folder = conf.get("Parameters", "folder_with_datafile") 
+DATAFILE = data_folder + "/appointments.csv"
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+
+def parse_birthdays_from_abook():
+    '''Loading birthdays from abook contacts'''
+    abook_file = str(Path.home())+"/.abook/addressbook"
+    bd_names, bd_months, bd_dates = [], [], []
+    abook = ConfigParser()
+    try:
+        abook.read(abook_file)
+        for each_contact in abook.sections():
+            for (key, value) in abook.items(each_contact):
+                if key == "birthday":
+                    bd_names.append(abook[each_contact]["name"])
+                    bd_months.append(int(abook[each_contact]["birthday"][-5:-3]))
+                    bd_dates.append(int(abook[each_contact]["birthday"][-2:]))
+    except:
+        pass
+    return bd_names, bd_months, bd_dates 
+
+
+def days_max_this_month(year, month):
+    '''Return the number of days in a given month of a given year'''
+    leap = 0
+    if year % 400 == 0:
+        leap = 1
+    elif year % 100 == 0:
+        leap = 0
+    elif year % 4 == 0:
+        leap = 1
+    if month == 2:
+        return 28 + leap
+    if month in [1,3,5,7,8,10,12]:
+        return 31
+    return 30
+
+
+def days_of_this_month(this_month, this_year):
+    '''Calculate the days for the calendar table 7x6'''
+    days_in_month = days_max_this_month(this_year, this_month)
+    first_day = date(this_year, this_month, 1).weekday() # First day of the month
+    dates = [0]*first_day				 # Fill the table for this month
+    dates.extend(range(1,1 + days_in_month))
+    dates.extend([0]*(7*6 - len(dates)))
+    return dates
+    
+
+def load_appointments(stdscr, y_max):
+    '''Read from user's appointments file or create it if it does not exist'''
+    try:
+        with open(DATAFILE) as f:
+            pass
+    except IOError:
+        with open(DATAFILE, "w+") as f:
+            pass
+
+    with open(DATAFILE,"r") as f:
+        apts = csv.reader(f, delimiter = ',')
+        all_events = [[], [], [], [], []]
+        try:
+            for row in apts:
+                all_events[0].append(int(row[0]))
+                all_events[1].append(int(row[1]))
+                all_events[2].append(int(row[2]))
+                all_events[3].append(int(row[3]))
+                all_events[4].append(row[4])
+        except:
+            pass
+    return all_events
+
+
+def add_event(stdscr, this_month, this_year):
+    '''Ask user to input new event and add it the file'''
+    y_max, x_max = stdscr.getmaxyx()
+    days_in_month = days_max_this_month(this_year, this_month)
+    echo() 
+    curs_set(True)
+    # First, ask the date within this month:
+    add_promt = "Enter the date: "+str(this_year)+"/"+str(this_month)+"/"
+    stdscr.addstr(y_max-2, 0, add_promt)
+    event_date = stdscr.getstr(y_max - 2, len(add_promt), 2).decode(encoding="utf-8")
+    # If user's date is the number and is in this month, ask the title:
+    try:
+        if int(event_date) <= days_in_month and int(event_date) > 0:
+            title_promt = "Enter the title: "
+            stdscr.addstr(y_max-2, 0, title_promt+" "*20)
+            stdscr.refresh()
+            name = stdscr.getstr(y_max - 2, len(title_promt), 60).decode(encoding="utf-8")
+
+            all_events = load_appointments(stdscr, y_max)
+            event_id = 1 if not all_events[0] else max(all_events[0])+1
+
+            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
+            if len(name) > 0:
+                with open(DATAFILE, "a") as f:
+                    f.write(new_event+"\n")
+    except:
+        pass
+    return
+
+
+def delete_event(stdscr, events_this_month):
+    '''Delete chosen events'''
+    y_max, x_max = stdscr.getmaxyx()
+    echo() 
+    curs_set(True)
+    prompt_string = "Number of event to delete: "
+    stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+    event_number = stdscr.getstr(y_max - 2, len(prompt_string), 6).decode(encoding="utf-8")
+    noecho()
+    curs_set(False)
+    # If provided number is correct, then delete the event:
+    try:
+        event_id = events_this_month[0][int(event_number)-1]
+        event_name = events_this_month[2][int(event_number)-1]
+        
+        if ASK_DELETE_CONFIRMATION:
+            prompt_string = "Really delete "+event_name+"? (y/n)"+" "*30
+            stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+            key = stdscr.getch()
+            confirmed = True*(key == 121)
+        else:
+            confirmed = True
+
+        if event_id <= max(events_this_month[0]) and event_id > 0 and confirmed:
+            original_file = DATAFILE
+            dummy_file = DATAFILE + '.bak'
+            is_deleted = False
+            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                for line in read_obj:
+                    if line.startswith(str(event_id)+',') == False:
+                        write_obj.write(line)
+                    else:
+                        is_deleted = True
+            if is_deleted:
+                os.remove(original_file)
+                os.rename(dummy_file, original_file)
+            else:
+                os.remove(dummy_file)
+    except:
+        pass
+
+
+def edit_event(stdscr, events_this_month, this_month, this_year):
+    '''Delete a chosen events and add a new one'''
+    y_max, x_max = stdscr.getmaxyx()
+    echo() 
+    curs_set(True)
+    prompt_string = "Number of event to edit: "
+    stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+    event_number = stdscr.getstr(y_max - 2, len(prompt_string), 6).decode(encoding="utf-8")
+    noecho()
+    curs_set(False)
+    # If provided number is correct, then delete the event:
+    try:
+        event_id = events_this_month[0][int(event_number)-1]
+        event_name = events_this_month[2][int(event_number)-1]
+        
+        if ASK_DELETE_CONFIRMATION:
+            prompt_string = "Really edit "+event_name+"? (y/n)"+" "*30
+            stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+            key = stdscr.getch()
+            confirmed = True*(key == 121)
+        else:
+            confirmed = True
+
+        if event_id <= max(events_this_month[0]) and event_id > 0 and confirmed:
+            original_file = DATAFILE
+            dummy_file = DATAFILE + '.bak'
+            is_deleted = False
+            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                for line in read_obj:
+                    if line.startswith(str(event_id)+',') == False:
+                        write_obj.write(line)
+                    else:
+                        is_deleted = True
+            if is_deleted:
+                os.remove(original_file)
+                os.rename(dummy_file, original_file)
+            else:
+                os.remove(dummy_file)
+    except:
+        pass
+    days_in_month = days_max_this_month(this_year, this_month)
+    echo() 
+    curs_set(True)
+    # First, ask the date within this month:
+    add_promt = "Enter new date: " + str(this_year)+"/"+str(this_month)+"/"
+    stdscr.addstr(y_max-2, 0, add_promt+" "*30)
+    padding = len(add_promt)
+    event_date = stdscr.getstr(y_max - 2, padding, 2).decode(encoding="utf-8")
+    # If user's date is the number and is in this month, ask the title:
+    try:
+        if int(event_date) <= days_in_month and int(event_date) > 0:
+            title_promt = "Enter new title: "
+            stdscr.addstr(y_max-2, 0, title_promt+" "*30)
+            stdscr.refresh()
+            name = stdscr.getstr(y_max - 2, len(title_promt), 60).decode(encoding="utf-8")
+
+            all_events = load_appointments(stdscr, y_max)
+            event_id = 1 if not all_events[0] else max(all_events[0])+1
+
+            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
+            if len(name) > 0:
+                with open(DATAFILE, "a") as f:
+                    f.write(new_event+"\n")
+    except:
+        pass
+
+
+def events_of_this_month(this_month, this_year, events):
+    '''Filters only events that happen in this month and sorts them'''
+    events_this_month = [[], [], []]
+    for index, year in enumerate(events[1]):
+        if (year == this_year) and (events[2][index] == this_month):
+            events_this_month[0].append(events[0][index])
+            events_this_month[1].append(events[3][index])
+            events_this_month[2].append(events[4][index])
+    sorted_all = sorted(zip(events_this_month[1], events_this_month[0], events_this_month[2]))
+    events_this_month[0] = [x for _,x,_ in sorted_all]
+    events_this_month[1] = [x for x,_,_ in sorted_all]
+    events_this_month[2] = [x for _,_,x in sorted_all]
+    return events_this_month
+
+
+def next_month(this_month, this_year):
+    '''Switches to the next month'''
+    if this_month < 12:
+        this_month += 1
+    else:
+        this_month = 1
+        this_year += 1
+    return this_month, this_year
+
+
+def previous_month(this_month, this_year):
+    '''Switches to the previous month'''
+    if this_month > 1:
+        this_month -= 1
+    else:
+        this_month = 12
+        this_year -= 1
+    return this_month, this_year
+
+
+def user_input(stdscr, r, c, prompt_string):
+    '''Ask user to input something and return this string'''
+    echo() 
+    stscr.addstr(r, 1, str(prompt_string))
+    stdscr.refresh()
+    user_input = stdscr.getstr(r + 1, 1, 20).decode(encoding="utf-8")
+    return user_input
+
+
+def display_day_names(stdscr, x_max):
+    '''Display day name depending on the screen available'''
+    num = 2 if x_max < 80 else 10
+    stdscr.addstr(1, 0*x_max//7, MON[:num], color_pair(1))
+    stdscr.addstr(1, 1*x_max//7, TUE[:num], color_pair(1))
+    stdscr.addstr(1, 2*x_max//7, WED[:num], color_pair(1))
+    stdscr.addstr(1, 3*x_max//7, THU[:num], color_pair(1))
+    stdscr.addstr(1, 4*x_max//7, FRI[:num], color_pair(1))
+    stdscr.addstr(1, 5*x_max//7, SAT[:num], color_pair(6))
+    stdscr.addstr(1, 6*x_max//7, SUN[:num], color_pair(6))
+
+
+def display_icon_for_event(name, delete_mode, edit_mode):
+    '''Check if event seems of certain type and return suatable icon'''
+    if not delete_mode and not edit_mode:
+        icon = EVENT_ICON*DISPLAY_ICONS+" "
+        for key in ICONS:
+            if key in name.lower():
+                icon = ICONS[key]*DISPLAY_ICONS+" "
+    else:
+        icon = ""
+    return icon
+
+
+def main(stdscr):
+    '''This is the main function that runs the screen'''
+    current_year  = datetime.now().year
+    current_month = datetime.now().month
+    current_day   = datetime.now().day
+    this_month    = current_month
+    this_year     = current_year
+    if BIRTHDAYS_FROM_ABOOK:
+        bd_names, bd_months, bd_dates = parse_birthdays_from_abook()
+    stdscr = initscr()
+
+    # Starting colors
+    start_color()
+    use_default_colors()
+    init_pair(1, COLOR_DAY_NAMES, -1)
+    init_pair(6, COLOR_WEEKEND_NAMES, -1)
+    init_pair(3, COLOR_HINTS, -1)
+    init_pair(7, COLOR_BIRTHDAYS, -1)
+
+    if MINIMAL_WEEKEND_INDICATOR:
+        init_pair(2, COLOR_WEEKENDS, -1)
+    else:
+        init_pair(2, COLOR_BLACK, COLOR_WEEKENDS)
+
+    if MINIMAL_TODAY_INDICATOR:
+        init_pair(4, COLOR_TODAY, -1)
+    else:
+        init_pair(4, COLOR_BLACK, COLOR_TODAY)
+
+    if MINIMAL_DAYS_INDICATOR:
+        init_pair(5, COLOR_DAYS, -1)
+    else:
+        init_pair(5, COLOR_BLACK, COLOR_DAYS)
+
+    noecho()
+    curs_set(False)
+    y_max, x_max = stdscr.getmaxyx()
+    running = True
+    delete_mode = False
+    edit_mode = False
+    refresh_mode = False
+    key = 27
+    show_hints = SHOW_KEYBINDINGS
+    while running:
+        stdscr.clear()
+        noecho()
+        curs_set(False)
+        all_events = load_appointments(stdscr, y_max)
+
+        # Displaying the month, year, and days of the week
+        stdscr.addstr(0, 0, str(MONTH_NAMES[this_month-1])+" "+str(this_year))
+        if SHOW_DAY_NAMES:
+            display_day_names(stdscr, x_max)
+
+        # Displaying the dates and events
+        dates = days_of_this_month(this_month, this_year)
+        events_this_month = events_of_this_month(this_month, this_year, all_events)    
+        day_number = 0
+        y_grid_max = 6
+        number_of_event_this_month = 1
+        for w in range(6):
+            for d in range(7):
+                this_date = dates[day_number]
+                if this_date > 0:
+                    # Show the dates:
+                    day_type = 5 if d < 5 else 2
+                    if current_year == this_year and current_month == this_month \
+                            and current_day == this_date: day_type = 4 
+                    date_display = str(this_date)+TODAY_ICON*(day_type==4)+str(" "*(x_max//7-len(str(this_date))+1))
+                    stdscr.addstr(2+w*(y_max//y_grid_max), d*x_max//7, date_display, color_pair(day_type)) 
+
+                    number_of_event_this_day = 0
+                    if BIRTHDAYS_FROM_ABOOK:
+                        for index, name in enumerate(bd_names):
+                            if bd_months[index] == this_month and bd_dates[index] == this_date:
+                                bd_display = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name
+                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//y_grid_max), \
+                                d*x_max//7, bd_display[:x_max//7], color_pair(7))
+                                number_of_event_this_day += 1
+
+                    for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
+                        if this_date == event_date:
+                            if number_of_event_this_day < y_max//y_grid_max-1: # If screen space is ok
+                                icon = display_icon_for_event(event_name, delete_mode, edit_mode)
+                                number = ("("+str(number_of_event_this_month)+")")*(delete_mode or edit_mode)
+                                event_display = icon + number + event_name
+                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//y_grid_max), \
+                                d*x_max//7,event_display[:x_max//7], color_pair(1))
+
+                                number_of_event_this_day += 1
+                                number_of_event_this_month += 1
+                            else:
+                                stdscr.addstr(3+number_of_event_this_day+w*(y_max//7), d*x_max//7,"...")
+                day_number += 1
+        
+        # stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
+
+        if show_hints:
+            stdscr.addstr(y_max - 1, 0, HINT[:x_max-1], color_pair(3))
+        
+        refresh_mode = False
+        if delete_mode:
+            delete_event(stdscr, events_this_month)
+            delete_mode = False
+            refresh_mode = True
+
+        if edit_mode:
+            edit_event(stdscr, events_this_month, this_month, this_year)
+            edit_mode = False
+            refresh_mode = True
+
+        if not refresh_mode:
+            key = stdscr.getch()
+
+            # Handle screen resize
+            if key == KEY_RESIZE:
+                y_max, x_max = stdscr.getmaxyx()
+                stdscr.clear()
+                stdscr.refresh()
+
+            # Handle user input
+            if key == 113: running = False                          # "q" for quit
+            if key == 110 or key == 106 or key == 108:              # "n" or "j" or "l" for next month
+                this_month, this_year = next_month(this_month, this_year)
+            if key == 112 or key == 104 or key == 107:              # "p" or "h" or "k" for previous month
+                this_month, this_year = previous_month(this_month, this_year)
+            if key == 97: add_event(stdscr, this_month, this_year)  # "a" for add event
+            if key == 100: delete_mode = True                       # "d" for delete
+            if key == 101: edit_mode = True	                    # "e" for edit
+            if key == 105: show_hints = not show_hints              # "i" for toggle hint
+                
+    echo()
+    curs_set(True)
+    endwin()
+    return 0
+
+if __name__ == "__main__":
+    wrapper(main)
