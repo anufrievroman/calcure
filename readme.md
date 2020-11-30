@@ -10,7 +10,8 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 - Auto pictograms according to keywords from event title (fully customizible)
 - Simple plain text database in a desired location
 - Colors, icons, and other features are fully customizable
-- Resize friendly, can shrink to a small window
+- Resize friendly. Can shrink to a small window
+- Autosave changes
 
 ## Instalation and running
 Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
@@ -23,15 +24,15 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 
 ## Key bindings
 
-`n` - next month
+`n`,`j`,`l`,`↓` - next month
 
-`p` - previous month
+`p`,`h`,`k`,`↑` - previous month
 
-`a` - add event
+`a`,`space` - add event
 
-`e` - edit event
+`e`,`c` - edit event
 
-`d` - delete event
+`d`,`x` - delete event
 
 `?` - toggle footer
 
@@ -46,18 +47,20 @@ You can edit parameters and colors in the `config.ini` file. Here is an example 
 
 ```
 [Parameters]
-folder_with_datafile = /home/John/.config/mincal
+folder_with_datafile = /home/user/.config/mincal
 birthdays_from_abook = Yes
-show_keybindings = No
+show_keybindings = Yes
 show_day_names = Yes
 minimal_today_indicator = Yes
 minimal_days_indicator = Yes
 minimal_weekend_indicator = Yes
-delete_confirmation = No
+cut_titles_by_cell_length = Yes
+ask_confirmations = Yes
 use_unicode_icons = Yes
 event_icon = •
 today_icon = •
 birthday_icon = ★
+hidden_icon = ...
 
 [Colors]
 color_today = 2
@@ -66,7 +69,7 @@ color_day_names = 4
 color_weekends = 1
 color_weekend_names = 1
 color_hints = 7
-color_promts = 7
+color_propmts = 7
 color_birthdays = 1
 
 [Day names]
@@ -93,7 +96,7 @@ nov = NOVEMBER
 dec = DECEMBER
 
 [Diologs]
-hint =  n - next month • p - previous month • a - add event • d - delete • e - edit • q - quit • i - toggle hints
+hint =  n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help
 
 [Event icons]
 travel = ✈
@@ -114,11 +117,11 @@ match = ♟
 play = ♟
 interview = ♟
 date = ♥
-concert = ♫
-gig = ♫
-disco = ♫
-music = ♫
-rehersal = ♫
+concert = ♪
+gig = ♪
+disco = ♪
+music = ♪
+rehersal = ♪
 call = ☎
 phone = ☎
 deadline = ⚑
