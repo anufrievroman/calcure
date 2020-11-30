@@ -508,14 +508,8 @@ def main(stdscr):
                     stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type)) 
 
                     num_of_event_this_day = 0
-                    if BIRTHDAYS_FROM_ABOOK:
-                        for index, name in enumerate(bd_names):
-                            if bd_months[index] == this_month and bd_dates[index] == this_date:
-                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name
-                                disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
-                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
-                                num_of_event_this_day += 1
-
+                    
+                    # Show events
                     for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
                         if this_date == event_date:
                             if num_of_event_this_day < y_cell - 1: # If screen space is ok
@@ -530,6 +524,15 @@ def main(stdscr):
                             else:
                                 hidden = HIDDEN_ICON + " "*(x_cell - 3)
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
+
+                    # Show birthdays
+                    if BIRTHDAYS_FROM_ABOOK:
+                        for index, name in enumerate(bd_names):
+                            if bd_months[index] == this_month and bd_dates[index] == this_date:
+                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name*(x_cell > 5)
+                                disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
+                                num_of_event_this_day += 1
                 day_number += 1
         
         if show_hints:
@@ -551,7 +554,7 @@ def main(stdscr):
                 key = stdscr.getkey()
 
                 # Handle screen resize
-                if key == KEY_RESIZE:
+                if key == "KEY_RESIZE":
                     y_max, x_max = stdscr.getmaxyx()
                     stdscr.clear()
                     stdscr.refresh()
