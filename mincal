@@ -14,6 +14,7 @@ if not os.path.exists(config_folder):
 config_file = config_folder + "/config.ini"
 conf = ConfigParser()
 
+
 def create_config():
     '''Create config file if it does not exist yet'''
     conf["Parameters"] = {
@@ -24,11 +25,13 @@ def create_config():
             "minimal_today_indicator":   "Yes",
             "minimal_days_indicator":    "Yes",
             "minimal_weekend_indicator": "Yes",
-            "delete_confirmation":       "No",
+            "cut_titles_by_cell_length": "No",
+            "ask_confirmations":         "Yes",
             "use_unicode_icons":         "Yes",
             "event_icon":                "•",
             "today_icon":                "•",
             "birthday_icon":             "★",
+            "hidden_icon":               "...",
             }
 
     conf["Colors"] = {
@@ -38,7 +41,7 @@ def create_config():
             "color_weekends":      "1",
             "color_weekend_names": "1",
             "color_hints":         "7",
-            "color_promts":        "7",
+            "color_propmts":        "7",
             "color_birthdays":     "1",
             }
 
@@ -68,7 +71,7 @@ def create_config():
             }
 
     conf["Diologs"] = {
-            "hint": " n - next month · p - previous month · a - add event · d - delete · e - edit · q - quit · ? - toggle hints"
+            "hint": " n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help"
             }
 
     conf["Event icons"] = {
@@ -131,12 +134,14 @@ try:
     MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
     MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
     MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
-    ASK_DELETE_CONFIRMATION   = conf.getboolean("Parameters", "delete_confirmation")
+    ASK_CONFIRMATIONS   = conf.getboolean("Parameters", "ask_confirmations")
     DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons")
+    CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length")
     TODAY_ICON                = conf.get("Parameters", "today_icon")
     EVENT_ICON                = conf.get("Parameters", "event_icon")
     BIRTHDAYS_FROM_ABOOK      = conf.get("Parameters", "birthdays_from_abook")
     BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon")
+    HIDDEN_ICON               = conf.get("Parameters", "hidden_icon")
 
     COLOR_TODAY         = int(conf.get("Colors", "color_today"))
     COLOR_DAYS          = int(conf.get("Colors", "color_days"))
@@ -144,7 +149,7 @@ try:
     COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
     COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
     COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
-    COLOR_PROMTS        = int(conf.get("Colors", "color_promts"))
+    COLOR_propmtS        = int(conf.get("Colors", "color_propmts"))
     COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
 
     MON = conf.get("Day names", "mon")
@@ -161,13 +166,14 @@ try:
 
     data_folder = conf.get("Parameters", "folder_with_datafile") 
 except:
-    print("Error in the config.ini file. Try removing the config file and run the program again.")
+    print("Error in the config.ini file. Try deleting the config file and run the program again.")
     exit()
 
 
 DATAFILE = data_folder + "/appointments.csv"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
+
 
 def parse_birthdays_from_abook():
     '''Loading birthdays from abook contacts'''
@@ -241,70 +247,59 @@ def add_event(stdscr, this_month, this_year):
     '''Ask user to input new event and add it the file'''
     y_max, x_max = stdscr.getmaxyx()
     days_in_month = days_max_this_month(this_year, this_month)
-    echo() 
-    curs_set(True)
     # First, ask the date within this month:
-    add_promt = "Enter the date: "+str(this_year)+"/"+str(this_month)+"/"
-    stdscr.addstr(y_max-2, 0, add_promt)
-    event_date = stdscr.getstr(y_max - 2, len(add_promt), 2).decode(encoding="utf-8")
+    add_propmt = "Enter the date: "+str(this_year)+"/"+str(this_month)+"/"
+    event_date = user_input(stdscr, add_propmt, 2)
     # If user's date is the number and is in this month, ask the title:
     try:
         if int(event_date) <= days_in_month and int(event_date) > 0:
-            title_promt = "Enter the title: "
-            stdscr.addstr(y_max-2, 0, title_promt+" "*20)
-            stdscr.refresh()
-            name = stdscr.getstr(y_max - 2, len(title_promt), 60).decode(encoding="utf-8")
-
+            title_propmt = "Enter the title: "
+            name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
             all_events = load_appointments(stdscr, y_max)
             event_id = 1 if not all_events[0] else max(all_events[0])+1
-
             new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
             if len(name) > 0:
                 with open(DATAFILE, "a") as f:
                     f.write(new_event+"\n")
     except:
         pass
-    return
 
 
 def delete_event(stdscr, events_this_month):
     '''Delete chosen events'''
     y_max, x_max = stdscr.getmaxyx()
-    echo() 
-    curs_set(True)
     prompt_string = "Number of event to delete: "
-    stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
-    event_number = stdscr.getstr(y_max - 2, len(prompt_string), 6).decode(encoding="utf-8")
-    noecho()
-    curs_set(False)
+    event_number = user_input(stdscr, prompt_string, 4)
     # If provided number is correct, then delete the event:
     try:
-        event_id = events_this_month[0][int(event_number)-1]
-        event_name = events_this_month[2][int(event_number)-1]
+        num = int(event_number)
+        if num <= len(events_this_month[0]) and num > 0:
+            event_id = events_this_month[0][int(event_number)-1]
+            event_name = events_this_month[2][int(event_number)-1]
         
-        if ASK_DELETE_CONFIRMATION:
-            prompt_string = "Really delete "+event_name+"? (y/n)"+" "*30
-            stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
-            key = stdscr.getch()
-            confirmed = True*(key == 121)
-        else:
-            confirmed = True
-
-        if event_id <= max(events_this_month[0]) and event_id > 0 and confirmed:
-            original_file = DATAFILE
-            dummy_file = DATAFILE + '.bak'
-            is_deleted = False
-            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
-                for line in read_obj:
-                    if line.startswith(str(event_id)+',') == False:
-                        write_obj.write(line)
-                    else:
-                        is_deleted = True
-            if is_deleted:
-                os.remove(original_file)
-                os.rename(dummy_file, original_file)
+            if ASK_CONFIRMATIONS:
+                prompt_string = "Really delete "+event_name+"? (y/n)"+" "*30
+                stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+                key = stdscr.getkey()
+                confirmed = True*(key == "y")
             else:
-                os.remove(dummy_file)
+                confirmed = True
+
+            if confirmed:
+                original_file = DATAFILE
+                dummy_file = DATAFILE + '.bak'
+                line_deleted = False
+                with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                    for line in read_obj:
+                        if line.startswith(str(event_id)+',') == False:
+                            write_obj.write(line)
+                        else:
+                            line_deleted = True
+                if line_deleted:
+                    os.remove(original_file)
+                    os.rename(dummy_file, original_file)
+                else:
+                    os.remove(dummy_file)
     except:
         pass
 
@@ -312,68 +307,61 @@ def delete_event(stdscr, events_this_month):
 def edit_event(stdscr, events_this_month, this_month, this_year):
     '''Delete a chosen events and add a new one'''
     y_max, x_max = stdscr.getmaxyx()
-    echo() 
-    curs_set(True)
     prompt_string = "Number of event to edit: "
-    stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
-    event_number = stdscr.getstr(y_max - 2, len(prompt_string), 6).decode(encoding="utf-8")
-    noecho()
-    curs_set(False)
-    # If provided number is correct, then delete the event:
+    event_number = (user_input(stdscr, prompt_string, 4))
+    event_chosen = False
     try:
-        event_id = events_this_month[0][int(event_number)-1]
-        event_name = events_this_month[2][int(event_number)-1]
-        
-        if ASK_DELETE_CONFIRMATION:
-            prompt_string = "Really edit "+event_name+"? (y/n)"+" "*30
-            stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
-            key = stdscr.getch()
-            confirmed = True*(key == 121)
-        else:
-            confirmed = True
-
-        if event_id <= max(events_this_month[0]) and event_id > 0 and confirmed:
-            original_file = DATAFILE
-            dummy_file = DATAFILE + '.bak'
-            is_deleted = False
-            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
-                for line in read_obj:
-                    if line.startswith(str(event_id)+',') == False:
-                        write_obj.write(line)
-                    else:
-                        is_deleted = True
-            if is_deleted:
-                os.remove(original_file)
-                os.rename(dummy_file, original_file)
+        # If provided number is correct, then delete the event:
+        num = int(event_number)
+        if num <= len(events_this_month[0]) and num > 0:
+            event_id = events_this_month[0][num-1]
+            event_name = events_this_month[2][num-1]
+            if ASK_CONFIRMATIONS:
+                prompt_string = "Really edit "+event_name+"? (y/n)"+" "*30
+                stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+                key = stdscr.getkey()
+                confirmed = True if key == "y" else False
             else:
-                os.remove(dummy_file)
+                confirmed = True
+            if confirmed:
+                original_file = DATAFILE
+                dummy_file = DATAFILE + '.bak'
+                line_deleted = False
+                with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                    for line in read_obj:
+                        if line.startswith(str(event_id)+',') == False:
+                            write_obj.write(line)
+                        else:
+                            line_deleted = True
+                if line_deleted:
+                    os.remove(original_file)
+                    os.rename(dummy_file, original_file)
+                else:
+                    os.remove(dummy_file)
+                event_chosen = True
+        else:
+           pass
     except:
         pass
-    days_in_month = days_max_this_month(this_year, this_month)
-    echo() 
-    curs_set(True)
-    # First, ask the date within this month:
-    add_promt = "Enter new date: " + str(this_year)+"/"+str(this_month)+"/"
-    stdscr.addstr(y_max-2, 0, add_promt+" "*30)
-    padding = len(add_promt)
-    event_date = stdscr.getstr(y_max - 2, padding, 2).decode(encoding="utf-8")
-    # If user's date is the number and is in this month, ask the title:
-    try:
-        if int(event_date) <= days_in_month and int(event_date) > 0:
-            title_promt = "Enter new title: "
-            stdscr.addstr(y_max-2, 0, title_promt+" "*30)
-            stdscr.refresh()
-            name = stdscr.getstr(y_max - 2, len(title_promt), 60).decode(encoding="utf-8")
-
-            all_events = load_appointments(stdscr, y_max)
-            event_id = 1 if not all_events[0] else max(all_events[0])+1
-
-            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
-            if len(name) > 0:
-                with open(DATAFILE, "a") as f:
-                    f.write(new_event+"\n")
-    except:
-        pass
+    if event_chosen:
+        days_in_month = days_max_this_month(this_year, this_month)
+        # First, ask the date within this month:
+        add_propmt = "Enter new date: "+str(this_year)+"/"+str(this_month)+"/"
+        event_date = user_input(stdscr, add_propmt, 2)
+        # If user's date is the number and is in this month, ask the title:
+        try:
+            if int(event_date) <= days_in_month and int(event_date) > 0:
+                title_propmt = "Enter new title: "
+                name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
+                all_events = load_appointments(stdscr, y_max)
+                event_id = 1 if not all_events[0] else max(all_events[0])+1
+                new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
+                if len(name) > 0:
+                    with open(DATAFILE, "a") as f:
+                        f.write(new_event+"\n")
+        except:
+            pass
+    return
 
 
 def events_of_this_month(this_month, this_year, events):
@@ -411,19 +399,24 @@ def previous_month(this_month, this_year):
     return this_month, this_year
 
 
-def user_input(stdscr, r, c, prompt_string):
+def user_input(stdscr, prompt_string, answer_length):
     '''Ask user to input something and return this string'''
+    y_max, x_max = stdscr.getmaxyx()
     echo() 
-    stscr.addstr(r, 1, str(prompt_string))
+    curs_set(True)
+    display_string = str(prompt_string) + " "*abs((x_max-len(prompt_string))-1) 
+    stdscr.addstr(y_max - 2, 0, display_string[:x_max-1])
     stdscr.refresh()
-    user_input = stdscr.getstr(r + 1, 1, 20).decode(encoding="utf-8")
+    user_input = stdscr.getstr(y_max - 2, len(prompt_string), answer_length).decode(encoding="utf-8")
+    noecho() 
+    curs_set(False)
     return user_input
 
 
 def display_day_names(stdscr, x_max):
     '''Display day name depending on the screen available'''
     num = 2 if x_max < 80 else 10
-    x_cell = x_max//7
+    x_cell = int(x_max//7)
     stdscr.addstr(1, 0*x_cell, MON[:num], color_pair(1))
     stdscr.addstr(1, 1*x_cell, TUE[:num], color_pair(1))
     stdscr.addstr(1, 2*x_cell, WED[:num], color_pair(1))
@@ -434,12 +427,12 @@ def display_day_names(stdscr, x_max):
 
 
 def display_icon_for_event(name, delete_mode, edit_mode):
-    '''Check if event seems of certain type and return suatable icon'''
+    '''Check if event seems of certain type and return corresponding icon'''
     if not delete_mode and not edit_mode and DISPLAY_ICONS:
         icon = EVENT_ICON + " "
         for key in ICONS:
             if key in name.lower():
-                icon = ICONS[key]*DISPLAY_ICONS+" "
+                icon = ICONS[key] + " "
     else:
         icon = ""
     return icon
@@ -456,24 +449,21 @@ def main(stdscr):
         bd_names, bd_months, bd_dates = parse_birthdays_from_abook()
     stdscr = initscr()
 
-    # Starting colors
+    # Initializing colors
     start_color()
     use_default_colors()
     init_pair(1, COLOR_DAY_NAMES, -1)
     init_pair(6, COLOR_WEEKEND_NAMES, -1)
     init_pair(3, COLOR_HINTS, -1)
     init_pair(7, COLOR_BIRTHDAYS, -1)
-
     if MINIMAL_WEEKEND_INDICATOR:
         init_pair(2, COLOR_WEEKENDS, -1)
     else:
         init_pair(2, COLOR_BLACK, COLOR_WEEKENDS)
-
     if MINIMAL_TODAY_INDICATOR:
         init_pair(4, COLOR_TODAY, -1)
     else:
         init_pair(4, COLOR_BLACK, COLOR_TODAY)
-
     if MINIMAL_DAYS_INDICATOR:
         init_pair(5, COLOR_DAYS, -1)
     else:
@@ -486,7 +476,6 @@ def main(stdscr):
     delete_mode = False
     edit_mode = False
     refresh_mode = False
-    key = 27
     show_hints = SHOW_KEYBINDINGS
     while running:
         stdscr.clear()
@@ -505,7 +494,7 @@ def main(stdscr):
         day_number = 0
         y_cell = ((y_max-2)//6)
         x_cell = x_max//7
-        number_of_event_this_month = 1
+        num_of_event_this_month = 1
         for w in range(6):
             for d in range(7):
                 this_date = dates[day_number]
@@ -518,35 +507,33 @@ def main(stdscr):
                     date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))-len(icon)))
                     stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type)) 
 
-                    number_of_event_this_day = 0
+                    num_of_event_this_day = 0
                     if BIRTHDAYS_FROM_ABOOK:
                         for index, name in enumerate(bd_names):
                             if bd_months[index] == this_month and bd_dates[index] == this_date:
-                                bd_display = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name
-                                stdscr.addstr(3+number_of_event_this_day+w*y_cell, \
-                                d*x_cell, bd_display[:x_cell], color_pair(7))
-                                number_of_event_this_day += 1
+                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name
+                                disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
+                                num_of_event_this_day += 1
 
                     for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
                         if this_date == event_date:
-                            if number_of_event_this_day < y_cell - 1: # If screen space is ok
+                            if num_of_event_this_day < y_cell - 1: # If screen space is ok
                                 icon = display_icon_for_event(event_name, delete_mode, edit_mode)
-                                number = ("("+str(number_of_event_this_month)+")")*(delete_mode or edit_mode)
-                                event_display = icon + number + event_name
-                                stdscr.addstr(3+number_of_event_this_day+w*y_cell, \
-                                d*x_cell,event_display[:x_cell], color_pair(1))
+                                number = (str(num_of_event_this_month)+"·")*(delete_mode or edit_mode)
+                                disp = icon + number + event_name*(x_cell > 5)
+                                disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
 
-                                number_of_event_this_day += 1
-                                number_of_event_this_month += 1
+                                num_of_event_this_day += 1
+                                num_of_event_this_month += 1
                             else:
-                                hidden = "..."+" "*(x_cell - 3)
-                                stdscr.addstr(3+number_of_event_this_day+w*y_cell-1, d*x_cell, hidden , color_pair(1))
+                                hidden = HIDDEN_ICON + " "*(x_cell - 3)
+                                stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
                 day_number += 1
         
-        # stdscr.addstr(y_max - 2, 0, "You pressed"+str(key))
-
         if show_hints:
-            stdscr.addstr(y_max - 1, 0, HINT[:x_max-1], color_pair(3))
+            stdscr.addstr(y_max - 1, 0, HINT[:x_max-2], color_pair(3))
         
         refresh_mode = False
         if delete_mode:
@@ -560,29 +547,32 @@ def main(stdscr):
             refresh_mode = True
 
         if not refresh_mode:
-            key = stdscr.getch()
+            try:
+                key = stdscr.getkey()
 
-            # Handle screen resize
-            if key == KEY_RESIZE:
-                y_max, x_max = stdscr.getmaxyx()
-                stdscr.clear()
-                stdscr.refresh()
+                # Handle screen resize
+                if key == KEY_RESIZE:
+                    y_max, x_max = stdscr.getmaxyx()
+                    stdscr.clear()
+                    stdscr.refresh()
 
-            # Handle user input
-            if key == 113: running = False                          # "q" for quit
-            if key == 110 or key == 106 or key == 108:              # "n" or "j" or "l" for next month
-                this_month, this_year = next_month(this_month, this_year)
-            if key == 112 or key == 104 or key == 107:              # "p" or "h" or "k" for previous month
-                this_month, this_year = previous_month(this_month, this_year)
-            if key == 97: add_event(stdscr, this_month, this_year)  # "a" for add event
-            if key == 100: delete_mode = True                       # "d" for delete
-            if key == 101: edit_mode = True	                    # "e" for edit
-            if key == 63: show_hints = not show_hints               # "?" for toggle hint
+                # Handle user input
+                if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
+                    this_month, this_year = next_month(this_month, this_year)
+                if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
+                    this_month, this_year = previous_month(this_month, this_year)
+                if key in ["a", " "]: add_event(stdscr, this_month, this_year)
+                if key in ["d", "x"]: delete_mode = True
+                if key in ["e", "c"]: edit_mode = True
+                if key == "q": running = False
+                if key == "?": show_hints = not show_hints
+            except KeyboardInterrupt:
+                running = False
                 
     echo()
     curs_set(True)
     endwin()
-    return 0
+    return
 
 if __name__ == "__main__":
     wrapper(main)
