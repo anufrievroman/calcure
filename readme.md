@@ -34,6 +34,8 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 
 `d`,`x` - delete event
 
+`home`,`gg`,`G` - return to current month
+
 `?` - toggle footer
 
 `q` - quit

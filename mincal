@@ -553,6 +553,17 @@ def main(stdscr):
             try:
                 key = stdscr.getkey()
 
+                # Handle "gg" to go to current month
+                if key == "g":
+                    try:
+                        key = stdscr.getkey()
+                        if key == "g":
+                            this_month = current_month
+                            this_year = current_year
+                        sdtscr.refresh()
+                    except:
+                        pass
+
                 # Handle screen resize
                 if key == "KEY_RESIZE":
                     y_max, x_max = stdscr.getmaxyx()
@@ -569,6 +580,10 @@ def main(stdscr):
                 if key in ["e", "c"]: edit_mode = True
                 if key == "q": running = False
                 if key == "?": show_hints = not show_hints
+                if key in ["KEY_HOME", "G"]: 
+                    this_month = current_month
+                    this_year = current_year
+
             except KeyboardInterrupt:
                 running = False
                 
