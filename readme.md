@@ -146,7 +146,7 @@ sport = ⛷
 gym = ⛷
 training = ⛷
 ```
-When configuring colors, numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
+When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
 
 ## Other programs
 For similar minimalist terminal expirience, check out my [todo app](https://github.com/anufrievroman/minimalist-tui-todo).
