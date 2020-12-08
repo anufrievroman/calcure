@@ -42,6 +42,7 @@ def create_config():
             "color_weekend_names": "1",
             "color_hints":         "7",
             "color_propmts":       "7",
+            "color_confirmations": "1",
             "color_birthdays":     "1",
             }
 
@@ -70,7 +71,7 @@ def create_config():
             "dec": "DECEMBER",
             }
 
-    conf["Diologs"] = {
+    conf["Dialogues"] = {
             "hint": " n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help"
             }
 
@@ -134,7 +135,7 @@ try:
     MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
     MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
     MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
-    ASK_CONFIRMATIONS   = conf.getboolean("Parameters", "ask_confirmations")
+    ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations")
     DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons")
     CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length")
     TODAY_ICON                = conf.get("Parameters", "today_icon")
@@ -149,8 +150,9 @@ try:
     COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
     COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
     COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
-    COLOR_propmtS        = int(conf.get("Colors", "color_propmts"))
+    COLOR_PROPMTS       = int(conf.get("Colors", "color_propmts"))
     COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
+    COLOR_CONFIRMATIONS = int(conf.get("Colors", "color_confirmations"))
 
     MON = conf.get("Day names", "mon")
     TUE = conf.get("Day names", "tue")
@@ -160,7 +162,7 @@ try:
     SAT = conf.get("Day names", "sat")
     SUN = conf.get("Day names", "sun")
 
-    HINT = conf.get("Diologs", "hint")
+    HINT = conf.get("Dialogues", "hint")
     MONTH_NAMES = [name for (month, name) in conf.items("Month names")]
     ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
 
@@ -257,7 +259,7 @@ def add_event(stdscr, this_month, this_year):
             name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
             all_events = load_appointments(stdscr, y_max)
             event_id = 1 if not all_events[0] else max(all_events[0])+1
-            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
+            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+event_date+","+'"'+name+'"'
             if len(name) > 0:
                 with open(DATAFILE, "a") as f:
                     f.write(new_event+"\n")
@@ -344,7 +346,7 @@ def edit_event(stdscr, events_this_month, this_month, this_year):
                 name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
                 all_events = load_appointments(stdscr, y_max)
                 event_id = 1 if not all_events[0] else max(all_events[0])+1
-                new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+str(event_date)+","+str(name)
+                new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+event_date+","+'"'+name+'"'
                 if len(name) > 0:
                     with open(DATAFILE, "a") as f:
                         f.write(new_event+"\n")
@@ -394,7 +396,7 @@ def user_input(stdscr, prompt_string, answer_length):
     echo() 
     curs_set(True)
     display_string = str(prompt_string) + " "*abs((x_max-len(prompt_string))-1) 
-    stdscr.addstr(y_max - 2, 0, display_string[:x_max-1])
+    stdscr.addstr(y_max - 2, 0, display_string[:x_max-1], color_pair(8))
     stdscr.refresh()
     user_input = stdscr.getstr(y_max - 2, len(prompt_string), answer_length).decode(encoding="utf-8")
     noecho() 
@@ -432,7 +434,7 @@ def ask_confirmation(stdscr, prompt_string):
     y_max, x_max = stdscr.getmaxyx()
     if ASK_CONFIRMATIONS:
         prompt = prompt_string+" "*abs(x_max-len(prompt_string)-1)
-        stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1])
+        stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1], color_pair(9))
         key = stdscr.getkey()
         confirmed = True if key == "y" else False
     else:
@@ -447,6 +449,8 @@ def initialize_colors(stdscr):
     init_pair(6, COLOR_WEEKEND_NAMES, -1)
     init_pair(3, COLOR_HINTS, -1)
     init_pair(7, COLOR_BIRTHDAYS, -1)
+    init_pair(8, COLOR_PROPMTS, -1)
+    init_pair(9, COLOR_CONFIRMATIONS, -1)
     if MINIMAL_WEEKEND_INDICATOR:
         init_pair(2, COLOR_WEEKENDS, -1)
     else:
