@@ -192,7 +192,7 @@ def parse_birthdays_from_abook():
                     bd_dates.append(int(abook[each_contact]["birthday"][-2:]))
     except:
         pass
-    return bd_names, bd_months, bd_dates 
+    return bd_names, bd_months, bd_dates
 
 
 def days_max_this_month(year, month):
@@ -219,7 +219,7 @@ def days_of_this_month(this_month, this_year):
     dates.extend(range(1,1 + days_in_month))
     dates.extend([0]*(7*6 - len(dates)))
     return dates
-    
+
 
 def load_appointments(stdscr, y_max):
     '''Read from user's appointments file or create it if it does not exist'''
@@ -393,13 +393,13 @@ def previous_month(this_month, this_year):
 def user_input(stdscr, prompt_string, answer_length):
     '''Ask user to input something and return this string'''
     y_max, x_max = stdscr.getmaxyx()
-    echo() 
+    echo()
     curs_set(True)
-    display_string = str(prompt_string) + " "*abs((x_max-len(prompt_string))-1) 
+    display_string = str(prompt_string) + " "*abs((x_max-len(prompt_string))-1)
     stdscr.addstr(y_max - 2, 0, display_string[:x_max-1], color_pair(8))
     stdscr.refresh()
     user_input = stdscr.getstr(y_max - 2, len(prompt_string), answer_length).decode(encoding="utf-8")
-    noecho() 
+    noecho()
     curs_set(False)
     return user_input
 
@@ -433,8 +433,9 @@ def ask_confirmation(stdscr, prompt_string):
     '''Ask user confirmation for an action'''
     y_max, x_max = stdscr.getmaxyx()
     if ASK_CONFIRMATIONS:
-        prompt = prompt_string+" "*abs(x_max-len(prompt_string)-1)
-        stdscr.addstr(y_max-2, 0, prompt_string[:x_max-1], color_pair(9))
+        halfdelay(255)
+        prompt = prompt_string + " "*abs(x_max - len(prompt_string) - 1)
+        stdscr.addstr(y_max-2, 0, prompt[:x_max-1], color_pair(9))
         key = stdscr.getkey()
         confirmed = True if key == "y" else False
     else:
@@ -464,6 +465,7 @@ def initialize_colors(stdscr):
     else:
         init_pair(5, COLOR_BLACK, COLOR_DAYS)
 
+
 def main(stdscr):
     '''This is the main function that runs the screen'''
     current_year  = datetime.now().year
@@ -473,18 +475,19 @@ def main(stdscr):
     this_year     = current_year
     if BIRTHDAYS_FROM_ABOOK:
         bd_names, bd_months, bd_dates = parse_birthdays_from_abook()
-    
+
     # Starting the screen
     stdscr = initscr()
     initialize_colors(stdscr)
     y_max, x_max = stdscr.getmaxyx()
-    running = True
-    delete_mode = False
-    edit_mode = False
+    running      = True
+    delete_mode  = False
+    edit_mode    = False
     refresh_mode = False
-    show_hints = SHOW_KEYBINDINGS
+    show_hints   = SHOW_KEYBINDINGS
     while running:
         stdscr.clear()
+        halfdelay(255)
         noecho()
         curs_set(False)
         all_events = load_appointments(stdscr, y_max)
@@ -501,7 +504,7 @@ def main(stdscr):
 
         # Displaying the dates and events
         dates = days_of_this_month(this_month, this_year)
-        events_this_month = events_of_this_month(this_month, this_year, all_events)    
+        events_this_month = events_of_this_month(this_month, this_year, all_events)
         day_number = 0
         y_cell = (y_max-2)//6
         x_cell = x_max//7
@@ -513,13 +516,13 @@ def main(stdscr):
                     # Show the dates:
                     day_type = 5 if d < 5 else 2
                     if current_year == this_year and current_month == this_month \
-                            and current_day == this_date: day_type = 4 
+                            and current_day == this_date: day_type = 4
                     icon = TODAY_ICON*(day_type==4) if DISPLAY_ICONS else "·"*(day_type==4)
                     date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))-len(icon)))
-                    stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type)) 
+                    stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type))
 
                     num_of_event_this_day = 0
-                    
+
                     # Show events
                     for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
                         if this_date == event_date:
@@ -545,11 +548,11 @@ def main(stdscr):
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
                                 num_of_event_this_day += 1
                 day_number += 1
-        
+
         # Show hints in footer
         if show_hints:
             stdscr.addstr(y_max - 1, 0, HINT[:x_max-2], color_pair(3))
-        
+
         # Handle user input
         refresh_mode = False
         if delete_mode:
@@ -593,18 +596,20 @@ def main(stdscr):
                 if key in ["a", " "]: add_event(stdscr, this_month, this_year)
                 if key in ["d", "x"]: delete_mode = True
                 if key in ["e", "c"]: edit_mode = True
-                if key == "q": 
+                if key == "q":
                     prompt_string = "Really exit? (y/n)"
                     confirmed = ask_confirmation(stdscr, prompt_string)
                     running = False if confirmed else True
                 if key == "?": show_hints = not show_hints
-                if key in ["KEY_HOME", "G"]: 
+                if key in ["KEY_HOME", "G"]:
                     this_month = current_month
                     this_year = current_year
 
             except KeyboardInterrupt:
                 running = False
-                
+            except:
+                pass
+
     echo()
     curs_set(True)
     endwin()
