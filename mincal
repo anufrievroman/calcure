@@ -14,6 +14,7 @@ if not os.path.exists(config_folder):
 config_file = config_folder + "/config.ini"
 conf = ConfigParser()
 
+default_hint =  "n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help"
 
 def create_config():
     '''Create config file if it does not exist yet'''
@@ -71,9 +72,7 @@ def create_config():
             "dec": "DECEMBER",
             }
 
-    conf["Dialogues"] = {
-            "hint": " n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help"
-            }
+    conf["Dialogues"] = {"hint": default_hint}
 
     conf["Event icons"] = {
             "travel":      "✈",
@@ -130,43 +129,60 @@ if not os.path.exists(config_file):
 
 try:
     conf.read(config_file)
-    SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings")
-    SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names")
-    MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_days_indicator")
-    MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator")
-    MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator")
-    ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations")
-    DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons")
-    CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length")
-    TODAY_ICON                = conf.get("Parameters", "today_icon")
-    EVENT_ICON                = conf.get("Parameters", "event_icon")
-    BIRTHDAYS_FROM_ABOOK      = conf.get("Parameters", "birthdays_from_abook")
-    BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon")
-    HIDDEN_ICON               = conf.get("Parameters", "hidden_icon")
+    SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
+    SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names", fallback=True)
+    MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_today_indicator", fallback=True)
+    MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator", fallback=True)
+    MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator", fallback=True)
+    ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations", fallback=True)
+    DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
+    CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
+    BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
+    TODAY_ICON                = conf.get("Parameters", "today_icon", fallback="•")
+    EVENT_ICON                = conf.get("Parameters", "event_icon", fallback="•")
+    BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon", fallback="★")
+    HIDDEN_ICON               = conf.get("Parameters", "hidden_icon", fallback="...")
 
-    COLOR_TODAY         = int(conf.get("Colors", "color_today"))
-    COLOR_DAYS          = int(conf.get("Colors", "color_days"))
-    COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names"))
-    COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends"))
-    COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names"))
-    COLOR_HINTS         = int(conf.get("Colors", "color_hints"))
-    COLOR_PROPMTS       = int(conf.get("Colors", "color_propmts"))
-    COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays"))
-    COLOR_CONFIRMATIONS = int(conf.get("Colors", "color_confirmations"))
+    COLOR_TODAY         = int(conf.get("Colors", "color_today", fallback=2))
+    COLOR_DAYS          = int(conf.get("Colors", "color_days", fallback=7))
+    COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names", fallback=4))
+    COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends", fallback=1))
+    COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names", fallback=1))
+    COLOR_HINTS         = int(conf.get("Colors", "color_hints", fallback=7))
+    COLOR_PROPMTS       = int(conf.get("Colors", "color_propmts", fallback=7))
+    COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays", fallback=1))
+    COLOR_CONFIRMATIONS = int(conf.get("Colors", "color_confirmations", fallback=1))
 
-    MON = conf.get("Day names", "mon")
-    TUE = conf.get("Day names", "tue")
-    WED = conf.get("Day names", "wed")
-    THU = conf.get("Day names", "thu")
-    FRI = conf.get("Day names", "fri")
-    SAT = conf.get("Day names", "sat")
-    SUN = conf.get("Day names", "sun")
+    MON = conf.get("Day names", "mon", fallback="MONDAY")
+    TUE = conf.get("Day names", "tue", fallback="TUESDAY")
+    WED = conf.get("Day names", "wed", fallback="WEDNESDAY")
+    THU = conf.get("Day names", "thu", fallback="THURSDAY")
+    FRI = conf.get("Day names", "fri", fallback="FRIDAY")
+    SAT = conf.get("Day names", "sat", fallback="SATURDAY")
+    SUN = conf.get("Day names", "sun", fallback="SUNDAY")
 
-    HINT = conf.get("Dialogues", "hint")
-    MONTH_NAMES = [name for (month, name) in conf.items("Month names")]
-    ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
+    HINT = conf.get("Dialogues", "hint", fallback=default_hint)
 
-    data_folder = conf.get("Parameters", "folder_with_datafile") 
+    JAN = conf.get("Month names", "jan", fallback="JANUARY")
+    FEB = conf.get("Month names", "feb", fallback="FEBRUARY")
+    MAR = conf.get("Month names", "mar", fallback="MARCH")
+    APR = conf.get("Month names", "apr", fallback="APRIL")
+    MAY = conf.get("Month names", "may", fallback="MAY")
+    JUN = conf.get("Month names", "jun", fallback="JUNE")
+    JUL = conf.get("Month names", "jul", fallback="JULY")
+    AUG = conf.get("Month names", "aug", fallback="AUGUST")
+    SEP = conf.get("Month names", "sep", fallback="SEPTEMBER")
+    OCT = conf.get("Month names", "oct", fallback="OCTOBER")
+    NOV = conf.get("Month names", "nov", fallback="NOVEMBER")
+    DEC = conf.get("Month names", "dec", fallback="DECEMBER")
+    MONTH_NAMES = [JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC]
+
+    try:
+        ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
+    except:
+        ICONS = {}
+
+    data_folder = conf.get("Parameters", "folder_with_datafile", fallback=config_folder) 
 except:
     print("Error in the config.ini file. Try deleting the config file and run the program again.")
     exit()
@@ -441,6 +457,7 @@ def ask_confirmation(stdscr, prompt_string):
     else:
         confirmed = True
     return confirmed
+
 
 def initialize_colors(stdscr):
     '''Define all the color pairs'''
