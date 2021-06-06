@@ -14,7 +14,7 @@ if not os.path.exists(config_folder):
 config_file = config_folder + "/config.ini"
 conf = ConfigParser()
 
-default_hint =  "n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help"
+default_hint =  "n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · i: calcurse import · q: Quit · ?: Help"
 
 def create_config():
     '''Create config file if it does not exist yet'''
@@ -193,21 +193,37 @@ if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
 
+def import_events_from_calcurse(all_events):
+    '''Importing events from calcurse apt file into our appointments file'''
+    calcurse_file = str(Path.home())+"/.local/share/calcurse/apts"
+    with open(calcurse_file, "r") as f:
+        lines = f.readlines()
+    for index, line in enumerate(lines):
+        month = line[0:2]
+        day = line[3:5]
+        year = line[6:10]
+        if line[11] == "[":
+            name = line[15:-1]
+        elif line[11] == "@":
+            name = line[41:-1]
+        event_id = 1 if not all_events[0] else max(all_events[0])+1
+        new_event = str(event_id+index)+","+year+","+month+","+day+","+'"'+name+'"'
+        with open(DATAFILE, "a") as f:
+            f.write(new_event+"\n")
+
+
 def parse_birthdays_from_abook():
     '''Loading birthdays from abook contacts'''
     abook_file = str(Path.home())+"/.abook/addressbook"
     bd_names, bd_months, bd_dates = [], [], []
     abook = ConfigParser()
-    try:
-        abook.read(abook_file)
-        for each_contact in abook.sections():
-            for (key, value) in abook.items(each_contact):
-                if key == "birthday":
-                    bd_names.append(abook[each_contact]["name"])
-                    bd_months.append(int(abook[each_contact]["birthday"][-5:-3]))
-                    bd_dates.append(int(abook[each_contact]["birthday"][-2:]))
-    except:
-        pass
+    abook.read(abook_file)
+    for each_contact in abook.sections():
+        for (key, value) in abook.items(each_contact):
+            if key == "birthday":
+                bd_names.append(abook[each_contact]["name"])
+                bd_months.append(int(abook[each_contact]["birthday"][-5:-3]))
+                bd_dates.append(int(abook[each_contact]["birthday"][-2:]))
     return bd_names, bd_months, bd_dates
 
 
@@ -618,6 +634,7 @@ def main(stdscr):
                     confirmed = ask_confirmation(stdscr, prompt_string)
                     running = False if confirmed else True
                 if key == "?": show_hints = not show_hints
+                if key == "i": import_events_from_calcurse(all_events)
                 if key in ["KEY_HOME", "G"]:
                     this_month = current_month
                     this_year = current_year
