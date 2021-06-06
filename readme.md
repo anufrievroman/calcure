@@ -1,5 +1,5 @@
 # Minimalist TUI Calendar
-Minimal calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/).
+Minimal calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/) and import events from [calcurse](https://github.com/lfos/calcurse).
 
 ![screenshot](screenshot1.jpeg)
 
@@ -12,6 +12,7 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 - Colors, icons, and other features are fully customizable
 - Resize friendly. Can shrink to a small window
 - Autosave changes
+- Import from calcurse
 
 ## Instalation and running
 Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
@@ -35,6 +36,8 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 `d`,`x` - delete event
 
 `home`,`gg`,`G` - return to current month
+
+`i` - import events from calcurse
 
 `?` - toggle footer
 
