@@ -77,29 +77,6 @@ color_hints = 7
 color_propmts = 7
 color_birthdays = 1
 
-[Day names]
-mon = MONDAY
-tue = TUESDAY
-wed = WEDNESDAY
-thu = THURSDAY
-fri = FRIDAY
-sat = SATURDAY
-sun = SUNDAY
-
-[Month names]
-jan = JANUARY
-feb = FEBRUARY
-mar = MARCH
-apr = APRIL
-may = MAY
-jun = JUNE
-jul = JULY
-aug = AUGUST
-sep = SEPTEMBER
-oct = OCTOBER
-nov = NOVEMBER
-dec = DECEMBER
-
 [Diologs]
 hint =  n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help
 
