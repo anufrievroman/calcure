@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from datetime import date, datetime
+from datetime import date
+import calendar
 from curses import *
 import csv
 import os
@@ -42,34 +43,9 @@ def create_config():
             "color_weekends":      "1",
             "color_weekend_names": "1",
             "color_hints":         "7",
-            "color_propmts":       "7",
+            "color_prompts":       "7",
             "color_confirmations": "1",
             "color_birthdays":     "1",
-            }
-
-    conf["Day names"] = {
-            "mon": "MONDAY",
-            "tue": "TUESDAY",
-            "wed": "WEDNESDAY",
-            "thu": "THURSDAY",
-            "fri": "FRIDAY",
-            "sat": "SATURDAY",
-            "sun": "SUNDAY",
-            }
-
-    conf["Month names"] = {
-            "jan": "JANUARY",
-            "feb": "FEBRUARY",
-            "mar": "MARCH",
-            "apr": "APRIL",
-            "may": "MAY",
-            "jun": "JUNE",
-            "jul": "JULY",
-            "aug": "AUGUST",
-            "sep": "SEPTEMBER",
-            "oct": "OCTOBER",
-            "nov": "NOVEMBER",
-            "dec": "DECEMBER",
             }
 
     conf["Dialogues"] = {"hint": default_hint}
@@ -149,53 +125,32 @@ try:
     COLOR_WEEKENDS      = int(conf.get("Colors", "color_weekends", fallback=1))
     COLOR_WEEKEND_NAMES = int(conf.get("Colors", "color_weekend_names", fallback=1))
     COLOR_HINTS         = int(conf.get("Colors", "color_hints", fallback=7))
-    COLOR_PROPMTS       = int(conf.get("Colors", "color_propmts", fallback=7))
+    COLOR_PROMPTS       = int(conf.get("Colors", "color_prompts", fallback=7))
     COLOR_BIRTHDAYS     = int(conf.get("Colors", "color_birthdays", fallback=1))
     COLOR_CONFIRMATIONS = int(conf.get("Colors", "color_confirmations", fallback=1))
 
-    MON = conf.get("Day names", "mon", fallback="MONDAY")
-    TUE = conf.get("Day names", "tue", fallback="TUESDAY")
-    WED = conf.get("Day names", "wed", fallback="WEDNESDAY")
-    THU = conf.get("Day names", "thu", fallback="THURSDAY")
-    FRI = conf.get("Day names", "fri", fallback="FRIDAY")
-    SAT = conf.get("Day names", "sat", fallback="SATURDAY")
-    SUN = conf.get("Day names", "sun", fallback="SUNDAY")
-
     HINT = conf.get("Dialogues", "hint", fallback=default_hint)
-
-    JAN = conf.get("Month names", "jan", fallback="JANUARY")
-    FEB = conf.get("Month names", "feb", fallback="FEBRUARY")
-    MAR = conf.get("Month names", "mar", fallback="MARCH")
-    APR = conf.get("Month names", "apr", fallback="APRIL")
-    MAY = conf.get("Month names", "may", fallback="MAY")
-    JUN = conf.get("Month names", "jun", fallback="JUNE")
-    JUL = conf.get("Month names", "jul", fallback="JULY")
-    AUG = conf.get("Month names", "aug", fallback="AUGUST")
-    SEP = conf.get("Month names", "sep", fallback="SEPTEMBER")
-    OCT = conf.get("Month names", "oct", fallback="OCTOBER")
-    NOV = conf.get("Month names", "nov", fallback="NOVEMBER")
-    DEC = conf.get("Month names", "dec", fallback="DECEMBER")
-    MONTH_NAMES = [JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC]
 
     try:
         ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
     except:
         ICONS = {}
 
-    data_folder = conf.get("Parameters", "folder_with_datafile", fallback=config_folder) 
+    data_folder = conf.get("Parameters", "folder_with_datafile", fallback=config_folder)
 except:
     print("Error in the config.ini file. Try deleting the config file and run the program again.")
     exit()
 
 
-DATAFILE = data_folder + "/appointments.csv"
+DATAFILE = data_folder + "/events.csv"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
 
-def import_events_from_calcurse(all_events):
-    '''Importing events from calcurse apt file into our appointments file'''
+def import_events_from_calcurse():
+    '''Importing events from calcurse apt file into our events file'''
     calcurse_file = str(Path.home())+"/.local/share/calcurse/apts"
+    events = load_events()
     with open(calcurse_file, "r") as f:
         lines = f.readlines()
     for index, line in enumerate(lines):
@@ -206,7 +161,7 @@ def import_events_from_calcurse(all_events):
             name = line[15:-1]
         elif line[11] == "@":
             name = line[41:-1]
-        event_id = 1 if not all_events[0] else max(all_events[0])+1
+        event_id = 1 if not events['id'] else max(events['id'])+1
         new_event = str(event_id+index)+","+year+","+month+","+day+","+'"'+name+'"'
         with open(DATAFILE, "a") as f:
             f.write(new_event+"\n")
@@ -214,47 +169,23 @@ def import_events_from_calcurse(all_events):
 
 def parse_birthdays_from_abook():
     '''Loading birthdays from abook contacts'''
-    abook_file = str(Path.home())+"/.abook/addressbook"
-    bd_names, bd_months, bd_dates = [], [], []
-    abook = ConfigParser()
-    abook.read(abook_file)
-    for each_contact in abook.sections():
-        for (key, value) in abook.items(each_contact):
-            if key == "birthday":
-                bd_names.append(abook[each_contact]["name"])
-                bd_months.append(int(abook[each_contact]["birthday"][-5:-3]))
-                bd_dates.append(int(abook[each_contact]["birthday"][-2:]))
-    return bd_names, bd_months, bd_dates
+    if BIRTHDAYS_FROM_ABOOK:
+        abook_file = str(Path.home())+"/.abook/addressbook"
+        bd_names, bd_dates = [], []
+        abook = ConfigParser()
+        abook.read(abook_file)
+        for each_contact in abook.sections():
+            for (key, value) in abook.items(each_contact):
+                if key == "birthday":
+                    bd_names.append(abook[each_contact]["name"])
+                    bd_month = int(abook[each_contact]["birthday"][-5:-3])
+                    bd_day = int(abook[each_contact]["birthday"][-2:])
+                    bd_dates.append(date(1, bd_month, bd_day))
+    return bd_dates, bd_names
 
 
-def days_max_this_month(year, month):
-    '''Return the number of days in a given month of a given year'''
-    leap = 0
-    if year % 400 == 0:
-        leap = 1
-    elif year % 100 == 0:
-        leap = 0
-    elif year % 4 == 0:
-        leap = 1
-    if month == 2:
-        return 28 + leap
-    if month in [1,3,5,7,8,10,12]:
-        return 31
-    return 30
-
-
-def days_of_this_month(this_month, this_year):
-    '''Calculate the days for the calendar table 7x6'''
-    days_in_month = days_max_this_month(this_year, this_month)
-    first_day = date(this_year, this_month, 1).weekday() # First day of the month
-    dates = [0]*first_day				 # Fill the table for this month
-    dates.extend(range(1,1 + days_in_month))
-    dates.extend([0]*(7*6 - len(dates)))
-    return dates
-
-
-def load_appointments(stdscr, y_max):
-    '''Read from user's appointments file or create it if it does not exist'''
+def load_events():
+    '''Read from user's events file or create it if it does not exist'''
     try:
         with open(DATAFILE) as f:
             pass
@@ -264,52 +195,62 @@ def load_appointments(stdscr, y_max):
 
     with open(DATAFILE,"r") as f:
         apts = csv.reader(f, delimiter = ',')
-        all_events = [[], [], [], [], []]
+        ids, dates, names, reps, freq = [], [], [], [], []
         try:
             for row in apts:
-                all_events[0].append(int(row[0]))
-                all_events[1].append(int(row[1]))
-                all_events[2].append(int(row[2]))
-                all_events[3].append(int(row[3]))
-                all_events[4].append(row[4])
+                ids.append(int(row[0]))
+                dates.append(date(int(row[1]),int(row[2]),int(row[3])))
+                names.append(row[4])
+                reps.append(int(row[5]))
+                freq.append(row[6])
         except:
             pass
-    return all_events
+        events = {'id': ids, 'dates': dates, 'names': names, 'reps': reps, 'freq': freq}
+    return events
 
 
-def add_event(stdscr, this_month, this_year):
-    '''Ask user to input new event and add it the file'''
+def add_event(stdscr, this_month, this_year, recuring):
+    '''Ask user to input new recuring event and add it the file'''
     y_max, x_max = stdscr.getmaxyx()
-    days_in_month = days_max_this_month(this_year, this_month)
-    # First, ask the date within this month:
-    add_propmt = "Enter the date: "+str(this_year)+"/"+str(this_month)+"/"
-    event_date = user_input(stdscr, add_propmt, 2)
+    days_in_month = calendar.monthrange(this_year, this_month)[1]
+
+    add_prompt = "Enter the date: "+str(this_year)+"/"+str(this_month)+"/"
+    event_date = user_input(stdscr, add_prompt, 2)
+
     # If user's date is the number and is in this month, ask the title:
-    try:
-        if int(event_date) <= days_in_month and int(event_date) > 0:
-            title_propmt = "Enter the title: "
-            name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
-            all_events = load_appointments(stdscr, y_max)
-            event_id = 1 if not all_events[0] else max(all_events[0])+1
-            new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+event_date+","+'"'+name+'"'
-            if len(name) > 0:
-                with open(DATAFILE, "a") as f:
-                    f.write(new_event+"\n")
-    except:
-        pass
+    if int(event_date) <= days_in_month and int(event_date) > 0:
+        title_prompt = "Enter the title: "
+        name = user_input(stdscr, title_prompt, x_max-len(title_prompt)-2)
+
+        if recuring:
+            rep_prompt = "How many times repeat the event: "
+            repetitions = user_input(stdscr, rep_prompt, 3)
+            freq_prompt = "Repeat the event every (d)ay, (w)eek, (m)onth or (y)ear?"
+            prompt = freq_prompt + " "*abs(x_max - len(freq_prompt) - 1)
+            stdscr.addstr(y_max-2, 0, prompt[:x_max-1], color_pair(8))
+            frequency = stdscr.getkey()
+        else:
+            repetitions = 1
+            frequency = "n"
+
+        events = load_events()
+        event_id = 1 if not events['id'] else max(events['id'])+1
+        new_event = (str(event_id)+","+str(this_year)+","+str(this_month)+","+
+                event_date+","+'"'+name+'"'+","+str(repetitions)+","+str(frequency))
+        if len(name) > 0 and int(repetitions) >= 0 and frequency in ["d","w","m","y","n"]:
+            with open(DATAFILE, "a") as f:
+                f.write(new_event+"\n")
 
 
 def delete_event(stdscr, events_this_month):
     '''Delete chosen events'''
     y_max, x_max = stdscr.getmaxyx()
     prompt_string = "Number of event to delete: "
-    event_number = user_input(stdscr, prompt_string, 4)
-    # If provided number is correct, then delete the event:
     try:
-        num = int(event_number)
-        if num <= len(events_this_month[0]) and num > 0:
-            event_id = events_this_month[0][int(event_number)-1]
-            event_name = events_this_month[2][int(event_number)-1]
+        num = user_input(stdscr, prompt_string, 4)
+        if int(num) <= len(events_this_month) and int(num) > 0:
+            event_id = events_this_month[int(num)-1][0]
+            event_name = events_this_month[int(num)-1][1]
             prompt_string = "Really delete "+event_name+"? (y/n)"
             confirmed = ask_confirmation(stdscr, prompt_string)
 
@@ -332,18 +273,19 @@ def delete_event(stdscr, events_this_month):
         pass
 
 
-def edit_event(stdscr, events_this_month, this_month, this_year):
+def edit_event(stdscr, events_this_month, month, year):
     '''Edit chosen event via deleting it and creating a new one'''
     y_max, x_max = stdscr.getmaxyx()
     prompt_string = "Number of event to edit: "
     event_number = (user_input(stdscr, prompt_string, 4))
     event_chosen = False
+    # If provided number is correct, then delete the event:
     try:
-        # If provided number is correct, then delete the event:
         num = int(event_number)
-        if num <= len(events_this_month[0]) and num > 0:
-            event_id = events_this_month[0][num-1]
-            event_name = events_this_month[2][num-1]
+        if num <= len(events_this_month) and num > 0:
+            recuring = True
+            event_id = events_this_month[int(num)-1][0]
+            event_name = events_this_month[int(num)-1][1]
             prompt_string = "Really edit "+event_name+"? (y/n)"
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
@@ -362,64 +304,57 @@ def edit_event(stdscr, events_this_month, this_month, this_year):
                 else:
                     os.remove(dummy_file)
                 event_chosen = True
-        else:
-           pass
     except:
         pass
+
     if event_chosen:
-        days_in_month = days_max_this_month(this_year, this_month)
+        days_in_month = calendar.monthrange(year, month)[1]
         # First, ask the date within this month:
-        add_propmt = "Enter new date: "+str(this_year)+"/"+str(this_month)+"/"
-        event_date = user_input(stdscr, add_propmt, 2)
+        add_prompt = "Enter new date: "+str(year)+"/"+str(month)+"/"
+        event_date = user_input(stdscr, add_prompt, 2)
+
         # If user's date is the number and is in this month, ask the title:
         try:
             if int(event_date) <= days_in_month and int(event_date) > 0:
-                title_propmt = "Enter new title: "
-                name = user_input(stdscr, title_propmt, x_max-len(title_propmt)-2)
-                all_events = load_appointments(stdscr, y_max)
-                event_id = 1 if not all_events[0] else max(all_events[0])+1
-                new_event = str(event_id)+","+str(this_year)+","+str(this_month)+","+event_date+","+'"'+name+'"'
-                if len(name) > 0:
+                title_prompt = "Enter new title: "
+                name = user_input(stdscr, title_prompt, x_max-len(title_prompt)-2)
+
+                rep_prompt = "How many times repeat the event: "
+                repetitions = user_input(stdscr, rep_prompt, 3)
+                freq_prompt = "Repeat the event every (d)ay, (w)eek, (m)onth or (y)ear?"
+                prompt = freq_prompt + " "*abs(x_max - len(freq_prompt) - 1)
+                stdscr.addstr(y_max-2, 0, prompt[:x_max-1], color_pair(8))
+                frequency = stdscr.getkey()
+
+                events = load_events()
+                event_id = 1 if not events['id'] else max(events['id'])+1
+                new_event = (str(event_id)+","+str(year)+","+str(month)+","+
+                        event_date+","+'"'+name+'"'+","+str(repetitions)+","+str(frequency))
+                if len(name) > 0 and int(repetitions) >= 0 and frequency in ["d","w","m","y","n"]:
                     with open(DATAFILE, "a") as f:
                         f.write(new_event+"\n")
         except:
             pass
-    return
 
 
-def events_of_this_month(this_month, this_year, events):
-    '''Filters only events that happen in this month and sorts them'''
-    events_this_month = [[], [], []]
-    for index, year in enumerate(events[1]):
-        if (year == this_year) and (events[2][index] == this_month):
-            events_this_month[0].append(events[0][index])
-            events_this_month[1].append(events[3][index])
-            events_this_month[2].append(events[4][index])
-    sorted_all = sorted(zip(events_this_month[1], events_this_month[0], events_this_month[2]))
-    events_this_month[0] = [x for _,x,_ in sorted_all]
-    events_this_month[1] = [x for x,_,_ in sorted_all]
-    events_this_month[2] = [x for _,_,x in sorted_all]
-    return events_this_month
-
-
-def next_month(this_month, this_year):
+def next_month(month, year):
     '''Switches to the next month'''
-    if this_month < 12:
-        this_month += 1
+    if month < 12:
+        month += 1
     else:
-        this_month = 1
-        this_year += 1
-    return this_month, this_year
+        month = 1
+        year += 1
+    return month, year
 
 
-def previous_month(this_month, this_year):
+def previous_month(month, year):
     '''Switches to the previous month'''
-    if this_month > 1:
-        this_month -= 1
+    if month > 1:
+        month -= 1
     else:
-        this_month = 12
-        this_year -= 1
-    return this_month, this_year
+        month = 12
+        year -= 1
+    return month, year
 
 
 def user_input(stdscr, prompt_string, answer_length):
@@ -438,15 +373,12 @@ def user_input(stdscr, prompt_string, answer_length):
 
 def display_day_names(stdscr, x_max):
     '''Display day name depending on the screen available'''
-    num = 2 if x_max < 80 else 10
-    x_cell = int(x_max//7)
-    stdscr.addstr(1, 0*x_cell, MON[:num], color_pair(1))
-    stdscr.addstr(1, 1*x_cell, TUE[:num], color_pair(1))
-    stdscr.addstr(1, 2*x_cell, WED[:num], color_pair(1))
-    stdscr.addstr(1, 3*x_cell, THU[:num], color_pair(1))
-    stdscr.addstr(1, 4*x_cell, FRI[:num], color_pair(1))
-    stdscr.addstr(1, 5*x_cell, SAT[:num], color_pair(6))
-    stdscr.addstr(1, 6*x_cell, SUN[:num], color_pair(6))
+    if SHOW_DAY_NAMES:
+        num = 2 if x_max < 80 else 10
+        x_cell = int(x_max//7)
+        for i in range(7):
+            color = 1 if i < 5 else 7
+            stdscr.addstr(1, i*x_cell, calendar.day_name[i][:num].upper(), color_pair(color))
 
 
 def display_icon_for_event(name, delete_mode, edit_mode):
@@ -483,7 +415,7 @@ def initialize_colors(stdscr):
     init_pair(6, COLOR_WEEKEND_NAMES, -1)
     init_pair(3, COLOR_HINTS, -1)
     init_pair(7, COLOR_BIRTHDAYS, -1)
-    init_pair(8, COLOR_PROPMTS, -1)
+    init_pair(8, COLOR_PROMPTS, -1)
     init_pair(9, COLOR_CONFIRMATIONS, -1)
     if MINIMAL_WEEKEND_INDICATOR:
         init_pair(2, COLOR_WEEKENDS, -1)
@@ -501,13 +433,11 @@ def initialize_colors(stdscr):
 
 def main(stdscr):
     '''This is the main function that runs the screen'''
-    current_year  = datetime.now().year
-    current_month = datetime.now().month
-    current_day   = datetime.now().day
-    this_month    = current_month
-    this_year     = current_year
-    if BIRTHDAYS_FROM_ABOOK:
-        bd_names, bd_months, bd_dates = parse_birthdays_from_abook()
+    my_cal = calendar.Calendar(firstweekday=0)
+    month  = date.today().month
+    year   = date.today().year
+
+    bd_dates, bd_names = parse_birthdays_from_abook()
 
     # Starting the screen
     stdscr = initscr()
@@ -523,60 +453,56 @@ def main(stdscr):
         halfdelay(255)
         noecho()
         curs_set(False)
-        all_events = load_appointments(stdscr, y_max)
-
-        # Update today's date
-        current_year  = datetime.now().year
-        current_month = datetime.now().month
-        current_day   = datetime.now().day
+        events = load_events()
+        today = date.today()
 
         # Displaying the month, year, and days of the week
-        stdscr.addstr(0, 0, str(MONTH_NAMES[this_month-1])+" "+str(this_year))
-        if SHOW_DAY_NAMES:
-            display_day_names(stdscr, x_max)
+        month_string = calendar.month_name[month].upper()
+        stdscr.addstr(0, 0, str(month_string)+" "+str(year))
+        display_day_names(stdscr, x_max)
 
         # Displaying the dates and events
-        dates = days_of_this_month(this_month, this_year)
-        events_this_month = events_of_this_month(this_month, this_year, all_events)
+        dates = my_cal.monthdayscalendar(year, month)
         day_number = 0
         y_cell = (y_max-2)//6
         x_cell = x_max//7
         num_of_event_this_month = 1
-        for w in range(6):
+        events_this_month = []
+        for w in range(len(dates)):
             for d in range(7):
-                this_date = dates[day_number]
-                if this_date > 0:
+                day = dates[w][d]
+                if day > 0:
                     # Show the dates:
                     day_type = 5 if d < 5 else 2
-                    if current_year == this_year and current_month == this_month \
-                            and current_day == this_date: day_type = 4
+                    if today == date(year, month, day): day_type = 4
                     icon = TODAY_ICON*(day_type==4) if DISPLAY_ICONS else "·"*(day_type==4)
-                    date_display = str(this_date)+icon+str(" "*(x_cell-len(str(this_date))-len(icon)))
+                    date_display = str(day)+icon+str(" "*(x_cell-len(str(day))-len(icon)))
                     stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(day_type))
 
-                    num_of_event_this_day = 0
 
                     # Show events
-                    for event_date, event_name in zip(events_this_month[1], events_this_month[2]):
-                        if this_date == event_date:
+                    num_of_event_this_day = 0
+                    for event_id, event_date, event_name in zip(events['id'], events['dates'], events['names']):
+                        if date(year, month, day) == event_date:
                             if num_of_event_this_day < y_cell - 1: # If screen space is ok
                                 icon = display_icon_for_event(event_name, delete_mode, edit_mode)
-                                number = (str(num_of_event_this_month)+"·")*(delete_mode or edit_mode)
+                                number = (str(len(events_this_month)+1)+"·")*(delete_mode or edit_mode)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
 
                                 num_of_event_this_day += 1
-                                num_of_event_this_month += 1
+                                events_this_month.append([event_id, event_name])
                             else:
                                 hidden = HIDDEN_ICON + " "*(x_cell - 3)
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
 
+
                     # Show birthdays
                     if BIRTHDAYS_FROM_ABOOK:
-                        for index, name in enumerate(bd_names):
-                            if bd_months[index] == this_month and bd_dates[index] == this_date:
-                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+name*(x_cell > 5)
+                        for index, bd_date in enumerate(bd_dates):
+                            if bd_date == date(1, month, day):
+                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+bd_names[index]*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
                                 num_of_event_this_day += 1
@@ -594,7 +520,7 @@ def main(stdscr):
             refresh_mode = True
 
         if edit_mode:
-            edit_event(stdscr, events_this_month, this_month, this_year)
+            edit_event(stdscr, events_this_month, month, year)
             edit_mode = False
             refresh_mode = True
 
@@ -607,8 +533,8 @@ def main(stdscr):
                     try:
                         key = stdscr.getkey()
                         if key == "g":
-                            this_month = current_month
-                            this_year = current_year
+                            month = today.month
+                            year  = today.year
                         sdtscr.refresh()
                     except KeyboardInterrupt:
                         running = False
@@ -623,10 +549,15 @@ def main(stdscr):
 
                 # Handle rest of the user input
                 if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
-                    this_month, this_year = next_month(this_month, this_year)
+                    month, year = next_month(month, year)
                 if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
-                    this_month, this_year = previous_month(this_month, this_year)
-                if key in ["a", " "]: add_event(stdscr, this_month, this_year)
+                    month, year = previous_month(month, year)
+                if key in ["a", " "]:
+                    recuring = False
+                    add_event(stdscr, month, year, recuring)
+                if key in ["A"]:
+                    recuring = True
+                    add_event(stdscr, month, year, recuring)
                 if key in ["d", "x"]: delete_mode = True
                 if key in ["e", "c"]: edit_mode = True
                 if key == "q":
@@ -634,10 +565,10 @@ def main(stdscr):
                     confirmed = ask_confirmation(stdscr, prompt_string)
                     running = False if confirmed else True
                 if key == "?": show_hints = not show_hints
-                if key == "i": import_events_from_calcurse(all_events)
+                if key == "i": import_events_from_calcurse()
                 if key in ["KEY_HOME", "G"]:
-                    this_month = current_month
-                    this_year = current_year
+                    month = today.month
+                    year  = today.year
 
             except KeyboardInterrupt:
                 running = False
