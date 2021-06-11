@@ -13,6 +13,7 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 - Resize friendly. Can shrink to a small window
 - Autosave changes
 - Import from calcurse
+- Start week on any day
 
 ## Instalation and running
 Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
@@ -30,6 +31,8 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 `p`,`h`,`k`,`↑` - previous month
 
 `a`,`space` - add event
+
+`A` - add recuring event
 
 `e`,`c` - edit event
 
@@ -62,6 +65,7 @@ minimal_weekend_indicator = Yes
 cut_titles_by_cell_length = Yes
 ask_confirmations = Yes
 use_unicode_icons = Yes
+start_week_day = 1
 event_icon = •
 today_icon = •
 birthday_icon = ★
