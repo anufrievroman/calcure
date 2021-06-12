@@ -186,6 +186,34 @@ def parse_birthdays_from_abook():
     return bd_dates, bd_names
 
 
+
+def calculate_recuring_events(year, month, day, fr):
+    '''Calculate the date of recuring events so that they occur in the next month or year'''
+    new_day = day
+    new_month = month
+    new_year = year
+    skip_days = 0
+    if fr in ["w","d"]:
+        for i in range(50):
+            if month + i > 12:
+                year = year + 1
+                month = month - 12
+            if day > skip_days + calendar.monthrange(year, month + i)[1]:
+                skip_days += calendar.monthrange(year, month + i)[1]
+                skip_months = i+1
+            else:
+                skip_months = i
+                break
+        new_day = day - skip_days
+        new_month = month + skip_months
+        new_year = year
+    if fr == "m":
+        if month > 12:
+            new_year = year + (month-1)//12
+            new_month = month - 12*(new_year-year)
+    return datetime.date(new_year, new_month, new_day)
+
+
 def load_events():
     '''Read from user's events file or create it if it does not exist'''
     try:
@@ -202,23 +230,19 @@ def load_events():
             for row in apts:
                 repetitions = int(row[5])
                 for r in range(repetitions):
-                    fr = row[6]
-                    year = int(row[1]) + r*(fr=='y')
-                    month = int(row[2]) + r*(fr=='m')
-                    day = int(row[3]) + r*(fr=='d') + 7*r*(fr=='w')
-                    if day > calendar.monthrange(year, month)[1]:
-                        new_day = day - calendar.monthrange(year, month)[1]
-                        month += day//calendar.monthrange(year, month)[1]
-                        day = new_day
-                    if month > 12:
-                        year += 1
-                        month -= 12
-
-                    ids.append(int(row[0]))
-                    dates.append(datetime.date(year, month, day))
-                    names.append(row[4])
-                    reps.append(int(row[5]))
-                    freq.append(row[6])
+                    try:
+                        fr = row[6]
+                        year  = int(row[1]) + r*(fr=='y')
+                        month = int(row[2]) + r*(fr=='m')
+                        day   = int(row[3]) + r*(fr=='d') + 7*r*(fr=='w')
+                        event_date = calculate_recuring_events(year, month, day, fr)
+                        ids.append(int(row[0]))
+                        dates.append(event_date)
+                        names.append(row[4])
+                        reps.append(int(row[5]))
+                        freq.append(row[6])
+                    except:
+                        pass
         except:
             pass
         events = {'id': ids, 'dates': dates, 'names': names, 'reps': reps, 'freq': freq}
@@ -471,6 +495,8 @@ def main(stdscr):
         halfdelay(255)
         noecho()
         curs_set(False)
+        y_cell = (y_max-2)//6
+        x_cell = x_max//7
         events = load_events()
         today = datetime.date.today()
 
@@ -480,12 +506,10 @@ def main(stdscr):
         display_day_names(stdscr, x_max)
 
         # Displaying the dates and events
-        dates = my_cal.monthdayscalendar(year, month)
         day_number = 0
-        y_cell = (y_max-2)//6
-        x_cell = x_max//7
         num_of_event_this_month = 1
         events_this_month = []
+        dates = my_cal.monthdayscalendar(year, month)
         for w in range(len(dates)):
             for d in range(7):
                 day = dates[w][d]
@@ -525,11 +549,14 @@ def main(stdscr):
                     # Display birthdays
                     if BIRTHDAYS_FROM_ABOOK:
                         for index, bd_date in enumerate(bd_dates):
-                            if bd_date == datetime.date(1, month, day):
-                                disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+bd_names[index]*(x_cell > 5)
-                                disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
-                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
-                                num_of_event_this_day += 1
+                            try:
+                                if bd_date == datetime.date(1, month, day):
+                                    disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+bd_names[index]*(x_cell > 5)
+                                    disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                    stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
+                                    num_of_event_this_day += 1
+                            except ValueError:
+                                pass
                 day_number += 1
 
         # Show hints in footer
