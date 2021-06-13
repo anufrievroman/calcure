@@ -15,7 +15,7 @@ if not os.path.exists(config_folder):
 config_file = config_folder + "/config.ini"
 conf = configparser.ConfigParser()
 
-default_hint =  "n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · i: calcurse import · q: Quit · ?: Help"
+default_hint =  "n: Next month · p: Previous month · a(A): Add (recurring) event · d: Delete · e: Edit · i: Import · q: Quit · ?: Help"
 
 def create_config():
     '''Create config file if it does not exist yet'''
@@ -186,21 +186,20 @@ def parse_birthdays_from_abook():
     return bd_dates, bd_names
 
 
-
 def calculate_recurring_events(year, month, day, fr):
     '''Calculate the date of recurring events so that they occur in the next month or year'''
-    new_day = day
+    new_day   = day
     new_month = month
-    new_year = year
+    new_year  = year
     skip_days = 0
     if fr in ["w","d"]:
-        for i in range(50):
+        for i in range(1000):
             if month + i > 12:
                 year = year + 1
                 month = month - 12
             if day > skip_days + calendar.monthrange(year, month + i)[1]:
                 skip_days += calendar.monthrange(year, month + i)[1]
-                skip_months = i+1
+                skip_months = i + 1
             else:
                 skip_months = i
                 break
@@ -282,15 +281,15 @@ def add_event(stdscr, month, year, recurring):
                 f.write(new_event+"\n")
 
 
-def delete_event(stdscr, events_this_month):
+def delete_event(stdscr, ids_this_month, names_this_month):
     '''Delete chosen events'''
     y_max, x_max = stdscr.getmaxyx()
     prompt_string = "Number of event to delete: "
     try:
         num = user_input(stdscr, prompt_string, 4)
-        if int(num) in range(1, len(events_this_month)+1):
-            event_id = events_this_month[int(num)-1][0]
-            event_name = events_this_month[int(num)-1][1]
+        if int(num) in range(1, len(ids_this_month)+1):
+            event_id = ids_this_month[int(num)-1]
+            event_name = names_this_month[int(num)-1]
             prompt_string = "Really delete "+event_name+"? (y/n)"
             confirmed = ask_confirmation(stdscr, prompt_string)
 
@@ -313,7 +312,7 @@ def delete_event(stdscr, events_this_month):
         pass
 
 
-def edit_event(stdscr, events_this_month, month, year):
+def edit_event(stdscr, ids_this_month, names_this_month, month, year):
     '''Edit chosen event via deleting it and creating a new one'''
     y_max, x_max = stdscr.getmaxyx()
     prompt_string = "Number of event to edit: "
@@ -321,10 +320,10 @@ def edit_event(stdscr, events_this_month, month, year):
     event_chosen = False
     # If provided number is correct, then delete the event:
     try:
-        if int(num) in range(1, len(events_this_month)+1):
+        if int(num) in range(1, len(ids_this_month)+1):
             recurring = True
-            event_id = events_this_month[int(num)-1][0]
-            event_name = events_this_month[int(num)-1][1]
+            event_id = ids_this_month[int(num)-1]
+            event_name = names_this_month[int(num)-1]
             prompt_string = "Really edit "+event_name+"? (y/n)"
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
@@ -473,17 +472,8 @@ def initialize_colors(stdscr):
         init_pair(5, COLOR_BLACK, COLOR_DAYS)
 
 
-def main(stdscr):
-    '''This is the main function that runs the screen'''
-    my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
-    month  = datetime.date.today().month
-    year   = datetime.date.today().year
-
+def monthly_view(stdscr, my_cal, month, year):
     bd_dates, bd_names = parse_birthdays_from_abook()
-
-    # Starting the screen
-    stdscr = initscr()
-    initialize_colors(stdscr)
     y_max, x_max = stdscr.getmaxyx()
     running      = True
     delete_mode  = False
@@ -508,7 +498,9 @@ def main(stdscr):
         # Displaying the dates and events
         day_number = 0
         num_of_event_this_month = 1
-        events_this_month = []
+        ids_this_month = []
+        names_this_month = []
+        event_number = 0
         dates = my_cal.monthdayscalendar(year, month)
         for w in range(len(dates)):
             for d in range(7):
@@ -524,7 +516,7 @@ def main(stdscr):
                         day_number = d+shift - 7*((d+shift) > 6)
                         color = 5 if day_number < 5 else 2
                         icon = ""
-                    date_display = str(day)+icon+str(" "*(x_cell-len(str(day))-len(icon)))
+                    date_display = str(day) + icon + str(" "*(x_cell-len(str(day))-len(icon)))
                     stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(color))
 
 
@@ -534,13 +526,20 @@ def main(stdscr):
                         if datetime.date(year, month, day) == event_date:
                             if num_of_event_this_day < y_cell - 1: # If screen space is ok
                                 icon = display_icon_for_event(event_name, delete_mode, edit_mode)
-                                number = (str(len(events_this_month)+1)+"·")*(delete_mode or edit_mode)
+                                # Check if this is recurring event
+                                if event_id in ids_this_month:
+                                    event_number = ids_this_month.index(event_id) + 1
+                                else:
+                                    event_number += 1
+                                # Display the event
+                                number = (str(event_number)+"·")*(delete_mode or edit_mode)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
 
                                 num_of_event_this_day += 1
-                                events_this_month.append([event_id, event_name])
+                                ids_this_month.append(event_id)
+                                names_this_month.append(event_name)
                             else:
                                 hidden = HIDDEN_ICON + " "*(x_cell - 3)
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
@@ -559,19 +558,19 @@ def main(stdscr):
                                 pass
                 day_number += 1
 
-        # Show hints in footer
+        # Show keybinding
         if show_hints:
             stdscr.addstr(y_max - 1, 0, HINT[:x_max-2], color_pair(3))
 
         # Handle user input
         refresh_mode = False
         if delete_mode:
-            delete_event(stdscr, events_this_month)
+            delete_event(stdscr, ids_this_month, names_this_month)
             delete_mode = False
             refresh_mode = True
 
         if edit_mode:
-            edit_event(stdscr, events_this_month, month, year)
+            edit_event(stdscr,  ids_this_month, names_this_month, month, year)
             edit_mode = False
             refresh_mode = True
 
@@ -627,6 +626,19 @@ def main(stdscr):
                 running = False if confirmed else True
             except:
                 pass
+
+
+def main(stdscr):
+    '''This is the main function that runs the screen'''
+    my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
+    month  = datetime.date.today().month
+    year   = datetime.date.today().year
+
+    # Starting the screen
+    stdscr = initscr()
+    initialize_colors(stdscr)
+    monthly_view(stdscr, my_cal, month, year)
+
 
     echo()
     curs_set(True)
