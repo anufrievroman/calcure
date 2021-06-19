@@ -5,15 +5,16 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 
 ## Features
 - Vim keys
-- Event management with a least possible number of key presses
+- Event management with a fewest key presses possible
 - Birthdays from your abook contacts
-- Auto pictograms according to keywords from event title (fully customizible)
-- Simple plain text database in a desired location
+- Auto pictograms according to event name ✈ ⛷ ⛱
+- Privacy mode ••••• to obfuscate events
+- Simple plain text database in a desired location for cloud sync
 - Colors, icons, and other features are fully customizable
 - Resize friendly. Can shrink to a small window
-- Autosave changes
 - Import from calcurse
 - Start week on any day
+
 
 ## Instalation and running
 Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
@@ -42,6 +43,8 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 
 `i` - import events from calcurse
 
+`*` - Toggle privacy mode
+
 `?` - toggle footer
 
 `q` - quit
@@ -63,11 +66,13 @@ minimal_today_indicator = Yes
 minimal_days_indicator = Yes
 minimal_weekend_indicator = Yes
 cut_titles_by_cell_length = Yes
+privacy_mode = No
 ask_confirmations = Yes
 use_unicode_icons = Yes
 start_week_day = 1
 event_icon = •
 today_icon = •
+privacy_icon = •
 birthday_icon = ★
 hidden_icon = ...
 
@@ -82,7 +87,7 @@ color_propmts = 7
 color_birthdays = 1
 
 [Diologs]
-hint =  n: Next month · p: Previous month · a: Add event · d: Delete · e: Edit · q: Quit · ?: Help
+hint =  n: Next month · p: Previous month · a(A): Add (recurring) event · d: Delete · e: Edit · i: Import · q: Quit · ?: Help
 
 [Event icons]
 travel = ✈
