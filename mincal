@@ -23,6 +23,7 @@ def create_config():
             "folder_with_datafile":      str(config_folder),
             "birthdays_from_abook":      "Yes",
             "show_keybindings":          "Yes",
+            "privacy_mode":              "No",
             "show_day_names":            "Yes",
             "minimal_today_indicator":   "Yes",
             "minimal_days_indicator":    "Yes",
@@ -32,6 +33,7 @@ def create_config():
             "use_unicode_icons":         "Yes",
             "start_week_day":            "1",
             "event_icon":                "•",
+            "privacy_icon":              "•",
             "today_icon":                "•",
             "birthday_icon":             "★",
             "hidden_icon":               "...",
@@ -113,12 +115,15 @@ try:
     MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator", fallback=True)
     ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations", fallback=True)
     DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
+    PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
     CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
     BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
-    TODAY_ICON                = conf.get("Parameters", "today_icon", fallback="•")
-    EVENT_ICON                = conf.get("Parameters", "event_icon", fallback="•")
-    BIRTHDAY_ICON             = conf.get("Parameters", "birthday_icon", fallback="★")
-    HIDDEN_ICON               = conf.get("Parameters", "hidden_icon", fallback="...")
+
+    TODAY_ICON    = conf.get("Parameters", "today_icon", fallback="•") if DISPLAY_ICONS else "·"
+    PRIVACY_ICON  = conf.get("Parameters", "privacy_icon", fallback="•") if DISPLAY_ICONS else "·"
+    HIDDEN_ICON   = conf.get("Parameters", "hidden_icon", fallback="...")
+    EVENT_ICON    = conf.get("Parameters", "event_icon", fallback="•")
+    BIRTHDAY_ICON = conf.get("Parameters", "birthday_icon", fallback="★")
 
     COLOR_TODAY         = int(conf.get("Colors", "color_today", fallback=2))
     COLOR_DAYS          = int(conf.get("Colors", "color_days", fallback=7))
@@ -437,14 +442,13 @@ def display_icon_for_event(name, delete_mode, edit_mode):
 def ask_confirmation(stdscr, prompt_string):
     '''Ask user confirmation for an action'''
     y_max, x_max = stdscr.getmaxyx()
+    confirmed = True
     if ASK_CONFIRMATIONS:
         halfdelay(255)
         prompt = prompt_string + " "*abs(x_max - len(prompt_string) - 1)
         stdscr.addstr(y_max-2, 0, prompt[:x_max-1], color_pair(9))
         key = stdscr.getkey()
         confirmed = True if key == "y" else False
-    else:
-        confirmed = True
     return confirmed
 
 
@@ -480,6 +484,7 @@ def monthly_view(stdscr, my_cal, month, year):
     edit_mode    = False
     refresh_mode = False
     show_hints   = SHOW_KEYBINDINGS
+    privacy_on   = PRIVACY_MODE
     while running:
         stdscr.clear()
         halfdelay(255)
@@ -510,7 +515,7 @@ def monthly_view(stdscr, my_cal, month, year):
                     # Display the dates
                     if datetime.date(year, month, day) == today:
                         color = 4
-                        icon = TODAY_ICON if DISPLAY_ICONS else "·"
+                        icon = TODAY_ICON
                     else:
                         shift = START_WEEK_DAY-1
                         day_number = d+shift - 7*((d+shift) > 6)
@@ -533,8 +538,10 @@ def monthly_view(stdscr, my_cal, month, year):
                                     event_number += 1
                                 # Display the event
                                 number = (str(event_number)+"·")*(delete_mode or edit_mode)
+                                if privacy_on: event_name = PRIVACY_ICON*len(event_name)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                disp = disp + " "*abs(x_max - x_cell*d - 1)
                                 stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
 
                                 num_of_event_this_day += 1
@@ -550,7 +557,9 @@ def monthly_view(stdscr, my_cal, month, year):
                         for index, bd_date in enumerate(bd_dates):
                             try:
                                 if bd_date == datetime.date(1, month, day):
-                                    disp = BIRTHDAY_ICON*DISPLAY_ICONS+" "+bd_names[index]*(x_cell > 5)
+                                    if privacy_on: event_name = PRIVACY_ICON*len(event_name)
+                                    bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy_on else bd_names[index]
+                                    disp = (BIRTHDAY_ICON+" ")*DISPLAY_ICONS+bd_name*(x_cell > 5)
                                     disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                     stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(7))
                                     num_of_event_this_day += 1
@@ -615,6 +624,7 @@ def monthly_view(stdscr, my_cal, month, year):
                     confirmed = ask_confirmation(stdscr, prompt_string)
                     running = False if confirmed else True
                 if key == "?": show_hints = not show_hints
+                if key == "*": privacy_on = not privacy_on
                 if key == "i": import_events_from_calcurse()
                 if key in ["KEY_HOME", "G"]:
                     month = today.month
