@@ -9,7 +9,7 @@ import configparser
 
 
 # Write configuration file if it does not exist
-config_folder = str(pathlib.Path.home())+"/.config/mincal"
+config_folder = str(pathlib.Path.home())+"/.config/calcure"
 if not os.path.exists(config_folder):
     os.makedirs(config_folder)
 config_file = config_folder + "/config.ini"

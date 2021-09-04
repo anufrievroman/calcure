@@ -1,9 +1,11 @@
-# Minimalist TUI Calendar
-Minimal calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/) and import events from [calcurse](https://github.com/lfos/calcurse).
+# calcure
 
-![screenshot](screenshot1.jpeg)
+Minimal TUI calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/) and import events from [calcurse](https://github.com/lfos/calcurse).
+
+![screenshot](screen.jpeg)
 
 ## Features
+
 - Vim keys
 - Event management with a fewest key presses possible
 - Birthdays from your abook contacts
@@ -17,11 +19,12 @@ Minimal calendar with stylish and customizable UI in linux terminal. You can add
 
 
 ## Instalation and running
-Simply copy the **mincal** file into a directory with your binaries, for example into `home/user/.local/bin` 
 
-Then, run by just typing `mincal` in a linux terminal.
+Simply copy the **calcure** file into a directory with your binaries, for example into `home/user/.local/bin` 
 
-In case of permission error, you'll need to make the file executable `chmod =rwx mincal`.
+Then, run by just typing `calcure` in a linux terminal.
+
+In case of permission error, you'll need to make the file executable `chmod =rwx calcure`.
 
 Also, it requires python 3 to run. If you don't have it, install `python` package from your standard repository.
 
@@ -52,13 +55,13 @@ Also, it requires python 3 to run. If you don't have it, install `python` packag
 
 ## Configuration
 
-On the first run, it will create a configuration file at `home/user/.config/mincal/config.ini`
+On the first run, it will create a configuration file at `home/user/.config/calcure/config.ini`
 
 You can edit parameters and colors in the `config.ini` file. Here is an example config:
 
 ```
 [Parameters]
-folder_with_datafile = /home/user/.config/mincal
+folder_with_datafile = /home/user/.config/calcure
 birthdays_from_abook = Yes
 show_keybindings = Yes
 show_day_names = Yes
@@ -137,5 +140,3 @@ training = ⛷
 ```
 When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
 
-## Other programs
-For similar minimalist terminal expirience, check out my [todo app](https://github.com/anufrievroman/minimalist-tui-todo).
