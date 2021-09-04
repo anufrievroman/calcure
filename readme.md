@@ -1,6 +1,6 @@
 # calcure
 
-Minimal TUI calendar with stylish and customizable UI in linux terminal. You can add and edit events and view birthdays from your [abook](https://abook.sourceforge.io/) and import events from [calcurse](https://github.com/lfos/calcurse).
+Minimal TUI calendar with customizable interface. You can manage your events, view birthdays from your [abook](https://abook.sourceforge.io/), and import events from [calcurse](https://github.com/lfos/calcurse).
 
 ![screenshot](screen.jpeg)
 
@@ -18,7 +18,7 @@ Minimal TUI calendar with stylish and customizable UI in linux terminal. You can
 - Start week on any day
 
 
-## Instalation and running
+## Installation and running
 
 Simply copy the **calcure** file into a directory with your binaries, for example into `home/user/.local/bin` 
 
