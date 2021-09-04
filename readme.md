@@ -18,15 +18,25 @@ Minimal TUI calendar with customizable interface. You can manage your events, vi
 - Start week on any day
 
 
-## Installation and running
+## Installation
+
+### On Arch-based distributions
+
+The package `calcure` is avalible in AUR. Simply install it with `yay -S calcure` or with your favourite AUR helper
+
+### On other distributions
 
 Simply copy the **calcure** file into a directory with your binaries, for example into `home/user/.local/bin` 
 
-Then, run by just typing `calcure` in a linux terminal.
-
 In case of permission error, you'll need to make the file executable `chmod =rwx calcure`.
 
-Also, it requires python 3 to run. If you don't have it, install `python` package from your standard repository.
+## Usage
+
+Run by typing `calcure` in a linux terminal.
+
+## Dependencies
+
+It only requires python 3. You should have it by deafult, but if you don't, install `python` package from your standard repository.
 
 ## Key bindings
 
