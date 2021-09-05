@@ -22,7 +22,7 @@ Minimalist TUI calendar and task manager with customizable interface. You can ma
 
 ### On Arch-based distributions
 
-The package `calcure` is avalible in AUR. Simply install it with `yay -S calcure` or with your favourite AUR helper
+The package `calcure` is avalible in AUR. Simply install it with `yay -S calcure` or with another AUR helper.
 
 ### On other distributions
 
@@ -93,7 +93,7 @@ It only requires python 3. You should have it by deafult, but if you don't, inst
 
 ## Configuration
 
-On the first run, it will create a configuration file at `home/user/.config/calcure/config.ini`
+On the first run, it will create a configuration file at `.config/calcure/config.ini`
 
 You can edit parameters and colors in the `config.ini` file. Here is an example config:
 

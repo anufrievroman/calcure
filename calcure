@@ -748,21 +748,6 @@ def unmark_task(stdscr, tasks, statuses):
         pass
 
 
-# def user_input(stdscr, prompt_string, answer_length):
-#     '''Ask user to input something and return this string'''
-#     y_max, x_max = stdscr.getmaxyx()
-#     echo()
-#     curs_set(True)
-#     display_string = str(prompt_string) + " "*abs((x_max-len(prompt_string))-1)
-#     stdscr.addstr(y_max - 3, 0, display_string[:x_max-1], color_pair(5))
-#     stdscr.refresh()
-#     line = 2 if (x_max < 25 and answer_length > 4) else 3
-#     shift = 0 if (x_max < 25 and answer_length > 4) else len(prompt_string)
-#     user_input = stdscr.getstr(y_max - line, shift, answer_length).decode(encoding="utf-8")
-#     noecho()
-#     curs_set(False)
-#     return user_input
-
 def monthly_view(stdscr, my_cal, month, year, regime, privacy_on):
     '''This is the calendar view that shows events'''
     bd_dates, bd_names = parse_birthdays_from_abook()
@@ -839,15 +824,22 @@ def monthly_view(stdscr, my_cal, month, year, regime, privacy_on):
                                 if privacy_on: event_name = PRIVACY_ICON*len(event_name)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
-                                disp = disp + " "*abs(x_max - x_cell*d - 1)
-                                stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
+                                disp = disp + " "*abs(x_max - x_cell*d - len(disp))
+                                try:
+                                    stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
+                                except:
+                                    pass
 
                                 num_of_event_this_day += 1
                                 ids_this_month.append(event_id)
                                 names_this_month.append(event_name)
                             else:
                                 hidden = HIDDEN_ICON + " "*(x_cell - 3)
-                                stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
+                                try:
+                                    stdscr.addstr(3+num_of_event_this_day+w*y_cell-1, d*x_cell, hidden, color_pair(1))
+                                except:
+                                    pass
+
 
 
                     # Display birthdays
@@ -1062,6 +1054,7 @@ def help_view(stdscr, regime):
                 '  d  ': 'Delete event',
                 '  e  ': 'Edit event',
                 '  C  ': 'Imort events from calcurse',
+                '  G  ': 'Return to current month',
                 }
 
         keys_todo = {
@@ -1087,7 +1080,7 @@ def help_view(stdscr, regime):
                 line = str(key+" · "+keys_calendar[key])[:x_max-3]
                 stdscr.addstr(index+7+len(keys_general), 0, line, color_pair(5))
 
-            stdscr.addstr(8+len(keys_calendar)+len(keys_general), 0, "Tasks view"[:x_max-3], color_pair(4))
+            stdscr.addstr(8+len(keys_calendar)+len(keys_general), 0, "Task view"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_todo):
                 line = str(key+" · "+keys_todo[key])[:x_max-3]
                 stdscr.addstr(index+10+len(keys_general)+len(keys_calendar), 0, line, color_pair(5))
