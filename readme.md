@@ -8,13 +8,14 @@ Minimalist TUI calendar and task manager with customizable interface. You can ma
 
 - Vim keys
 - Operation with a fewest key presses possible
+- Todo list with tasks and subtasks
 - Birthdays from your abook contacts
+- Import events and tasks from calcurse
 - Auto pictograms according to the name ✈ ⛷ ⛱
 - Privacy mode ••••• to obfuscate events and tasks
 - Simple plain text database in a desired location for cloud sync
 - Colors, icons, and other features are fully customizable
 - Resize friendly. Can shrink to a small window
-- Import from calcurse
 - Start week on any day
 
 
@@ -50,7 +51,7 @@ It only requires python 3. You should have it by deafult, but if you don't, inst
 
 `*` · Toggle privacy mode
 
-`?` · toggle footer
+`?` · Show keybindings
 
 `q` · quit
 
@@ -78,13 +79,17 @@ It only requires python 3. You should have it by deafult, but if you don't, inst
 
 `a` · Add task
 
+`A` · Add subtask
+
 `i` · Mark task as important
 
 `I` · Mark all as important
 
-`d` · Delete task
+`d` · Delete task and all subtasks
 
 `D` · Delete all tasks
+
+`s` · Toggle subtask
 
 `e` · Edit task
 

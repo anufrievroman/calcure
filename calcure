@@ -50,7 +50,7 @@ def create_config():
             "todo_icon": "•",
             "important_icon": "‣",
             "show_header": "Yes",
-            "header": "TODO LIST:",
+            "header": "TASKS:",
             }
 
     conf["Colors"] = {
@@ -104,13 +104,12 @@ def create_config():
             "over":        "⚑",
             "finish":      "⚑",
             "end":         "⚑",
-            "appointment": "✔",
-            "task ":       "✔",
-            "doctor":      "⛑",
-            "dentist":     "⛑",
-            "medical":     "⛑",
-            "hospital":    "⛑",
+            "doctor":      "✚",
+            "dentist":     "✚",
+            "medical":     "✚",
+            "hospital":    "✚",
             "party":       "☘",
+            "bar":         "☘",
             "museum":      "⛬",
             "meet":        "⛬",
             "talk":        "⛬",
@@ -152,7 +151,7 @@ try:
     # Todo settings
     CALCURSE_TODO_FILE   = conf.get("Parameters", "calcurse_todo_file", fallback=calcurse_todo_file)
     CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=calcurse_events_file)
-    TITLE                = conf.get("Parameters", "header", fallback="TODO LIST:")
+    TITLE                = conf.get("Parameters", "header", fallback="TASKS:")
     SHOW_TITLE           = conf.getboolean("Parameters", "show_header", fallback=True)
     SHOW_KEYBINDINGS     = conf.getboolean("Parameters", "show_keybindings", fallback=True)
     DONE_ICON            = conf.get("Parameters", "done_icon", fallback="✔") if DISPLAY_ICONS else "×"
@@ -208,7 +207,8 @@ def import_events_from_calcurse():
         if line[11] == "[":
             name = line[15:-1]
         elif line[11] == "@":
-            name = line[41:-1]
+            name = line[35:-1]
+            name = name.replace('|',' ')
         event_id = 1 if not events['id'] else max(events['id'])+1
         new_event = str(event_id+index)+","+year+","+month+","+day+","+'"'+name+'"'+',1,n'
         with open(EVENTS_FILE, "a") as f:
@@ -556,16 +556,52 @@ def load_tasks():
 
 
 def add_task(stdscr):
-    '''Promt the user to input new task and adds it to the file'''
+    '''Promts the user to input new task and adds it to the file'''
     y_max, x_max = stdscr.getmaxyx()
-    try:
-        prompt_string = "New task: "
+    prompt_string = "New task: "
+    new_task = user_input(stdscr, prompt_string, x_max - 1)
+    if len(new_task) > 0:
+        with open(TASKS_FILE,"a") as f:
+            f.write(f'"{new_task}",todo\n')
+
+
+def add_subtask(stdscr, tasks, statuses):
+    '''Promts the user to input a subtask for existing taks and adds it to the file'''
+    y_max, x_max = stdscr.getmaxyx()
+    shift = 2 if SHOW_TITLE else 0
+    for	i in range(len(tasks)):
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
+    prompt_string = "Add subtask for number: "
+    number = user_input(stdscr, prompt_string, 4)
+    if int(number) > 0 and int(number) <= len(tasks):
+        prompt_string = "New subtask: "
         new_task = user_input(stdscr, prompt_string, x_max - 1)
         if len(new_task) > 0:
-            with open(TASKS_FILE,"a") as f:
-                f.write('"'+new_task+'"' + ",todo\n")
-    except:
-        pass
+            tasks.insert(int(number), '--'+new_task)
+            statuses.insert(int(number), statuses[int(number)-1])
+            with open(TASKS_FILE,"w") as f:
+                for task, status in zip(tasks, statuses):
+                    f.write('"'+task+'",'+status+'\n')
+
+
+def toggle_subtask(stdscr, tasks, statuses):
+    '''Toggle the state of tasks-subtasks back and forth'''
+    y_max, x_max = stdscr.getmaxyx()
+    shift = 2 if SHOW_TITLE else 0
+    for	i in range(len(tasks)):
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
+    prompt_string = "Which (sub)subtask to toggle: "
+    number = user_input(stdscr, prompt_string, 4)
+    if int(number) > 0 and int(number) <= len(tasks):
+        if tasks[int(number)-1][:2] == '--':
+            tasks[int(number)-1] = tasks[int(number)-1][2:]
+        else:
+            tasks[int(number)-1] = '--'+tasks[int(number)-1]
+        with open(TASKS_FILE,"w") as f:
+            for task, status in zip(tasks, statuses):
+                f.write('"'+task+'",'+status+'\n')
 
 
 def delete_all_tasks(stdscr):
@@ -573,30 +609,27 @@ def delete_all_tasks(stdscr):
     y_max, x_max = stdscr.getmaxyx()
     echo()
     curs_set(False)
-    try:
-        prompt_string = "Really delete all tasks? (y/n) "
-        confirmed = ask_confirmation(stdscr, prompt_string)
-        if confirmed:
-            with open(TASKS_FILE, 'w'):
-                pass
-    except:
-        pass
+    prompt_string = "Really delete all tasks? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed:
+        with open(TASKS_FILE, 'w'):
+            pass
 
 
 def calcurse_import(stdscr):
     '''Import todo events from calcurse database'''
     y_max, _ = stdscr.getmaxyx()
-    try:
-        prompt_string = "Import tasks from calcurse? (y/n) "
-        confirmed = ask_confirmation(stdscr, prompt_string)
-        if confirmed:
-            with open(CALCURSE_TODO_FILE, 'r') as f:
-                for task in f.readlines():
-                    if len(task) > 0:
-                        with open(TASKS_FILE,"a") as f:
+    prompt_string = "Import tasks from calcurse? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed:
+        with open(CALCURSE_TODO_FILE, 'r') as f:
+            for task in f.readlines():
+                if len(task) > 0:
+                    with open(TASKS_FILE,"a") as f:
+                        if task[1] in ['1','2']:
+                            f.write('"'+task[4:-1]+'"' + ",important\n")
+                        else:
                             f.write('"'+task[4:-1]+'"' + ",todo\n")
-    except:
-        pass
 
 
 def mark_all_as_done(stdscr, tasks):
@@ -604,15 +637,12 @@ def mark_all_as_done(stdscr, tasks):
     y_max, x_max = stdscr.getmaxyx()
     echo()
     curs_set(False)
-    try:
-        prompt_string = "Really mark all tasks as done? (y/n) "
-        confirmed = ask_confirmation(stdscr, prompt_string)
-        if confirmed:
-            with open(TASKS_FILE, "w") as f:
-                for task in tasks:
-                    f.write(task + ",done\n")
-    except:
-        pass
+    prompt_string = "Really mark all tasks as done? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed:
+        with open(TASKS_FILE, "w") as f:
+            for task in tasks:
+                f.write(task + ",done\n")
 
 
 def mark_all_as_important(stdscr, tasks):
@@ -620,15 +650,12 @@ def mark_all_as_important(stdscr, tasks):
     y_max, x_max = stdscr.getmaxyx()
     echo()
     curs_set(False)
-    try:
-        prompt_string = "Really mark all tasks as important? (y/n) "
-        confirmed = ask_confirmation(stdscr, prompt_string)
-        if confirmed: 
-            with open(TASKS_FILE, "w") as f:
-                for task in tasks:
-                    f.write(task + ",important\n")
-    except:
-        pass
+    prompt_string = "Really mark all tasks as important? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed: 
+        with open(TASKS_FILE, "w") as f:
+            for task in tasks:
+                f.write(task + ",important\n")
 
 
 def unmark_all_tasks(stdscr, tasks):
@@ -636,37 +663,42 @@ def unmark_all_tasks(stdscr, tasks):
     y_max, x_max = stdscr.getmaxyx()
     echo()
     curs_set(False)
-    try:
-        prompt_string = "Really unmark all tasks? (y/n) "
-        confirmed = ask_confirmation(stdscr, prompt_string)
-        if confirmed:
-            with open(TASKS_FILE, "w") as f:
-                for task in tasks:
-                    f.write(task + ",todo\n")
-    except:
-        pass
+    prompt_string = "Really unmark all tasks? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed:
+        with open(TASKS_FILE, "w") as f:
+            for task in tasks:
+                f.write(task + ",todo\n")
 
 
 def delete_task(stdscr, tasks, statuses):
-    '''Promt the user which task to delete and change the file'''
+    '''Promts the user which task to delete and changes the file'''
     y_max, x_max = stdscr.getmaxyx()
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
-        stdscr.addstr(shift+i, 1, str(i+1))
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Delete task number: "
     number = user_input(stdscr, prompt_string, 4)
-    try:
-        if int(number) > 0 and int(number) <= len(tasks):
-            prompt_string = "Really delete this task? (y/n) "
-            confirmed = ask_confirmation(stdscr, prompt_string)
-            if confirmed:
-                del tasks[int(number)-1]
-                del statuses[int(number)-1]
-                with open(TASKS_FILE,"w") as f:
-                    for task, status in zip(tasks, statuses):
-                        f.write(task+","+status+"\n")
-    except:
-        pass
+    if int(number) > 0 and int(number) <= len(tasks):
+        prompt_string = "Really delete this task? (y/n) "
+        confirmed = ask_confirmation(stdscr, prompt_string)
+        if confirmed:
+            to_delete = [int(number)-1]
+            # Mark subtasks to be deleted as well
+            if tasks[int(number)-1][:2] != '--':
+                for i in range(int(number), len(tasks)):
+                    if tasks[i][:2] == '--':
+                        to_delete.append(i)
+                    else:
+                        break
+            # Delete marked tasks
+            for index in reversed(to_delete):
+                del tasks[index]
+                del statuses[index]
+            with open(TASKS_FILE,"w") as f:
+                for task, status in zip(tasks, statuses):
+                    f.write(task+","+status+"\n")
 
 
 def edit_task(stdscr, tasks, statuses):
@@ -674,24 +706,21 @@ def edit_task(stdscr, tasks, statuses):
     y_max, x_max = stdscr.getmaxyx()
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
-        stdscr.addstr(shift+i, 1, str(i+1))
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Edit task number: "
     number = user_input(stdscr, prompt_string, 4)
 
-    try:
-        if int(number) > 0 and int(number) <= len(tasks):
-            prompt_string = "New task: "
-            new_task = user_input(stdscr, prompt_string, x_max - 1)
-            try:
-                if len(new_task) > 0:
-                    tasks[int(number)-1] = new_task
-                    with open(TASKS_FILE,"w") as f:
-                        for task, status in zip(tasks, statuses):
-                            f.write('"'+task+'",'+status+'\n')
-            except:
-                pass
-    except:
-        pass
+    if int(number) > 0 and int(number) <= len(tasks):
+        prompt_string = "New task: "
+        new_task = user_input(stdscr, prompt_string, x_max - 1)
+        if len(new_task) > 0:
+            if tasks[int(number)-1][:2] == "--":
+                new_task = "--"+new_task
+            tasks[int(number)-1] = new_task
+            with open(TASKS_FILE,"w") as f:
+                for task, status in zip(tasks, statuses):
+                    f.write('"'+task+'",'+status+'\n')
 
 
 def mark_as_done(stdscr, tasks, statuses):
@@ -699,17 +728,22 @@ def mark_as_done(stdscr, tasks, statuses):
     y_max, x_max = stdscr.getmaxyx()
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
-        stdscr.addstr(shift+i, 1, str(i+1))
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Mark as done task number: "
     number = user_input(stdscr, prompt_string, 4)
-    try:
-        if int(number) > 0 and int(number) <= len(tasks):
-            statuses[int(number)-1] = "done"
-            with open(TASKS_FILE,"w") as f:
-                for task, status in zip(tasks, statuses):
-                    f.write(task+","+status+"\n")
-    except:
-        pass
+    if int(number) > 0 and int(number) <= len(tasks):
+        statuses[int(number)-1] = "done"
+        # if there are subtasks, mark them as well
+        if tasks[int(number)-1][:2] != '--':
+            for i in range(int(number), len(tasks)):
+                if tasks[i][:2] == '--':
+                    statuses[i] = "done"
+                else:
+                    break
+        with open(TASKS_FILE,"w") as f:
+            for task, status in zip(tasks, statuses):
+                f.write(task+","+status+"\n")
 
 
 def mark_as_important(stdscr, tasks, statuses):
@@ -717,38 +751,48 @@ def mark_as_important(stdscr, tasks, statuses):
     y_max, x_max = stdscr.getmaxyx()
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
-        stdscr.addstr(shift+i, 1, str(i+1))
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Mark as important task number: "
     number = user_input(stdscr, prompt_string, 4)
-    try:
-        if int(number) > 0 and int(number) <= len(tasks):
-            statuses[int(number)-1] = "important"
-            with open(TASKS_FILE,"w") as f:
-                for task, status in zip(tasks, statuses):
-                    f.write(task+","+status+"\n")
-    except:
-        pass
+    if int(number) > 0 and int(number) <= len(tasks):
+        statuses[int(number)-1] = "important"
+        # if there are subtasks, mark them as well
+        if tasks[int(number)-1][:2] != '--':
+            for i in range(int(number), len(tasks)):
+                if tasks[i][:2] == '--':
+                    statuses[i] = "important"
+                else:
+                    break
+        with open(TASKS_FILE,"w") as f:
+            for task, status in zip(tasks, statuses):
+                f.write(task+","+status+"\n")
 
 
 def unmark_task(stdscr, tasks, statuses):
     '''Promt the user which task to unmark as done and rewrites the file'''
     y_max, x_max = stdscr.getmaxyx()
-    shift = 3 if SHOW_TITLE else 0
+    shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
-        stdscr.addstr(shift+i, 1, str(i+1))
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Unmark task number: "
     number = user_input(stdscr, prompt_string, 4)
-    try:
-        if int(number) > 0 and int(number) <= len(tasks):
-            statuses[int(number)-1] = "todo"
-            with open(TASKS_FILE,"w") as f:
-                for task, status in zip(tasks, statuses):
-                    f.write(task+","+status+"\n")
-    except:
-        pass
+    if int(number) > 0 and int(number) <= len(tasks):
+        statuses[int(number)-1] = "todo"
+        # if there are subtasks, unmark them as well
+        if tasks[int(number)-1][:2] != '--':
+            for i in range(int(number), len(tasks)):
+                if tasks[i][:2] == '--':
+                    statuses[i] = "todo"
+                else:
+                    break
+        with open(TASKS_FILE,"w") as f:
+            for task, status in zip(tasks, statuses):
+                f.write(task+","+status+"\n")
 
 
-def monthly_view(stdscr, my_cal, month, year, regime, privacy_on):
+def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
     '''This is the calendar view that shows events'''
     bd_dates, bd_names = parse_birthdays_from_abook()
     y_max, x_max = stdscr.getmaxyx()
@@ -918,10 +962,10 @@ def monthly_view(stdscr, my_cal, month, year, regime, privacy_on):
                     confirmed = ask_confirmation(stdscr, prompt_string)
                     if confirmed:
                         running = False
-                        regime = 'exit'
+                        state = 'exit'
                 if key == "?":
                     running = False
-                    regime = 'help_view'
+                    state = 'help_screen'
                 if key == "*": privacy_on = not privacy_on
                 if key == "C": import_events_from_calcurse()
                 if key in ["KEY_HOME", "G"]:
@@ -929,20 +973,20 @@ def monthly_view(stdscr, my_cal, month, year, regime, privacy_on):
                     year  = today.year
                 if key in ["KEY_TAB", " "]:
                     running = False
-                    regime = 'todo_view'
+                    state = 'task_screen'
 
             except KeyboardInterrupt:
                 prompt_string = "Really exit? (y/n)"
                 confirmed = ask_confirmation(stdscr, prompt_string)
                 if confirmed:
                     running = False
-                    regime = 'exit'
+                    state = 'exit'
             except:
                 pass
-    return regime, privacy_on, month
+    return state, privacy_on, month
 
 
-def todo_view(stdscr, regime, privacy_on):
+def task_screen(stdscr, state, privacy_on):
     '''This is the todo view that shows the screen with tasks'''
     y_max, x_max = stdscr.getmaxyx()
     running = True
@@ -962,17 +1006,24 @@ def todo_view(stdscr, regime, privacy_on):
             # Display the tasks:
             for index, task in enumerate(tasks):
                 task = task[:x_max-3]
+
+                # Check the tabbing for subtasks
+                tab = 1
+                if task[:2] == '--':
+                    tab += 2
+                    task = task[2:]
+
                 if privacy_on: task = PRIVACY_ICON*len(task)
                 if statuses[index] == "done":
-                    stdscr.addstr(index+shift,1,DONE_ICON, color_pair(12))
-                    stdscr.addstr(index+shift,3, task, color_pair(12))
+                    stdscr.addstr(index+shift, tab,DONE_ICON, color_pair(12))
+                    stdscr.addstr(index+shift, tab+2, task, color_pair(12))
                 elif statuses[index] == "important":
-                    stdscr.addstr(index+shift,1,IMPORTANT_ICON, color_pair(13))
-                    stdscr.addstr(index+shift,3, task, color_pair(13))
+                    stdscr.addstr(index+shift, tab,IMPORTANT_ICON, color_pair(13))
+                    stdscr.addstr(index+shift, tab+2, task, color_pair(13))
                 else:
                     icon = display_icon(task)
-                    stdscr.addstr(index+shift,1, icon, color_pair(11))
-                    stdscr.addstr(index+shift,3, task, color_pair(11))
+                    stdscr.addstr(index+shift, tab, icon, color_pair(11))
+                    stdscr.addstr(index+shift, tab+2, task, color_pair(11))
 
             # Show keybinding
             if show_hints:
@@ -993,7 +1044,8 @@ def todo_view(stdscr, regime, privacy_on):
                 stdscr.refresh()
 
             # Handle various keys
-            if key in ["a"]: add_task(stdscr)
+            if key == "a": add_task(stdscr)
+            if key == "A": add_subtask(stdscr, tasks, statuses)
             if key == "D": delete_all_tasks(stdscr)
             if key == "v": mark_as_done(stdscr, tasks, statuses)
             if key == "V": mark_all_as_done(stdscr, tasks)
@@ -1001,35 +1053,36 @@ def todo_view(stdscr, regime, privacy_on):
             if key == "I": mark_all_as_important(stdscr, tasks)
             if key == "u": unmark_task(stdscr, tasks, statuses)
             if key == "U": unmark_all_tasks(stdscr, tasks)
+            if key == "s": toggle_subtask(stdscr, tasks, statuses)
             if key == "*": privacy_on = not privacy_on
             if key == "C": calcurse_import(stdscr)
             if key == "d": delete_task(stdscr, tasks, statuses)
             if key in ["e", "c"]: edit_task(stdscr, tasks, statuses)
             if key == " ":
                 running = False
-                regime = 'monthly_view'
+                state = 'monthly_screen'
             if key == "?":
                 running = False
-                regime = 'help_view'
+                state = 'help_screen'
             if key == "q":
                 prompt_string = "Really exit? (y/n) "
                 confirmed = ask_confirmation(stdscr, prompt_string)
                 if confirmed:
                     running = False
-                    regime = 'exit'
+                    state = 'exit'
 
         except KeyboardInterrupt:
             prompt_string = "Really exit? (y/n) "
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
                 running = False
-                regime = 'exit'
+                state = 'exit'
         except:
             pass
-    return regime, privacy_on
+    return state, privacy_on
 
 
-def help_view(stdscr, regime):
+def help_screen(stdscr, state):
     '''This is the help view that shows all the keybinding'''
     y_max, x_max = stdscr.getmaxyx()
     running = True
@@ -1059,9 +1112,10 @@ def help_view(stdscr, regime):
 
         keys_todo = {
                 '  a  ': 'Add task',
+                '  A  ': 'Add subtask',
                 '  i  ': 'Mark task as important',
                 '  I  ': 'Mark all as important',
-                '  d  ': 'Delete task',
+                '  d  ': 'Delete task (with all subtasks)',
                 '  D  ': 'Delete all tasks',
                 '  e  ': 'Edit task',
                 '  C  ': 'Imort tasks from calcurse',
@@ -1072,17 +1126,17 @@ def help_view(stdscr, regime):
             stdscr.addstr(0, 0, "KEYBINDINGS"[:x_max-3], color_pair(6))
             stdscr.addstr(2, 0, "General"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_general):
-                line = str(key+" · "+keys_general[key])[:x_max-3]
+                line = str(key+" "+keys_general[key])[:x_max-3]
                 stdscr.addstr(index+4, 0, line, color_pair(5))
 
             stdscr.addstr(5+len(keys_general), 0, "Calendar view"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_calendar):
-                line = str(key+" · "+keys_calendar[key])[:x_max-3]
+                line = str(key+" "+keys_calendar[key])[:x_max-3]
                 stdscr.addstr(index+7+len(keys_general), 0, line, color_pair(5))
 
             stdscr.addstr(8+len(keys_calendar)+len(keys_general), 0, "Task view"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_todo):
-                line = str(key+" · "+keys_todo[key])[:x_max-3]
+                line = str(key+" "+keys_todo[key])[:x_max-3]
                 stdscr.addstr(index+10+len(keys_general)+len(keys_calendar), 0, line, color_pair(5))
             stdscr.addstr(11+len(keys_todo)+len(keys_general)+len(keys_calendar), 0, "Vim keys work as well!", color_pair(1))
         except:
@@ -1103,17 +1157,17 @@ def help_view(stdscr, regime):
             # Handle keys to exit the help screen
             if key in [" ", "?", "q"]:
                 running = False
-                regime = 'monthly_view'
+                state = 'monthly_screen'
 
         except KeyboardInterrupt:
             prompt_string = "Really exit? (y/n) "
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
                 running = False
-                regime = 'exit'
+                state = 'exit'
         except:
             pass
-    return regime
+    return state
 
 
 def main(stdscr):
@@ -1124,22 +1178,22 @@ def main(stdscr):
     privacy_on   = PRIVACY_MODE
 
     if DEFAULT_VIEW == 'calendar':
-        regime = 'monthly_view'
+        state = 'monthly_screen'
     else:
-        regime = 'todo_view'
+        state = 'task_screen'
 
     # Starting the screen
     stdscr = initscr()
     initialize_colors(stdscr)
 
     # Running 
-    while regime != 'exit':
-        if regime == 'monthly_view':
-            regime, privacy_on, month = monthly_view(stdscr, my_cal, month, year, regime, privacy_on)
-        elif regime == 'todo_view':
-            regime, privacy_on = todo_view(stdscr, regime, privacy_on)
-        elif regime == 'help_view':
-            regime = help_view(stdscr, regime)
+    while state != 'exit':
+        if state == 'monthly_screen':
+            state, privacy_on, month = monthly_screen(stdscr, my_cal, month, year, state, privacy_on)
+        elif state == 'task_screen':
+            state, privacy_on = task_screen(stdscr, state, privacy_on)
+        elif state == 'help_screen':
+            state = help_screen(stdscr, state)
         else:
             break
 
@@ -1147,7 +1201,6 @@ def main(stdscr):
     echo()
     curs_set(True)
     endwin()
-    return
 
 
 if __name__ == "__main__":
