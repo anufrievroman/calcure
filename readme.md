@@ -7,15 +7,15 @@ Minimalist TUI calendar and task manager with customizable interface. You can ma
 ## Features
 
 - Vim keys
-- Operation with a fewest key presses possible
+- Operate with a fewest key presses possible
 - Todo list with tasks and subtasks
-- Birthdays from your abook contacts
+- See birthdays from your abook contacts
 - Import events and tasks from calcurse
-- Auto pictograms according to the name ✈ ⛷ ⛱
-- Privacy mode ••••• to obfuscate events and tasks
+- Generate pictograms according to the name ✈ ⛷ ⛱
+- Toggle privacy mode ••••• to obfuscate events and tasks
 - Simple plain text database in a desired location for cloud sync
-- Colors, icons, and other features are fully customizable
-- Resize friendly. Can shrink to a small window
+- Fully customizable colors, icons, and other features
+- Resize and mobile friendly
 - Start week on any day
 
 
@@ -35,13 +35,13 @@ cp calcure/calcure $HOME/.local/bin
 chmod =rwx $HOME/.local/bin/calcure
 ```
 
-## Usage
-
-Run by typing `calcure` in a linux terminal.
-
 ## Dependencies
 
 It only requires python 3. You should have it by deafult, but if you don't, install `python` package from your standard repository.
+
+## Usage
+
+Run by typing `calcure` in a linux terminal.
 
 ## Key bindings
 
@@ -62,38 +62,40 @@ It only requires python 3. You should have it by deafult, but if you don't, inst
 
 `p`,`h`,`k`,`↑` · Previous month
 
-`a` · Add event
+`a` · Add an event
 
-`A` · Add reccuring event
+`A` · Add a reccuring event
 
-`d` · Delete event
+`i` · Mark/unmark an event as important
 
-`e` · Edit event
+`d` · Delete an event
 
-`C` · Imort events from calcurse
+`e` · Edit an event
+
+`C` · Import events from calcurse
 
 `home`,`gg`,`G` - return to current month
 
 
 ### Tasks view
 
-`a` · Add task
+`a` · Add a task
 
-`A` · Add subtask
+`A` · Add a subtask
 
-`i` · Mark task as important
+`i` · Mark a task as important
 
-`I` · Mark all as important
+`I` · Mark all tasks as important
 
-`d` · Delete task and all subtasks
+`d` · Delete a task and all its subtasks
 
 `D` · Delete all tasks
 
-`s` · Toggle subtask
+`s` · Toggle between task and subtask
 
-`e` · Edit task
+`e` · Edit a task
 
-`C` · Imort tasks from calcurse
+`C` · Import tasks from calcurse
 
 
 ## Configuration

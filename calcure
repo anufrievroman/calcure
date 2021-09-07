@@ -7,6 +7,7 @@ import os
 import pathlib
 import configparser
 import subprocess
+import re
 
 
 # Write configuration file if it does not exist
@@ -269,28 +270,33 @@ def load_events():
             pass
 
     with open(EVENTS_FILE,"r") as f:
-        apts = csv.reader(f, delimiter = ',')
-        ids, dates, names, reps, freq = [], [], [], [], []
+        lines = csv.reader(f, delimiter = ',')
+        ids, dates, names, reps, freq, statuses = [], [], [], [], [], []
         try:
-            for row in apts:
-                repetitions = int(row[5])
+            for line in lines:
+                repetitions = int(line[5])
                 for r in range(repetitions):
                     try:
-                        fr = row[6]
-                        year  = int(row[1]) + r*(fr=='y')
-                        month = int(row[2]) + r*(fr=='m')
-                        day   = int(row[3]) + r*(fr=='d') + 7*r*(fr=='w')
+                        fr = line[6]
+                        year  = int(line[1]) + r*(fr=='y')
+                        month = int(line[2]) + r*(fr=='m')
+                        day   = int(line[3]) + r*(fr=='d') + 7*r*(fr=='w')
                         event_date = calculate_recurring_events(year, month, day, fr)
-                        ids.append(int(row[0]))
+                        ids.append(int(line[0]))
                         dates.append(event_date)
-                        names.append(row[4])
-                        reps.append(int(row[5]))
-                        freq.append(row[6])
+                        names.append(line[4])
+                        reps.append(int(line[5]))
+                        freq.append(line[6])
+                        # Update of the old format to accomodate statuses
+                        if len(line) < 8:
+                            statuses.append("normal")
+                        else:
+                            statuses.append(line[7])
                     except:
                         pass
         except:
             pass
-        events = {'id': ids, 'dates': dates, 'names': names, 'reps': reps, 'freq': freq}
+        events = {'id': ids, 'dates': dates, 'names': names, 'reps': reps, 'freq': freq, 'statuses': statuses}
     return events
 
 
@@ -321,7 +327,8 @@ def add_event(stdscr, month, year, recurring):
         events = load_events()
         event_id = 1 if not events['id'] else max(events['id'])+1
         new_event = (str(event_id)+","+str(year)+","+str(month)+","+
-                event_date+","+'"'+name+'"'+","+str(repetitions)+","+str(frequency))
+                event_date+","+'"'+name+'"'+","+str(repetitions)+","+
+                str(frequency))
         if len(name) > 0 and int(repetitions) >= 0 and frequency in ["d","w","m","y","n"]:
             with open(EVENTS_FILE, "a") as f:
                 f.write(new_event+"\n")
@@ -358,6 +365,44 @@ def delete_event(stdscr, ids_this_month, names_this_month):
         pass
 
 
+def mark_event_as_important(stdscr, ids_this_month, names_this_month, month, year):
+    '''Mark existing event as important'''
+    y_max, x_max = stdscr.getmaxyx()
+    prompt_string = "Mark as important event number: "
+    num = (user_input(stdscr, prompt_string, 4))
+    event_chosen = False
+    # If provided number is correct, then change the status:
+    try:
+        if int(num) in range(1, len(ids_this_month)+1):
+            recurring = True
+            event_id = ids_this_month[int(num)-1]
+            event_name = names_this_month[int(num)-1]
+            # Here we work with a dummy file and replace the original in the last moment
+            original_file = EVENTS_FILE
+            dummy_file = EVENTS_FILE + '.bak'
+            line_deleted = False
+            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                for line in read_obj:
+                    if not line.startswith(str(event_id)+','):
+                        write_obj.write(line)
+                    else:
+                        if "important" in line[-11:]:
+                            # line = line[:-10] + "\n"
+                            line = re.sub(',important', '', line)
+                        else:
+                            # line = re.sub("", '', line)
+                            line = line[:-1] + ',important\n'
+                        write_obj.write(line)
+                        line_edited = True
+            if line_edited:
+                os.remove(original_file)
+                os.rename(dummy_file, original_file)
+            else:
+                os.remove(dummy_file)
+    except:
+        pass
+
+
 def edit_event(stdscr, ids_this_month, names_this_month, month, year):
     '''Edit chosen event via deleting it and creating a new one'''
     y_max, x_max = stdscr.getmaxyx()
@@ -378,7 +423,7 @@ def edit_event(stdscr, ids_this_month, names_this_month, month, year):
                 line_deleted = False
                 with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
                     for line in read_obj:
-                        if line.startswith(str(event_id)+',') == False:
+                        if not line.startswith(str(event_id)+','):
                             write_obj.write(line)
                         else:
                             line_deleted = True
@@ -464,16 +509,16 @@ def display_day_names(stdscr, x_max):
             shift = START_WEEK_DAY-1
             day_number = i+shift - 7*((i+shift) > 6)
             name = calendar.day_name[day_number][:num].upper()
-            color = 1 if day_number < 5 else 7
+            color = 1 if day_number < 5 else 6
             try:
                 stdscr.addstr(1, i*x_cell, name, color_pair(color))
             except:
                 pass
 
 
-def display_icon(name, delete_mode=False, edit_mode=False):
+def display_icon(name, selection_mode=False):
     '''Check if event seems of certain type and return corresponding icon'''
-    if not delete_mode and not edit_mode and DISPLAY_ICONS:
+    if not selection_mode and DISPLAY_ICONS:
         icon = EVENT_ICON + " "
         for key in ICONS:
             if key in name.lower():
@@ -524,14 +569,15 @@ def initialize_colors(stdscr):
     init_pair(13, COLOR_IMPORTANT, -1)
 
 
-def check_weather():
-    '''Checking weather in the current location. This function is slow...'''
-    try:
-        weather_string = str(subprocess.getstatusoutput(f"curl -s wttr.in/?format=3")[1])
-        weather_string = " " + weather_string.split(':')[1]
-    except:
-        pass
-    return weather_string
+def check_weather(weather):
+    '''Checking weather in the current location if it was not checked before'''
+    if weather == "":
+        try:
+            weather = str(subprocess.getstatusoutput(f"curl -s wttr.in/?format=3")[1])
+            weather = " " + weather.split(':')[1]
+        except:
+            pass
+    return weather
 
 
 def load_tasks():
@@ -586,13 +632,13 @@ def add_subtask(stdscr, tasks, statuses):
 
 
 def toggle_subtask(stdscr, tasks, statuses):
-    '''Toggle the state of tasks-subtasks back and forth'''
+    '''Toggle between task and subtask state'''
     y_max, x_max = stdscr.getmaxyx()
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
         col = 1 if i+1 < 10 else 0
         stdscr.addstr(shift+i, col, str(i+1))
-    prompt_string = "Which (sub)subtask to toggle: "
+    prompt_string = "Which (sub)task to toggle: "
     number = user_input(stdscr, prompt_string, 4)
     if int(number) > 0 and int(number) <= len(tasks):
         if tasks[int(number)-1][:2] == '--':
@@ -652,7 +698,7 @@ def mark_all_as_important(stdscr, tasks):
     curs_set(False)
     prompt_string = "Really mark all tasks as important? (y/n) "
     confirmed = ask_confirmation(stdscr, prompt_string)
-    if confirmed: 
+    if confirmed:
         with open(TASKS_FILE, "w") as f:
             for task in tasks:
                 f.write(task + ",important\n")
@@ -792,19 +838,15 @@ def unmark_task(stdscr, tasks, statuses):
                 f.write(task+","+status+"\n")
 
 
-def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
+def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
     '''This is the calendar view that shows events'''
     bd_dates, bd_names = parse_birthdays_from_abook()
-    y_max, x_max = stdscr.getmaxyx()
-    running      = True
-    delete_mode  = False
-    edit_mode    = False
-    refresh_mode = False
-    show_hints   = SHOW_KEYBINDINGS
+    y_max, x_max   = stdscr.getmaxyx()
+    selection_mode = False
+    refresh_mode   = False
+    running        = True
+    show_hints     = SHOW_KEYBINDINGS
 
-    if SHOW_WEATHER:
-        print("Loading weather data...")
-        weather = check_weather()
 
     while running:
         stdscr.clear()
@@ -833,13 +875,10 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
                 day = dates[w][d]
                 if day > 0:
 
-                    # Display dates of the month (and weather)
+                    # Display dates of the month
                     if datetime.date(year, month, day) == today:
                         color = 4
-                        try:
-                            icon = TODAY_ICON + weather[:x_cell-4] if x_cell > 5 else TODAY_ICON
-                        except:
-                            icon = TODAY_ICON
+                        icon = TODAY_ICON
                     else:
                         shift = START_WEEK_DAY-1
                         day_number = d+shift - 7*((d+shift) > 6)
@@ -854,23 +893,26 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
 
                     # Display events
                     num_of_event_this_day = 0
-                    for event_id, event_date, event_name in zip(events['id'], events['dates'], events['names']):
+                    for event_id, event_date, event_name, event_status in zip(events['id'], events['dates'], events['names'], events['statuses']):
                         if datetime.date(year, month, day) == event_date:
                             if num_of_event_this_day < y_cell - 1: # If screen space is ok
-                                icon = display_icon(event_name, delete_mode, edit_mode)
-                                # Check if this is recurring event
+                                icon = display_icon(event_name, selection_mode)
+
+                                # Check if this is a recurring event
                                 if event_id in ids_this_month:
                                     event_number = ids_this_month.index(event_id) + 1
                                 else:
                                     event_number += 1
+
                                 # Display the event
-                                number = (str(event_number)+"·")*(delete_mode or edit_mode)
+                                number = (str(event_number)+"·")*(selection_mode)
                                 if privacy_on: event_name = PRIVACY_ICON*len(event_name)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 disp = disp + " "*abs(x_max - x_cell*d - len(disp))
+                                color = 13 if event_status == 'important' else 1
                                 try:
-                                    stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(1))
+                                    stdscr.addstr(3+num_of_event_this_day+w*y_cell, d*x_cell, disp, color_pair(color))
                                 except:
                                     pass
 
@@ -904,24 +946,32 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
                                 pass
                 day_number += 1
 
-        # Show keybinding
+        # Display weather
+        if SHOW_WEATHER:
+            stdscr.refresh()
+            weather = check_weather(weather)
+            if len(weather) < x_max-len(month_string):
+                stdscr.addstr(0, x_max-len(weather)-1, weather, color_pair(4))
+
+        # Show keybinding hint
         if show_hints:
             stdscr.addstr(y_max - 1, 0, CALENDAR_HINT[:x_max-2], color_pair(3))
 
         # Handle user input
 
-        # stdscr.addstr(y_max - 1, 0, key, color_pair(3))
+        # If this we need to choose one of the events:
         refresh_mode = False
-        if delete_mode:
-            delete_event(stdscr, ids_this_month, names_this_month)
-            delete_mode = False
+        if selection_mode:
+            if key in ["d", "x"]:
+                delete_event(stdscr, ids_this_month, names_this_month)
+            elif key in ["e", "c"]:
+                edit_event(stdscr, ids_this_month, names_this_month, month, year)
+            elif key in ["i"]:
+                mark_event_as_important(stdscr, ids_this_month, names_this_month, month, year)
+            selection_mode = False
             refresh_mode = True
 
-        if edit_mode:
-            edit_event(stdscr,  ids_this_month, names_this_month, month, year)
-            edit_mode = False
-            refresh_mode = True
-
+        # Otherwise, check for regular keys:
         if not refresh_mode:
             try:
                 key = stdscr.getkey()
@@ -944,7 +994,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
                     stdscr.clear()
                     stdscr.refresh()
 
-                # Handle rest of the user input
+                # Handle rest of the keybindings
                 if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
                     month, year = next_month(month, year)
                 if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
@@ -955,8 +1005,9 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
                 if key in ["A"]:
                     recurring = True
                     add_event(stdscr, month, year, recurring)
-                if key in ["d", "x"]: delete_mode = True
-                if key in ["e", "c"]: edit_mode = True
+                if key in ["d", "x"]: selection_mode = True
+                if key in ["e", "c"]: selection_mode = True
+                if key in ["i"]: selection_mode = True
                 if key == "q":
                     prompt_string = "Really exit? (y/n)"
                     confirmed = ask_confirmation(stdscr, prompt_string)
@@ -975,15 +1026,18 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on):
                     running = False
                     state = 'task_screen'
 
+            # Handle keybard interruption with ctr+c
             except KeyboardInterrupt:
                 prompt_string = "Really exit? (y/n)"
                 confirmed = ask_confirmation(stdscr, prompt_string)
                 if confirmed:
                     running = False
                     state = 'exit'
+
+            # This except is necessary to prevent many various crashes
             except:
                 pass
-    return state, privacy_on, month
+    return state, privacy_on, month, weather
 
 
 def task_screen(stdscr, state, privacy_on):
@@ -1071,12 +1125,14 @@ def task_screen(stdscr, state, privacy_on):
                     running = False
                     state = 'exit'
 
+        # Handle keybard interruption with ctr+c
         except KeyboardInterrupt:
             prompt_string = "Really exit? (y/n) "
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
                 running = False
                 state = 'exit'
+        # This except is necessary to prevent many various crashes
         except:
             pass
     return state, privacy_on
@@ -1102,23 +1158,25 @@ def help_screen(stdscr, state):
         keys_calendar = {
                 '  n  ': 'Next month',
                 '  p  ': 'Previous month',
-                '  a  ': 'Add event',
-                '  A  ': 'Add reccuring event',
-                '  d  ': 'Delete event',
-                '  e  ': 'Edit event',
-                '  C  ': 'Imort events from calcurse',
+                '  a  ': 'Add an event',
+                '  A  ': 'Add a reccuring event',
+                '  i  ': 'Mark/unmark an event as important',
+                '  d  ': 'Delete an event',
+                '  e  ': 'Edit an event',
+                '  C  ': 'Import events from calcurse',
                 '  G  ': 'Return to current month',
                 }
 
         keys_todo = {
-                '  a  ': 'Add task',
-                '  A  ': 'Add subtask',
-                '  i  ': 'Mark task as important',
+                '  a  ': 'Add a task',
+                '  A  ': 'Add a subtask',
+                '  i  ': 'Mark a task as important',
                 '  I  ': 'Mark all as important',
-                '  d  ': 'Delete task (with all subtasks)',
+                '  d  ': 'Delete a task (with all subtasks)',
                 '  D  ': 'Delete all tasks',
-                '  e  ': 'Edit task',
-                '  C  ': 'Imort tasks from calcurse',
+                '  e  ': 'Edit a task',
+                '  s  ': 'Toggle between task and subtask',
+                '  C  ': 'Import tasks from calcurse',
                 }
 
         # Printing out the dictionaries
@@ -1176,6 +1234,7 @@ def main(stdscr):
     month  = datetime.date.today().month
     year   = datetime.date.today().year
     privacy_on   = PRIVACY_MODE
+    weather      = ''
 
     if DEFAULT_VIEW == 'calendar':
         state = 'monthly_screen'
@@ -1186,10 +1245,10 @@ def main(stdscr):
     stdscr = initscr()
     initialize_colors(stdscr)
 
-    # Running 
+    # Running various screens depending on the state
     while state != 'exit':
         if state == 'monthly_screen':
-            state, privacy_on, month = monthly_screen(stdscr, my_cal, month, year, state, privacy_on)
+            state, privacy_on, month, weather = monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather)
         elif state == 'task_screen':
             state, privacy_on = task_screen(stdscr, state, privacy_on)
         elif state == 'help_screen':
