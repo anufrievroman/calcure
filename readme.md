@@ -1,20 +1,21 @@
 # calcure
 
-Minimalist TUI calendar and task manager with customizable interface. You can manage your events and tasks, view birthdays from your [abook](https://abook.sourceforge.io/), and import events and tasks from [calcurse](https://github.com/lfos/calcurse).
+Minimalist TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and imports events and tasks from [calcurse](https://github.com/lfos/calcurse).
 
 ![screenshot](screenshot.jpeg)
 
+
 ## Features
 
-- Vim keys
-- Operate with a fewest key presses possible
+- Vim keys supported
+- Operate with fewest key presses possible
 - Todo list with tasks and subtasks
-- See birthdays from your abook contacts
+- See birthdays of your abook contacts
 - Import events and tasks from calcurse
 - Generate pictograms according to the name ✈ ⛷ ⛱
 - Toggle privacy mode ••••• to obfuscate events and tasks
-- Simple plain text database in a desired location for cloud sync
-- Fully customizable colors, icons, and other features
+- Plain text database in your folder for cloud sync
+- Customizable colors, icons, and other features
 - Resize and mobile friendly
 - Start week on any day
 
@@ -24,6 +25,7 @@ Minimalist TUI calendar and task manager with customizable interface. You can ma
 ### On Arch-based distributions
 
 The package `calcure` is avalible in AUR. Simply install it with `yay -S calcure` or with another AUR helper.
+
 
 ### On other distributions
 
@@ -39,9 +41,11 @@ chmod =rwx $HOME/.local/bin/calcure
 
 It only requires python 3. You should have it by deafult, but if you don't, install `python` package from your standard repository.
 
+
 ## Usage
 
 Run by typing `calcure` in a linux terminal.
+
 
 ## Key bindings
 
