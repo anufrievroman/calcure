@@ -1037,7 +1037,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
             # This except is necessary to prevent many various crashes
             except:
                 pass
-    return state, privacy_on, month, weather
+    return state, privacy_on, month, year, weather
 
 
 def task_screen(stdscr, state, privacy_on):
@@ -1248,7 +1248,7 @@ def main(stdscr):
     # Running various screens depending on the state
     while state != 'exit':
         if state == 'monthly_screen':
-            state, privacy_on, month, weather = monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather)
+            state, privacy_on, month, year, weather = monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather)
         elif state == 'task_screen':
             state, privacy_on = task_screen(stdscr, state, privacy_on)
         elif state == 'help_screen':
