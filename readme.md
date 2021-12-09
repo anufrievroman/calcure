@@ -8,28 +8,28 @@ Minimalist TUI calendar and task manager with customizable interface. Manages yo
 ## Features
 
 - Vim keys supported
-- Operate with fewest key presses possible
+- Operation with fewest key presses possible
 - Todo list with tasks and subtasks
-- See birthdays of your abook contacts
-- Import events and tasks from calcurse
-- Generate pictograms according to the name ✈ ⛷ ⛱
-- Toggle privacy mode ••••• to obfuscate events and tasks
+- Birthdays of your abook contacts
+- Events and tasks from calcurse
+- Icons according to the name ✈ ⛷ ⛱
+- Privacy mode ••••• to obfuscate events and tasks
 - Plain text database in your folder for cloud sync
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
-- Start week on any day
+- Week can start on any day
 
 
 ## Installation
 
-### On Arch-based distributions
+### On Arch-based Linux distributions
 
-The package `calcure` is avalible in AUR. Simply install it with `yay -S calcure` or with another AUR helper.
+The package `calcure` is available in AUR. Simply install it with `yay -S calcure` or with another AUR helper.
 
 
-### On other distributions
+### On other Linux distributions
 
-Just copy the **calcure** file into a directory with your binaries and make it executable:
+Just copy the `calcure` file into a directory with your binaries and make it executable:
 
 ```
 git clone https://github.com/anufrievroman/calcure
@@ -39,12 +39,12 @@ chmod =rwx $HOME/.local/bin/calcure
 
 ## Dependencies
 
-It only requires python 3. You should have it by deafult, but if you don't, install `python` package from your standard repository.
+It only requires python 3. On Linux, you should have it by default, but if you don't, install `python` package from your standard repository.
 
 
 ## Usage
 
-Run by typing `calcure` in a linux terminal.
+Run by typing `calcure` in your terminal.
 
 
 ## Key bindings
@@ -68,7 +68,7 @@ Run by typing `calcure` in a linux terminal.
 
 `a` · Add an event
 
-`A` · Add a reccuring event
+`A` · Add a recurring event
 
 `i` · Mark/unmark an event as important
 
@@ -106,13 +106,13 @@ Run by typing `calcure` in a linux terminal.
 
 On the first run, it will create a configuration file at `.config/calcure/config.ini`
 
-You can edit parameters and colors in the `config.ini` file. Here is an example config:
+You can edit parameters and colors in the `config.ini` file. Here is an example config (don't forget to change *username*):
 
 ```
 [Parameters]
-folder_with_datafiles = /home/user/.config/calcure
-calcurse_todo_file = /home/user/.local/share/calcurse/todo
-calcurse_events_file = /home/user/.local/share/calcurse/apts
+folder_with_datafiles = /home/username/.config/calcure
+calcurse_todo_file = /home/username/.local/share/calcurse/todo
+calcurse_events_file = /home/username/.local/share/calcurse/apts
 default_view = calendar
 birthdays_from_abook = Yes
 show_keybindings = Yes
@@ -204,4 +204,3 @@ training = ⛷
 
 ```
 When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
-

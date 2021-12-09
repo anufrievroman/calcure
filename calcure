@@ -10,7 +10,7 @@ import subprocess
 import re
 
 
-# Write configuration file if it does not exist
+# Write configuration file if it does not exist:
 config_folder = str(pathlib.Path.home())+"/.config/calcure"
 if not os.path.exists(config_folder):
     os.makedirs(config_folder)
@@ -123,12 +123,12 @@ def create_config():
     with open(config_file, 'w') as f:
         conf.write(f)
 
-# Load configuration file
+# Load configuration file or create if it does not exist:
 if not os.path.exists(config_file):
     create_config()
 
 try:
-    # Calendar settings
+    # Calendar settings:
     conf.read(config_file)
     SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
     SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names", fallback=True)
@@ -149,7 +149,7 @@ try:
     EVENT_ICON    = conf.get("Parameters", "event_icon", fallback="•")
     BIRTHDAY_ICON = conf.get("Parameters", "birthday_icon", fallback="★")
 
-    # Todo settings
+    # Todo settings:
     CALCURSE_TODO_FILE   = conf.get("Parameters", "calcurse_todo_file", fallback=calcurse_todo_file)
     CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=calcurse_events_file)
     TITLE                = conf.get("Parameters", "header", fallback="TASKS:")
@@ -159,7 +159,7 @@ try:
     TODO_ICON            = conf.get("Parameters", "todo_icon", fallback="•") if DISPLAY_ICONS else "·"
     IMPORTANT_ICON       = conf.get("Parameters", "important_icon", fallback="‣") if DISPLAY_ICONS else "!"
 
-    # Calendar colors
+    # Calendar colors:
     COLOR_TODAY         = int(conf.get("Colors", "color_today", fallback=2))
     COLOR_DAYS          = int(conf.get("Colors", "color_days", fallback=7))
     COLOR_DAY_NAMES     = int(conf.get("Colors", "color_day_names", fallback=4))
@@ -171,7 +171,7 @@ try:
     COLOR_CONFIRMATIONS = int(conf.get("Colors", "color_confirmations", fallback=1))
     START_WEEK_DAY      = int(conf.get("Parameters", "start_week_day", fallback=1))
 
-    # Todo colors
+    # Todo colors:
     COLOR_TODO      = int(conf.get("Colors", "color_todo", fallback=7))
     COLOR_DONE      = int(conf.get("Colors", "color_done", fallback=6))
     COLOR_TITLE     = int(conf.get("Colors", "color_title", fallback=1))
@@ -287,7 +287,7 @@ def load_events():
                         names.append(line[4])
                         reps.append(int(line[5]))
                         freq.append(line[6])
-                        # Update of the old format to accomodate statuses
+                        # Update of the old format to accomodate statuses:
                         if len(line) < 8:
                             statuses.append("normal")
                         else:
@@ -378,7 +378,8 @@ def mark_event_as_important(stdscr, ids_this_month, names_this_month, month, yea
             recurring = True
             event_id = ids_this_month[int(num)-1]
             event_name = names_this_month[int(num)-1]
-            # Here we work with a dummy file and replace the original in the last moment
+
+            # Here we work with a dummy file and replace the original in the last moment:
             original_file = EVENTS_FILE
             dummy_file = EVENTS_FILE + '.bak'
             line_deleted = False
@@ -518,12 +519,12 @@ def display_day_names(stdscr, x_max):
 
 
 def display_icon(name, selection_mode=False):
-    '''Check if event seems of certain type and return corresponding icon'''
+    '''Check if event name contains a keyword and return corresponding icon'''
     if not selection_mode and DISPLAY_ICONS:
         icon = EVENT_ICON + " "
-        for key in ICONS:
-            if key in name.lower():
-                icon = ICONS[key] + " "
+        for keyword in ICONS:
+            if keyword in name.lower():
+                icon = ICONS[keyword] + " "
     else:
         icon = ""
     return icon
@@ -732,14 +733,14 @@ def delete_task(stdscr, tasks, statuses):
         confirmed = ask_confirmation(stdscr, prompt_string)
         if confirmed:
             to_delete = [int(number)-1]
-            # Mark subtasks to be deleted as well
+            # Mark subtasks to be deleted as well:
             if tasks[int(number)-1][:2] != '--':
                 for i in range(int(number), len(tasks)):
                     if tasks[i][:2] == '--':
                         to_delete.append(i)
                     else:
                         break
-            # Delete marked tasks
+            # Delete marked tasks:
             for index in reversed(to_delete):
                 del tasks[index]
                 del statuses[index]
@@ -781,7 +782,8 @@ def mark_as_done(stdscr, tasks, statuses):
     number = user_input(stdscr, prompt_string, 4)
     if int(number) > 0 and int(number) <= len(tasks):
         statuses[int(number)-1] = "done"
-        # if there are subtasks, mark them as well
+
+        # if there are subtasks, mark them as well:
         if tasks[int(number)-1][:2] != '--':
             for i in range(int(number), len(tasks)):
                 if tasks[i][:2] == '--':
@@ -804,7 +806,8 @@ def mark_as_important(stdscr, tasks, statuses):
     number = user_input(stdscr, prompt_string, 4)
     if int(number) > 0 and int(number) <= len(tasks):
         statuses[int(number)-1] = "important"
-        # if there are subtasks, mark them as well
+
+        # if there are subtasks, mark them as well:
         if tasks[int(number)-1][:2] != '--':
             for i in range(int(number), len(tasks)):
                 if tasks[i][:2] == '--':
@@ -827,7 +830,8 @@ def unmark_task(stdscr, tasks, statuses):
     number = user_input(stdscr, prompt_string, 4)
     if int(number) > 0 and int(number) <= len(tasks):
         statuses[int(number)-1] = "todo"
-        # if there are subtasks, unmark them as well
+
+        # if there are subtasks, unmark them as well:
         if tasks[int(number)-1][:2] != '--':
             for i in range(int(number), len(tasks)):
                 if tasks[i][:2] == '--':
@@ -864,7 +868,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
         stdscr.addstr(0, 0, str(month_string)+" "+str(year))
         display_day_names(stdscr, x_max)
 
-        # Displaying the dates and events
+        # Displaying the dates and events:
         day_number = 0
         ids_this_month = []
         names_this_month = []
@@ -875,7 +879,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                 day = dates[w][d]
                 if day > 0:
 
-                    # Display dates of the month
+                    # Display dates of the month:
                     if datetime.date(year, month, day) == today:
                         color = 4
                         icon = TODAY_ICON
@@ -891,14 +895,16 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                         pass
 
 
-                    # Display events
+                    # Display events:
                     num_of_event_this_day = 0
                     for event_id, event_date, event_name, event_status in zip(events['id'], events['dates'], events['names'], events['statuses']):
+
+                        # Check if this event happens in this day and screen space is okay:
                         if datetime.date(year, month, day) == event_date:
-                            if num_of_event_this_day < y_cell - 1: # If screen space is ok
+                            if num_of_event_this_day < y_cell - 1:
                                 icon = display_icon(event_name, selection_mode)
 
-                                # Check if this is a recurring event
+                                # Check if this is a recurring event:
                                 if event_id in ids_this_month:
                                     event_number = ids_this_month.index(event_id) + 1
                                 else:
@@ -906,7 +912,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                                     ids_this_month.append(event_id)
                                     names_this_month.append(event_name)
 
-                                # Display the event
+                                # Display the event:
                                 number = (str(event_number)+"·")*(selection_mode)
                                 if privacy_on: event_name = PRIVACY_ICON*len(event_name)
                                 disp = icon + number + event_name*(x_cell > 5)
@@ -928,7 +934,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
 
 
 
-                    # Display birthdays
+                    # Display birthdays:
                     if BIRTHDAYS_FROM_ABOOK:
                         for index, bd_date in enumerate(bd_dates):
                             try:
@@ -953,13 +959,13 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
             if len(weather) < x_max-len(month_string):
                 stdscr.addstr(0, x_max-len(weather)-1, weather, color_pair(4))
 
-        # Show keybinding hint
+        # Show keybinding hint:
         if show_hints:
             stdscr.addstr(y_max - 1, 0, CALENDAR_HINT[:x_max-2], color_pair(3))
 
-        # Handle user input
+        # Handle user input:
 
-        # If this we need to choose one of the events:
+        # If we need to choose one of the events:
         refresh_mode = False
         if selection_mode:
             if key in ["d", "x"]:
@@ -975,7 +981,8 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
         if not refresh_mode:
             try:
                 key = stdscr.getkey()
-                # Handle "gg" to go to current month
+
+                # Handle "gg" to go to current month:
                 if key == "g":
                     try:
                         key = stdscr.getkey()
@@ -988,13 +995,13 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                     except:
                         pass
 
-                # Handle screen resize
+                # Handle screen resize:
                 if key == "KEY_RESIZE":
                     y_max, x_max = stdscr.getmaxyx()
                     stdscr.clear()
                     stdscr.refresh()
 
-                # Handle rest of the keybindings
+                # Handle rest of the keybindings:
                 if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
                     month, year = next_month(month, year)
                 if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
@@ -1026,7 +1033,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                     running = False
                     state = 'task_screen'
 
-            # Handle keybard interruption with ctr+c
+            # Handle keybard interruption with ctr+c:
             except KeyboardInterrupt:
                 prompt_string = "Really exit? (y/n)"
                 confirmed = ask_confirmation(stdscr, prompt_string)
@@ -1034,7 +1041,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                     running = False
                     state = 'exit'
 
-            # This except is necessary to prevent many various crashes
+            # This except is necessary to prevent many various crashes:
             except:
                 pass
     return state, privacy_on, month, year, weather
@@ -1052,7 +1059,7 @@ def task_screen(stdscr, state, privacy_on):
         curs_set(False)
         tasks, statuses = load_tasks()
         try:
-            # Display the header
+            # Display the header:
             if SHOW_TITLE:
                 stdscr.addstr(0, 0, TITLE[:x_max-3], color_pair(10))
             shift = 2 if SHOW_TITLE else 0
@@ -1061,7 +1068,7 @@ def task_screen(stdscr, state, privacy_on):
             for index, task in enumerate(tasks):
                 task = task[:x_max-3]
 
-                # Check the tabbing for subtasks
+                # Check the tabbing for subtasks:
                 tab = 1
                 if task[:2] == '--':
                     tab += 2
@@ -1079,7 +1086,7 @@ def task_screen(stdscr, state, privacy_on):
                     stdscr.addstr(index+shift, tab, icon, color_pair(11))
                     stdscr.addstr(index+shift, tab+2, task, color_pair(11))
 
-            # Show keybinding
+            # Show keybinding:
             if show_hints:
                 stdscr.addstr(y_max - 1, 0, TODO_HINT[:x_max-2], color_pair(3))
         except:
@@ -1087,17 +1094,17 @@ def task_screen(stdscr, state, privacy_on):
 
         stdscr.refresh()
 
-        # Getting user's input
+        # Getting user's input:
         try:
             key = stdscr.getkey()
 
-            # Handle screen resize
+            # Handle screen resize:
             if key == "KEY_RESIZE":
                 y_max, x_max = stdscr.getmaxyx()
                 stdscr.clear()
                 stdscr.refresh()
 
-            # Handle various keys
+            # Handle various keys:
             if key == "a": add_task(stdscr)
             if key == "A": add_subtask(stdscr, tasks, statuses)
             if key == "D": delete_all_tasks(stdscr)
@@ -1125,14 +1132,15 @@ def task_screen(stdscr, state, privacy_on):
                     running = False
                     state = 'exit'
 
-        # Handle keybard interruption with ctr+c
+        # Handle keybard interruption with ctr+c:
         except KeyboardInterrupt:
             prompt_string = "Really exit? (y/n) "
             confirmed = ask_confirmation(stdscr, prompt_string)
             if confirmed:
                 running = False
                 state = 'exit'
-        # This except is necessary to prevent many various crashes
+
+        # This except is necessary to prevent many various crashes:
         except:
             pass
     return state, privacy_on
@@ -1147,7 +1155,7 @@ def help_screen(stdscr, state):
         noecho()
         curs_set(False)
 
-        # Keybinding dictionaries
+        # Keybinding dictionaries:
         keys_general = {
                 'space': 'Switch between calendar and tasks',
                 '  ?  ': 'Toggle this help',
@@ -1159,7 +1167,7 @@ def help_screen(stdscr, state):
                 '  n  ': 'Next month',
                 '  p  ': 'Previous month',
                 '  a  ': 'Add an event',
-                '  A  ': 'Add a reccuring event',
+                '  A  ': 'Add a recurring event',
                 '  i  ': 'Mark/unmark an event as important',
                 '  d  ': 'Delete an event',
                 '  e  ': 'Edit an event',
@@ -1179,7 +1187,7 @@ def help_screen(stdscr, state):
                 '  C  ': 'Import tasks from calcurse',
                 }
 
-        # Printing out the dictionaries
+        # Printing out the dictionaries:
         try:
             stdscr.addstr(0, 0, "KEYBINDINGS"[:x_max-3], color_pair(6))
             stdscr.addstr(2, 6, "General"[:x_max-3], color_pair(4))
@@ -1202,17 +1210,17 @@ def help_screen(stdscr, state):
 
         stdscr.refresh()
 
-        # Getting user's input
+        # Getting user's input:
         try:
             key = stdscr.getkey()
 
-            # Handle screen resize
+            # Handle screen resize:
             if key == "KEY_RESIZE":
                 y_max, x_max = stdscr.getmaxyx()
                 stdscr.clear()
                 stdscr.refresh()
 
-            # Handle keys to exit the help screen
+            # Handle keys to exit the help screen:
             if key in [" ", "?", "q"]:
                 running = False
                 state = 'monthly_screen'
@@ -1241,11 +1249,11 @@ def main(stdscr):
     else:
         state = 'task_screen'
 
-    # Starting the screen
+    # Starting the screen:
     stdscr = initscr()
     initialize_colors(stdscr)
 
-    # Running various screens depending on the state
+    # Running various screens depending on the state:
     while state != 'exit':
         if state == 'monthly_screen':
             state, privacy_on, month, year, weather = monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather)
@@ -1256,7 +1264,7 @@ def main(stdscr):
         else:
             break
 
-    # Cleaning up
+    # Cleaning up:
     echo()
     curs_set(True)
     endwin()
