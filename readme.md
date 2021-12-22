@@ -1,35 +1,34 @@
-# calcure
+# Calcure
 
 Minimalist TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and imports events and tasks from [calcurse](https://github.com/lfos/calcurse).
 
 ![screenshot](screenshot.jpeg)
 
-
 ## Features
 
-- Vim keys supported
+- Vim keys
 - Operation with fewest key presses possible
-- Todo list with tasks and subtasks
+- Todo list with subtasks and timers ⌚
 - Birthdays of your abook contacts
-- Events and tasks from calcurse
+- Import of events and tasks from calcurse
 - Icons according to the name ✈ ⛷ ⛱
 - Privacy mode ••••• to obfuscate events and tasks
 - Plain text database in your folder for cloud sync
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
 - Week can start on any day
+- Current weather ⛅ · *experimental*
 
 
 ## Installation
 
 ### On Arch-based Linux distributions
 
-The package `calcure` is available in AUR. Simply install it with `yay -S calcure` or with another AUR helper.
-
+The package `calcure` is available in AUR. Install it with `yay -S calcure` or with another AUR helper.
 
 ### On other Linux distributions
 
-Just copy the `calcure` file into a directory with your binaries and make it executable:
+Just copy the `calcure` file into a directory with your binaries and make it executable. For example:
 
 ```
 git clone https://github.com/anufrievroman/calcure
@@ -39,13 +38,24 @@ chmod =rwx $HOME/.local/bin/calcure
 
 ## Dependencies
 
-It only requires python 3. On Linux, you should have it by default, but if you don't, install `python` package from your standard repository.
+It only requires python 3. On Linux and MacOS, you should have it by default, but if you don't, install `python` package from your standard repository.
 
 
 ## Usage
 
-Run by typing `calcure` in your terminal.
+Run `calcure` in your terminal. 
 
+### User arguments
+
+`calcure c` - Start with the calendar view (default)
+
+`calcure j` - Start with the journal view
+
+`calcure help` - Start on the help page
+
+`calcure p` - Start in the privacy mode (text is obfuscated as •••••)
+
+`calcure version` - Print the version and exit
 
 ## Key bindings
 
@@ -72,7 +82,7 @@ Run by typing `calcure` in your terminal.
 
 `i` · Mark/unmark an event as important
 
-`d` · Delete an event
+`d`,`x` · Delete an event
 
 `e` · Edit an event
 
@@ -87,6 +97,14 @@ Run by typing `calcure` in your terminal.
 
 `A` · Add a subtask
 
+`v` · Mark a task as done
+
+`V` · Mark all tasks as done
+
+`u` · Unmark a task
+
+`U` · Unmark all tasks
+
 `i` · Mark a task as important
 
 `I` · Mark all tasks as important
@@ -94,6 +112,10 @@ Run by typing `calcure` in your terminal.
 `d` · Delete a task and all its subtasks
 
 `D` · Delete all tasks
+
+`t` · Start / pause timer for a task
+
+`T` · Remove a timer
 
 `s` · Toggle between task and subtask
 
@@ -123,9 +145,10 @@ minimal_today_indicator = Yes
 minimal_days_indicator = Yes
 minimal_weekend_indicator = Yes
 cut_titles_by_cell_length = No
-ask_confirmations = No
+ask_confirmations = Yes
 use_unicode_icons = Yes
 start_week_day = 1
+refresh_interval = 1
 event_icon = •
 privacy_icon = •
 today_icon = •
@@ -134,8 +157,9 @@ hidden_icon = ...
 done_icon = ✔
 todo_icon = •
 important_icon = ‣
+timer_icon = ⌚
 show_header = Yes
-header = TODO LIST:
+header = TASKS:
 
 [Colors]
 color_today = 2
@@ -151,6 +175,8 @@ color_todo = 7
 color_done = 6
 color_title = 4
 color_important = 1
+color_timer = 2
+color_timer_paused = 7
 
 [Dialogues]
 calendar_hint = Space: Tasks · n/p: Change month · a: Add event · ?: Keybindings
@@ -176,23 +202,22 @@ play = ♟
 interview = ♟
 date = ♥
 concert = ♪
-gig = ♪
-disco = ♪
+dance = ♪
 music = ♪
 rehersal = ♪
-call = ☎
-phone = ☎
+call = ✆
+phone = ✆
+zoom = ✆
 deadline = ⚑
 over = ⚑
 finish = ⚑
 end = ⚑
-appointment = ✔
-task  = ✔
-doctor = ⛑
-dentist = ⛑
-medical = ⛑
-hospital = ⛑
+doctor = ✚
+dentist = ✚
+medical = ✚
+hospital = ✚
 party = ☘
+bar = ☘
 museum = ⛬
 meet = ⛬
 talk = ⛬
@@ -201,6 +226,8 @@ hearing = ⛬
 sport = ⛷
 gym = ⛷
 training = ⛷
+email = ✉
+letter = ✉
 
 ```
 When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
