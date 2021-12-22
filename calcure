@@ -43,6 +43,7 @@ def create_config():
             "cut_titles_by_cell_length": "No",
             "ask_confirmations":         "Yes",
             "use_unicode_icons":         "Yes",
+            "show_current_time":         "No",
             "start_week_day":            "1",
             "refresh_interval":          "1",
             "event_icon":                "•",
@@ -145,6 +146,7 @@ try:
     MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator", fallback=True)
     ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations", fallback=True)
     SHOW_WEATHER              = conf.getboolean("Parameters", "show_weather", fallback=False)
+    SHOW_CURRENT_TIME         = conf.getboolean("Parameters", "show_current_time", fallback=False)
     DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
     PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
     CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
@@ -967,8 +969,8 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
         today = datetime.date.today()
 
         # Displaying the month, year, and days of the week
-        month_string = calendar.month_name[month].upper()
-        stdscr.addstr(0, 0, str(month_string)+" "+str(year))
+        month_year_string = str(calendar.month_name[month].upper()) + " " + str(year)
+        stdscr.addstr(0, 0, month_year_string)
         display_day_names(stdscr, x_max)
 
         # Displaying the dates and events:
@@ -1037,8 +1039,6 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                                 except:
                                     pass
 
-
-
                     # Display birthdays:
                     if BIRTHDAYS_FROM_ABOOK:
                         for index, bd_date in enumerate(bd_dates):
@@ -1062,8 +1062,13 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
         if SHOW_WEATHER:
             stdscr.refresh()
             weather = check_weather(weather)
-            if len(weather) < x_max-len(month_string):
+            if len(weather) < x_max-len(month_year_string):
                 stdscr.addstr(0, x_max-len(weather)-1, weather, color_pair(4))
+
+        # Display current time:
+        if SHOW_CURRENT_TIME and (x_max > 2*len(month_year_string) + 6):
+            time_string = time.strftime("%H:%M", time.localtime())
+            stdscr.addstr(0, x_max//2-2, time_string, color_pair(5))
 
         # Show keybinding hint:
         if show_hints:
