@@ -8,7 +8,7 @@ import pathlib
 import configparser
 import subprocess
 import re
-import sys
+import sys, getopt
 import time
 
 version = "1.5"
@@ -204,20 +204,31 @@ except:
     print("Error in the config.ini file. Try deleting the config file and run the program again.")
     exit()
 
+# Read user arguments:
+try:
+    opts, args = getopt.getopt(sys.argv[1:],"pjchv",["folder="])
+    for opt, arg in opts:
+        if opt in ("--folder"):
+            data_folder = arg
+        elif opt == '-p':
+            PRIVACY_MODE = True
+        elif opt == '-j':
+            DEFAULT_VIEW = 'journal'
+        elif opt == '-c':
+            DEFAULT_VIEW = 'calendar'
+        elif opt in ("-h"):
+            DEFAULT_VIEW = 'help'
+        elif opt in ("-v"):
+            DEFAULT_VIEW = 'version'
+            print ("Calcure - version " + version)
+except getopt.GetoptError:
+    pass
+
+# Assigng data files:
 EVENTS_FILE = data_folder + "/events.csv"
 TASKS_FILE = data_folder + "/tasks.csv"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
-
-# Read user arguments:
-if "p" in sys.argv:    PRIVACY_MODE = True
-if "j" in sys.argv:    DEFAULT_VIEW = 'journal'
-if "c" in sys.argv:    DEFAULT_VIEW = 'calendar'
-if "h" in sys.argv:    DEFAULT_VIEW = 'help'
-if "help" in sys.argv: DEFAULT_VIEW = 'help'
-if "version" in sys.argv:
-    DEFAULT_VIEW = 'version'
-    print ("Calcure - version " + version)
 
 
 def import_events_from_calcurse():
