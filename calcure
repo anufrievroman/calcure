@@ -618,13 +618,15 @@ def initialize_colors(stdscr):
 
 
 def check_weather(weather):
-    '''Checking weather in the current location if it was not checked before'''
-    if weather == "":
+    '''Check the weather in the current location if it was not checked before'''
+    if weather == None:
         try:
-            weather = str(subprocess.getstatusoutput(f"curl -s wttr.in/?format=3")[1])
-            weather = " " + weather.split(':')[1]
+            # weather = str(subprocess.getstatusoutput(f"curl -s -m 3 wttr.in/?format=3")[1])
+            weather = str(subprocess.check_output(["curl","-s","wttr.in/?format=3"],
+                          timeout=2, encoding='utf-8'))[:-1]
+            weather = weather.split(':')[1]
         except:
-            pass
+            weather = " "
     return weather
 
 
@@ -932,18 +934,18 @@ def calculate_passed_time(times, curently_counting):
         time_passed += time.time() - float(times[-1])
 
     # Depending on how much time has passed, show in different formats:
-    one_hour = 60*60
-    one_day  = 24*one_hour
+    one_hour = 60*60.0
+    one_day = 24*one_hour
     if time_passed < one_hour:
         format_string = "%M:%S"
     else:
         format_string = "%H:%M:%S"
     time_string = str(time.strftime(format_string, time.gmtime(int(time_passed))))
 
-    if time_passed > one_day:
+    if 2*one_day > time_passed > one_day:
         time_string = "1 day " + time_string
-    elif time_passed > 2*one_day:
-        time_string = str(time_passed//one_day) + "days " + time_string
+    if time_passed >= 2*one_day:
+        time_string = str(int(time_passed//one_day)) + " days " + time_string
     if DISPLAY_ICONS:
         time_string = TIMER_ICON + time_string
     return time_string
@@ -1058,21 +1060,23 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                                 pass
                 day_number += 1
 
-        # Display weather
-        if SHOW_WEATHER:
-            stdscr.refresh()
-            weather = check_weather(weather)
-            if len(weather) < x_max-len(month_year_string):
-                stdscr.addstr(0, x_max-len(weather)-1, weather, color_pair(4))
-
         # Display current time:
         if SHOW_CURRENT_TIME and (x_max > 2*len(month_year_string) + 6):
             time_string = time.strftime("%H:%M", time.localtime())
             stdscr.addstr(0, x_max//2-2, time_string, color_pair(5))
 
-        # Show keybinding hint:
+        # Display keybinding hint:
         if show_hints:
             stdscr.addstr(y_max - 1, 0, CALENDAR_HINT[:x_max-2], color_pair(3))
+
+        # Display weather:
+        if SHOW_WEATHER:
+            if weather == None:
+                stdscr.addstr(0, x_max - 2, "·", color_pair(4))
+            stdscr.refresh()
+            weather = check_weather(weather)
+            if len(weather) < x_max-len(month_year_string):
+                stdscr.addstr(0, x_max - len(weather) - 0, weather, color_pair(4))
 
         # Handle user input:
 
@@ -1363,9 +1367,10 @@ def main(stdscr):
     my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
     month  = datetime.date.today().month
     year   = datetime.date.today().year
-    privacy_on   = PRIVACY_MODE
-    weather      = ''
+    privacy_on  = PRIVACY_MODE
+    weather     = None
 
+    # Decide how to start the program:
     if DEFAULT_VIEW == 'calendar':
         state = 'monthly_screen'
     elif DEFAULT_VIEW == 'help':
@@ -1375,7 +1380,7 @@ def main(stdscr):
     else:
         state = 'journal_screen'
 
-    # Starting the screen:
+    # Starting the curses screen:
     stdscr = initscr()
     initialize_colors(stdscr)
 
@@ -1390,7 +1395,7 @@ def main(stdscr):
         else:
             break
 
-    # Cleaning up:
+    # Cleaning up before quitting:
     echo()
     curs_set(True)
     endwin()
