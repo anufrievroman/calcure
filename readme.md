@@ -47,15 +47,17 @@ Run `calcure` in your terminal.
 
 ### User arguments
 
-`calcure c` - Start with the calendar view (default)
+`-c` - Start on the calendar page (default)
 
-`calcure j` - Start with the journal view
+`-j` - Start on the journal page
 
-`calcure help` - Start on the help page
+`-h` - Start on the help page
 
-`calcure p` - Start in the privacy mode (text is obfuscated as •••••)
+`-p` - Start in the privacy mode (text is obfuscated as •••••)
 
-`calcure version` - Print the version and exit
+`-v` - Print the version and exit
+
+`--folder=FOLDERNAME` - Use datafiles from specific folder. For example, if you want to have separate databases for work and for personal things, you can start as `calcure --folder=$HOME/.calcure/work` or `calcure --folder=$HOME/.calcure/personal`
 
 ## Key bindings
 
