@@ -25,6 +25,16 @@ calcurse_events_file  = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
 default_calendar_hint =  "Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings"
 default_todo_hint     = "Space · Calendar   a · Add   v · Done   i · Important   ? · All keybindings"
 
+# Read config file from user arguments, if provided:
+try:
+    opts, args = getopt.getopt(sys.argv[1:],"pjchv",["folder=", "config="])
+    for opt, arg in opts:
+        if opt in ("--config"):
+            config_file = arg
+except getopt.GetoptError:
+    pass
+
+
 def create_config():
     '''Create config file if it does not exist yet'''
     conf["Parameters"] = {
@@ -206,7 +216,7 @@ except:
 
 # Read user arguments:
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"pjchv",["folder="])
+    opts, args = getopt.getopt(sys.argv[1:],"pjchv",["folder=", "config="])
     for opt, arg in opts:
         if opt in ("--folder"):
             data_folder = arg
