@@ -63,6 +63,8 @@ Run `calcure` in your terminal.
 
 ## Key bindings
 
+Beside key bindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) and dedicated buttons (`home` etc) are supported as well.
+
 ### General
 
 `space` · Switch between calendar and tasks
@@ -90,9 +92,11 @@ Run `calcure` in your terminal.
 
 `e` · Edit an event
 
-`C` · Import events from calcurse
+`g` · Go to selected day
 
-`home`,`gg`,`G` - return to current month
+`C` · Import events from Calcurse
+
+`G` - return to current month
 
 
 ### Tasks view
@@ -125,7 +129,7 @@ Run `calcure` in your terminal.
 
 `e` · Edit a task
 
-`C` · Import tasks from calcurse
+`C` · Import tasks from Calcurse
 
 
 ## Configuration
@@ -235,3 +239,8 @@ letter = ✉
 
 ```
 When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
+
+
+## Contribution and donations
+
+If you wish to contribute, feel free to open issues or propose PRs. Particularly, you are welcome to contribute on the topics of file encryption, sycing with popular calendar services, and translations. If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
