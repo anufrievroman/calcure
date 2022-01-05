@@ -755,15 +755,14 @@ def add_subtask(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
-    if int(number) > 0 and int(number) <= len(tasks):
-        # prompt_string = " " + TODO_ICON + " "
-        # new_task = user_input_for_tasks(stdscr, prompt_string, x_max - 1, int(number), True)
+    if number_is_valid(number, tasks):
+        number = int(number)
         prompt_string = "Enter the subtask: "
         new_task = user_input(stdscr, prompt_string, x_max - 1)
         if len(new_task) > 0:
-            tasks.insert(int(number), '--' + new_task)
-            statuses.insert(int(number), statuses[int(number)-1])
-            timestamps.insert(int(number), [])
+            tasks.insert(number, '--' + new_task)
+            statuses.insert(number, statuses[number-1])
+            timestamps.insert(number, [])
             write_tasks_file(tasks, statuses, timestamps)
 
 
@@ -776,11 +775,12 @@ def toggle_subtask(stdscr, tasks, statuses, timestamps):
         stdscr.addstr(shift+i, col, str(i+1))
     prompt_string = "Which (sub)task to toggle: "
     number = user_input(stdscr, prompt_string, 4)
-    if int(number) > 0 and int(number) <= len(tasks):
-        if tasks[int(number)-1][:2] == '--':
-            tasks[int(number)-1] = tasks[int(number)-1][2:]
+    if number_is_valid(number, tasks):
+        number = int(number)
+        if tasks[number-1][:2] == '--':
+            tasks[number-1] = tasks[number-1][2:]
         else:
-            tasks[int(number)-1] = '--' + tasks[int(number)-1]
+            tasks[number-1] = '--' + tasks[number-1]
         write_tasks_file(tasks, statuses, timestamps)
 
 
@@ -820,14 +820,15 @@ def delete_task(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then delete:
-    if int(number) > 0 and int(number) <= len(tasks):
+    if number_is_valid(number, tasks):
+        number = int(number)
         prompt_string = "Really delete this task? (y/n) "
         confirmed = ask_confirmation(stdscr, prompt_string)
         if confirmed:
-            to_delete = [int(number)-1]
+            to_delete = [number-1]
             # Mark subtasks to be deleted as well:
-            if tasks[int(number)-1][:2] != '--':
-                for i in range(int(number), len(tasks)):
+            if tasks[number-1][:2] != '--':
+                for i in range(number, len(tasks)):
                     if tasks[i][:2] == '--':
                         to_delete.append(i)
                     else:
@@ -853,15 +854,53 @@ def edit_task(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
-    if int(number) > 0 and int(number) <= len(tasks):
-        tab = "   " if tasks[int(number)-1][:2] == "--"  else " "
+    if number_is_valid(number, tasks):
+        number = int(number)
+        tab = "   " if tasks[number-1][:2] == "--"  else " "
         prompt_string = tab + TODO_ICON + " "
-        new_task = user_input_for_tasks(stdscr, prompt_string, x_max - 1, int(number))
+        new_task = user_input_for_tasks(stdscr, prompt_string, x_max - 1, number)
         if len(new_task) > 0:
-            if tasks[int(number)-1][:2] == "--":
+            if tasks[number-1][:2] == "--":
                 new_task = "--"+new_task
-            tasks[int(number)-1] = new_task
+            tasks[number-1] = new_task
             write_tasks_file(tasks, statuses, timestamps)
+
+
+def move_task(stdscr, tasks, statuses, timestamps):
+    '''Ask the user which task to move and where'''
+    y_max, x_max = stdscr.getmaxyx()
+
+    # Display task numbers and ask which to edit:
+    shift = 2 if SHOW_TITLE else 0
+    for	i in range(len(tasks)):
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
+    prompt_string = "Move task number: "
+    move_from = user_input(stdscr, prompt_string, 4)
+
+    # If the provided number corresponds to a task, then ask where to move:
+    if number_is_valid(move_from, tasks):
+        move_from = int(move_from)
+        prompt_string = "Move to the position number: "
+        move_to = user_input(stdscr, prompt_string, 4)
+        if number_is_valid(move_to, tasks):
+            move_to = int(move_to)
+            tasks.insert(move_to-1, tasks.pop(move_from-1))
+            statuses.insert(move_to-1, statuses.pop(move_from-1))
+            timestamps.insert(move_to-1, timestamps.pop(move_from-1))
+            write_tasks_file(tasks, statuses, timestamps)
+
+
+def number_is_valid(number, tasks):
+    '''Check if input is integer and corresponds to a task'''
+    try:
+        number = int(number)
+        if 0 < number <= len(tasks):
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
 
 
 def mark_as_done(stdscr, tasks, statuses, timestamps):
@@ -877,12 +916,13 @@ def mark_as_done(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
-    if int(number) > 0 and int(number) <= len(tasks):
-        statuses[int(number)-1] = "done"
+    if number_is_valid(number, tasks):
+        number = int(number)
+        statuses[number-1] = "done"
 
         # if there are subtasks, mark them as well:
-        if tasks[int(number)-1][:2] != '--':
-            for i in range(int(number), len(tasks)):
+        if tasks[number-1][:2] != '--':
+            for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
                     statuses[i] = "done"
                 else:
@@ -903,12 +943,13 @@ def mark_as_important(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
-    if int(number) > 0 and int(number) <= len(tasks):
-        statuses[int(number)-1] = "important"
+    if number_is_valid(number, tasks):
+        number = int(number)
+        statuses[number-1] = "important"
 
         # if there are subtasks, mark them as well:
-        if tasks[int(number)-1][:2] != '--':
-            for i in range(int(number), len(tasks)):
+        if tasks[number-1][:2] != '--':
+            for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
                     statuses[i] = "important"
                 else:
@@ -929,12 +970,13 @@ def unmark_task(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
-    if int(number) > 0 and int(number) <= len(tasks):
-        statuses[int(number)-1] = "todo"
+    if number_is_valid(number, tasks):
+        number = int(number)
+        statuses[number-1] = "todo"
 
         # if there are subtasks, unmark them as well:
-        if tasks[int(number)-1][:2] != '--':
-            for i in range(int(number), len(tasks)):
+        if tasks[number-1][:2] != '--':
+            for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
                     statuses[i] = "todo"
                 else:
@@ -973,11 +1015,12 @@ def reset_timer(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then remove timestamps:
-    if int(number) > 0 and int(number) <= len(tasks):
+    if number_is_valid(number, tasks):
+        number = int(number)
         prompt_string = "Really remove the timer? (y/n) "
         confirmed = ask_confirmation(stdscr, prompt_string)
         if confirmed:
-            timestamps[int(number)-1] = []
+            timestamps[number-1] = []
             write_tasks_file(tasks, statuses, timestamps)
 
 
@@ -1008,8 +1051,9 @@ def add_timestamp(stdscr, tasks, statuses, timestamps):
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then add timestamp:
-    if int(number) > 0 and int(number) <= len(tasks):
-        timestamps[int(number)-1].append(int(time.time()))
+    if number_is_valid(number, tasks):
+        number = int(number)
+        timestamps[number-1].append(int(time.time()))
         write_tasks_file(tasks, statuses, timestamps)
 
 
@@ -1039,8 +1083,10 @@ def calculate_passed_time(times, curently_counting):
         time_string = "1 day " + time_string
     if time_passed >= 2*one_day:
         time_string = str(int(time_passed//one_day)) + " days " + time_string
-    if DISPLAY_ICONS:
-        time_string = TIMER_ICON + time_string
+    if curently_counting == False and DISPLAY_ICONS:
+        time_string = "⏯︎ " + time_string
+    elif curently_counting == True and DISPLAY_ICONS:
+        time_string = "⏵ " + time_string
     return time_string
 
 
@@ -1424,12 +1470,23 @@ def journal_screen(stdscr, state, privacy_on):
     '''This is the todo view that shows the screen with tasks'''
     y_max, x_max = stdscr.getmaxyx()
     running = True
+    refresh_screen = True
     while (running):
-        stdscr.clear()
+        if refresh_screen:
+            stdscr.clear()
+            refresh_screen = False
         noecho()
-        halfdelay(REFRESH_INTERVAL*10)
+        halfdelay(255)
         curs_set(False)
         tasks, statuses, timestamps = load_tasks()
+
+        # Check if any of the timers is counting, and increase the update:
+        for times in timestamps:
+            curently_counting = False if not times else (len(times)%2 == 1)
+            if curently_counting:
+                halfdelay(REFRESH_INTERVAL*10)
+                break
+
         try:
             # Display the header:
             if SHOW_TITLE:
@@ -1504,6 +1561,7 @@ def journal_screen(stdscr, state, privacy_on):
             if key == "t": add_timestamp(stdscr, tasks, statuses, timestamps)
             if key == "T": reset_timer(stdscr, tasks, statuses, timestamps)
             if key == "s": toggle_subtask(stdscr, tasks, statuses, timestamps)
+            if key == "m": move_task(stdscr, tasks, statuses, timestamps)
             if key == "*": privacy_on = not privacy_on
             if key == "C": calcurse_import(stdscr)
             if key in ["d", "x"]: delete_task(stdscr, tasks, statuses, timestamps)
@@ -1520,6 +1578,8 @@ def journal_screen(stdscr, state, privacy_on):
                 if confirmed:
                     running = False
                     state = 'exit'
+
+            refresh_screen = True
 
         # Handle keybard interruption with ctr+c:
         except KeyboardInterrupt:
@@ -1569,10 +1629,11 @@ def help_screen(stdscr, state):
                 '  i(I) ': 'Mark one (all) of the tasks as important',
                 '  v(V) ': 'Mark one (all) of the tasks as done',
                 '  u(U) ': 'Unmark one (all) of the tasks',
-                '  d(A) ': 'Delete one (all) of the tasks (with all subtasks)',
+                '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
                 '  t(T) ': 'Start/pause (reset) timer for a task',
                 '  e,c  ': 'Edit a task',
                 '   s   ': 'Toggle between task and subtask',
+                '   m   ': 'Move a task',
                 '   C   ': 'Import tasks from calcurse',
                 }
 
