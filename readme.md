@@ -1,6 +1,6 @@
 # Calcure
 
-Minimalist TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and imports events and tasks from [calcurse](https://github.com/lfos/calcurse).
+Minimalist TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse).
 
 ![screenshot](screenshot.jpeg)
 
@@ -17,7 +17,7 @@ Minimalist TUI calendar and task manager with customizable interface. Manages yo
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
 - Week can start on any day
-- Current weather ⛅ · *experimental*
+- Current weather ⛅
 
 
 ## Installation
@@ -61,9 +61,9 @@ Run `calcure` in your terminal.
 
 `--config=CONFIGFILE.ini` - Use specific config file instead of the default one. For example, if you want to separate not only datafiles, like in the previous example, but other settings too, you can run program with alternative config as `calcure --config=$HOME/.config/calcure/config2.ini`. If the specified config file does not exist, it will be created with default settings.
 
-## Key bindings
+## Keybindings
 
-Beside key bindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) and dedicated buttons (`home` etc) are supported as well.
+Besides keybindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) and dedicated buttons (`home` etc) are supported as well.
 
 ### General
 
@@ -124,6 +124,8 @@ Beside key bindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) 
 `t` · Start / pause timer for a task
 
 `T` · Remove a timer
+
+`m` · Move a task
 
 `s` · Toggle between task and subtask
 
@@ -238,7 +240,9 @@ email = ✉
 letter = ✉
 
 ```
-When configuring colors, the numbers mean: 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
+When configuring colors, the numbers indicate standart colors of your terminal and by usually mean: 
+
+1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
 
 
 ## Contribution and donations
