@@ -22,23 +22,26 @@ Minimalist TUI calendar and task manager with customizable interface. Manages yo
 
 ## Installation
 
-### On Arch-based Linux distributions
+### On Arch Linux, Manjaro, Artix and other arch-based distributions
 
 The package `calcure` is available in AUR. Install it with `yay -S calcure` or with another AUR helper.
 
 ### On other Linux distributions
 
-Just copy the `calcure` file into a directory with your binaries and make it executable. For example:
+Just copy the `calcure` file into a directory with your binaries and make it executable. For example,:
 
 ```
 git clone https://github.com/anufrievroman/calcure
 cp calcure/calcure $HOME/.local/bin
 chmod =rwx $HOME/.local/bin/calcure
+pip install holidays
 ```
 
 ## Dependencies
 
-It only requires python 3. On Linux and MacOS, you should have it by default, but if you don't, install `python` package from your standard repository.
+To run, it only requires python 3. On Linux and MacOS, you should have it by default, but if you don't, install `python` package from your standard repository.
+
+To display holidays, you also need to instal holidays library as `pip install holidays`.
 
 
 ## Usage
@@ -148,6 +151,8 @@ calcurse_events_file = /home/username/.local/share/calcurse/apts
 default_view = calendar
 birthdays_from_abook = Yes
 show_keybindings = Yes
+show_holidays = Yes
+holiday_country = US
 privacy_mode = No
 show_weather = No
 show_day_names = Yes
@@ -169,7 +174,7 @@ todo_icon = •
 important_icon = ‣
 timer_icon = ⌚
 show_header = Yes
-header = TASKS:
+header = JOURNAL
 
 [Colors]
 color_today = 2
@@ -181,6 +186,7 @@ color_hints = 7
 color_prompts = 7
 color_confirmations = 1
 color_birthdays = 1
+color_holidays = 2
 color_todo = 7
 color_done = 6
 color_title = 4
@@ -189,9 +195,9 @@ color_timer = 2
 color_timer_paused = 7
 
 [Dialogues]
-calendar_hint = Space: Tasks · n/p: Change month · a: Add event · ?: Keybindings
-todo_hint = Space: Calendar · a: Add · v: Done · i: Important · ?: Keybindings
-
+calendar_hint = Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings
+todo_hint = Space · Calendar   a · Add   v · Done   i · Important   ? · Keybindings
+ 
 [Event icons]
 travel = ✈
 plane = ✈
@@ -240,11 +246,16 @@ email = ✉
 letter = ✉
 
 ```
-When configuring colors, the numbers indicate standart colors of your terminal and by usually mean: 
+When configuring colors, the numbers indicate standard colors of your terminal and usually mean: 
 
 1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
 
+## Troubleshooting
+
+- If you cannot install the program using proposed commands, try manually coping `calcure` file on your computer, making it executable (via file properties) and running it from terminal `./calcure`.
+- If your terminal shows empty squares insted of icons, probably it does not support unicode. In this case, in config set: `use_unicode_icons = No`.
+- Weather widget slows down launch of the program and requires internet. If that is a problem, switch off weather in config: `show_weather = No`.
 
 ## Contribution and donations
 
-If you wish to contribute, feel free to open issues or propose PRs. Particularly, you are welcome to contribute on the topics of file encryption, sycing with popular calendar services, and translations. If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
+If you wish to contribute, feel free to open issues or propose PRs. Particularly, you are welcome to contribute on the topics of file encryption, sycing with popular calendar services, and translations. For big changes, please open an issue to discuss first. If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
