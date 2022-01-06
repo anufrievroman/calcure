@@ -56,12 +56,14 @@ def create_config():
             "ask_confirmations":         "Yes",
             "use_unicode_icons":         "Yes",
             "show_current_time":         "No",
+            "show_holidays":             "Yes",
             "start_week_day":            "1",
             "refresh_interval":          "1",
             "event_icon":                "•",
             "privacy_icon":              "•",
             "today_icon":                "•",
             "birthday_icon":             "★",
+            "holiday_icon":              "⛱",
             "hidden_icon":               "...",
             "done_icon":                 "✔",
             "todo_icon":                 "•",
@@ -81,6 +83,7 @@ def create_config():
             "color_prompts":       "7",
             "color_confirmations": "1",
             "color_birthdays":     "1",
+            "color_holidays":      "2",
             "color_todo":          "7",
             "color_done":          "6",
             "color_title":         "4",
@@ -102,7 +105,7 @@ def create_config():
             "flight":      "✈",
             "airport":     "✈",
             "vacation":    "⛱",
-            "holyday":     "⛱",
+            "holiday":     "⛱",
             "day-off":     "⛱",
             "hair":        "✂",
             "barber":      "✂",
@@ -160,17 +163,20 @@ try:
     SHOW_WEATHER              = conf.getboolean("Parameters", "show_weather", fallback=False)
     SHOW_CURRENT_TIME         = conf.getboolean("Parameters", "show_current_time", fallback=False)
     DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
+    DISPLAY_HOLIDAYS          = conf.getboolean("Parameters", "show_holidays", fallback=True)
     PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
     CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
     BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
     START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
 
-    DEFAULT_VIEW  = conf.get("Parameters", "default_view", fallback="calendar")
-    TODAY_ICON    = conf.get("Parameters", "today_icon", fallback="•") if DISPLAY_ICONS else "·"
-    PRIVACY_ICON  = conf.get("Parameters", "privacy_icon", fallback="•") if DISPLAY_ICONS else "·"
-    HIDDEN_ICON   = conf.get("Parameters", "hidden_icon", fallback="...")
-    EVENT_ICON    = conf.get("Parameters", "event_icon", fallback="•")
-    BIRTHDAY_ICON = conf.get("Parameters", "birthday_icon", fallback="★")
+    DEFAULT_VIEW     = conf.get("Parameters", "default_view", fallback="calendar")
+    HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
+    TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if DISPLAY_ICONS else "·"
+    PRIVACY_ICON     = conf.get("Parameters", "privacy_icon", fallback="•") if DISPLAY_ICONS else "·"
+    HIDDEN_ICON      = conf.get("Parameters", "hidden_icon", fallback="...")
+    EVENT_ICON       = conf.get("Parameters", "event_icon", fallback="•")
+    BIRTHDAY_ICON    = conf.get("Parameters", "birthday_icon", fallback="★")
+    HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="⛱")
 
     # Journal settings:
     CALCURSE_TODO_FILE   = conf.get("Parameters", "calcurse_todo_file", fallback=calcurse_todo_file)
@@ -193,6 +199,7 @@ try:
     COLOR_HINTS          = int(conf.get("Colors", "color_hints", fallback=7))
     COLOR_PROMPTS        = int(conf.get("Colors", "color_prompts", fallback=7))
     COLOR_BIRTHDAYS      = int(conf.get("Colors", "color_birthdays", fallback=1))
+    COLOR_HOLIDAYS       = int(conf.get("Colors", "color_holidays", fallback=2))
     COLOR_CONFIRMATIONS  = int(conf.get("Colors", "color_confirmations", fallback=1))
     COLOR_TIMER          = int(conf.get("Colors", "color_timer", fallback=2))
     COLOR_TIMER_PAUSED   = int(conf.get("Colors", "color_timer_paused", fallback=7))
@@ -241,6 +248,22 @@ EVENTS_FILE = data_folder + "/events.csv"
 TASKS_FILE = data_folder + "/tasks.csv"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
+
+
+def load_holidays(year):
+    '''Load list of holidays in this country around this year'''
+    try:
+        import holidays
+        holidays = eval("holidays."+HOLIDAY_COUNTRY+"(years=[year-1, year, year+1])")
+    except ModuleNotFoundError:
+        # python = sys.executable
+        # subprocess.check_call([python, '-m', 'pip', 'install', 'holidays'], stdout=subprocess.DEVNULL)
+        holidays = None
+    except SyntaxError:
+        holidays = None
+    except AttributeError:
+        holidays = None
+    return holidays
 
 
 def import_events_from_calcurse():
@@ -671,6 +694,7 @@ def initialize_colors(stdscr):
     init_pair(13, COLOR_IMPORTANT, -1)
     init_pair(14, COLOR_TIMER, -1)
     init_pair(15, COLOR_TIMER_PAUSED, -1)
+    init_pair(16, COLOR_HOLIDAYS, -1)
 
 
 def check_weather(weather):
@@ -1107,7 +1131,7 @@ def reset_to_today():
     return day, month, year
 
 
-def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather):
+def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, holidays):
     '''This is the daily view that shows event of the day'''
     bd_dates, bd_names = parse_birthdays_from_abook()
     y_max, x_max   = stdscr.getmaxyx()
@@ -1196,6 +1220,22 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather):
                 except ValueError:
                     pass
 
+        # Display holidays:
+        if DISPLAY_HOLIDAYS and holidays is not None:
+            for holyday_date, occasion in holidays.items():
+                try:
+                    if holyday_date == datetime.date(year, month, day):
+                        occasion = PRIVACY_ICON*len(occasion) if privacy_on else occasion
+                        disp = (HOLIDAY_ICON+" ")*DISPLAY_ICONS+occasion
+                        disp = disp[:x_max - 1]
+                        try:
+                            stdscr.addstr(2 + num_of_event_this_day, 1, disp, color_pair(16))
+                        except:
+                            pass
+                        num_of_event_this_day += 1
+                except ValueError:
+                    pass
+
         # Display current time, hints, and weather:
         display_time(stdscr, date_string)
         if SHOW_KEYBINDINGS:
@@ -1267,7 +1307,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather):
     return state, privacy_on, month, year, weather
 
 
-def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
+def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holidays):
     '''This is the calendar view that shows events of the month'''
     bd_dates, bd_names = parse_birthdays_from_abook()
     y_max, x_max   = stdscr.getmaxyx()
@@ -1363,13 +1403,29 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather):
                         for index, bd_date in enumerate(bd_dates):
                             try:
                                 if bd_date == datetime.date(1, month, day):
-                                    if privacy_on: event_name = PRIVACY_ICON*len(event_name)
                                     bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy_on else bd_names[index]
                                     disp = (BIRTHDAY_ICON+" ")*DISPLAY_ICONS+bd_name*(x_cell > 5)
                                     disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                     try:
                                         stdscr.addstr(3+num_of_event_this_day+w*y_cell,
                                                         d*x_cell, disp, color_pair(7))
+                                    except:
+                                        pass
+                                    num_of_event_this_day += 1
+                            except ValueError:
+                                pass
+
+                    # Display holidays:
+                    if DISPLAY_HOLIDAYS and holidays is not None:
+                        for holyday_date, occasion in holidays.items():
+                            try:
+                                if holyday_date == datetime.date(year, month, day):
+                                    occasion = PRIVACY_ICON*len(occasion) if privacy_on else occasion
+                                    disp = (HOLIDAY_ICON+" ")*DISPLAY_ICONS+occasion*(x_cell > 5)
+                                    disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
+                                    try:
+                                        stdscr.addstr(3+num_of_event_this_day+w*y_cell,
+                                                        d*x_cell, disp, color_pair(16))
                                     except:
                                         pass
                                     num_of_event_this_day += 1
@@ -1606,7 +1662,7 @@ def help_screen(stdscr, state):
 
         # Keybinding dictionaries:
         keys_general = {
-                ' Space ': 'Switch between calendar and tasks',
+                ' Space ': 'Switch between calendar and journal',
                 '   ?   ': 'Toggle this help',
                 '   *   ': 'Toggle privacy mode',
                 '   q   ': 'Quit',
@@ -1651,13 +1707,22 @@ def help_screen(stdscr, state):
                 line = str(key+" "+keys_calendar[key])[:x_max-3]
                 stdscr.addstr(index+5+len(keys_general), 0, line, color_pair(5))
 
-            stdscr.addstr(6+len(keys_calendar)+len(keys_general), 8,
-                    "JOURNAL KEYBINDINGS"[:x_max-3], color_pair(4))
+            # If screen allows, fit horizontally, else stack vertically:
+            if x_max < 102:
+                shift_x = 0
+                shift_y = 6 + len(keys_general) + len(keys_calendar)
+            else:
+                shift_x = 45
+                shift_y = 2
+
+            stdscr.addstr(shift_y, shift_x + 8, "JOURNAL KEYBINDINGS"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_todo):
-                line = str(key+" "+keys_todo[key])[:x_max-3]
-                stdscr.addstr(index+7+len(keys_general)+len(keys_calendar), 0, line, color_pair(5))
-            stdscr.addstr(8+len(keys_todo)+len(keys_general)+len(keys_calendar), 1, "Vim keys work as well!", color_pair(1))
-        except:
+                line = str(key + " " + keys_todo[key])[:x_max-3]
+                stdscr.addstr(index + 1 + shift_y, shift_x, line, color_pair(5))
+            stdscr.addstr(2 + len(keys_todo) + shift_y, shift_x + 8, "Vim hjkl keys work as well!", color_pair(6))
+            stdscr.addstr(4 + len(keys_todo) + shift_y, shift_x + 8, "For more information, visit:", color_pair(5))
+            stdscr.addstr(5 + len(keys_todo) + shift_y, shift_x + 8, "https://github.com/anufrievroman/calcure", color_pair(4))
+        except Exception:
             pass
 
         stdscr.refresh()
@@ -1696,6 +1761,7 @@ def main(stdscr):
     my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
     month  = datetime.date.today().month
     year   = datetime.date.today().year
+    holidays = load_holidays(year)
     privacy_on  = PRIVACY_MODE
     weather     = None
 
@@ -1717,9 +1783,11 @@ def main(stdscr):
     # Running various screens depending on the state:
     while state != 'exit':
         if state == 'monthly_screen':
-            state, privacy_on, day, month, year, weather = monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather)
+            state, privacy_on, day, month, year, weather = monthly_screen(stdscr, my_cal,
+                                        month, year, state, privacy_on, weather, holidays)
         elif state == 'daily_screen':
-            state, privacy_on, month, year, weather = daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather)
+            state, privacy_on, month, year, weather = daily_screen(stdscr, my_cal,
+                                    day, month, year, state, privacy_on, weather, holidays)
         elif state == 'journal_screen':
             state, privacy_on = journal_screen(stdscr, state, privacy_on)
         elif state == 'help_screen':
@@ -1731,7 +1799,6 @@ def main(stdscr):
     echo()
     curs_set(True)
     endwin()
-
 
 if __name__ == "__main__":
     wrapper(main)
