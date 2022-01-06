@@ -63,7 +63,7 @@ def create_config():
             "privacy_icon":              "•",
             "today_icon":                "•",
             "birthday_icon":             "★",
-            "holiday_icon":              "⛱",
+            "holiday_icon":              "☘️",
             "hidden_icon":               "...",
             "done_icon":                 "✔",
             "todo_icon":                 "•",
@@ -75,6 +75,7 @@ def create_config():
 
     conf["Colors"] = {
             "color_today":         "2",
+            "color_events":        "4",
             "color_days":          "7",
             "color_day_names":     "4",
             "color_weekends":      "1",
@@ -90,6 +91,8 @@ def create_config():
             "color_important":     "1",
             "color_timer":         "2",
             "color_timer_paused":  "7",
+            "color_time":          "7",
+            "color_weather":       "2",
             }
 
     conf["Dialogues"] = {
@@ -100,10 +103,10 @@ def create_config():
     conf["Event icons"] = {
             "travel":      "✈",
             "plane":       "✈",
-            "trip":        "✈",
             "voyage":      "✈",
             "flight":      "✈",
             "airport":     "✈",
+            "trip":        "🏕",
             "vacation":    "⛱",
             "holiday":     "⛱",
             "day-off":     "⛱",
@@ -114,15 +117,17 @@ def create_config():
             "game":        "♟",
             "match":       "♟",
             "play":        "♟",
-            "interview":   "♟",
+            "interview":   "🎙️",
+            "conference":  "🎙️",
+            "hearing":     "🎙️",
             "date":        "♥",
             "concert":     "♪",
             "dance":       "♪",
             "music":       "♪",
             "rehersal":    "♪",
-            "call":        "✆",
-            "phone":       "✆",
-            "zoom":        "✆",
+            "call":        "🕻",
+            "phone":       "🕻",
+            "zoom":        "🕻",
             "deadline":    "⚑",
             "over":        "⚑",
             "finish":      "⚑",
@@ -136,10 +141,8 @@ def create_config():
             "museum":      "⛬",
             "meet":        "⛬",
             "talk":        "⛬",
-            "conference":  "⛬",
-            "hearing":     "⛬",
             "sport":       "⛷",
-            "gym":         "⛷",
+            "gym":         "🏋",
             "training":    "⛷",
             "email":       "✉",
             "letter":      "✉",
@@ -176,7 +179,7 @@ try:
     HIDDEN_ICON      = conf.get("Parameters", "hidden_icon", fallback="...")
     EVENT_ICON       = conf.get("Parameters", "event_icon", fallback="•")
     BIRTHDAY_ICON    = conf.get("Parameters", "birthday_icon", fallback="★")
-    HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="⛱")
+    HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="☘️")
 
     # Journal settings:
     CALCURSE_TODO_FILE   = conf.get("Parameters", "calcurse_todo_file", fallback=calcurse_todo_file)
@@ -192,6 +195,7 @@ try:
 
     # Calendar colors:
     COLOR_TODAY          = int(conf.get("Colors", "color_today", fallback=2))
+    COLOR_EVENTS         = int(conf.get("Colors", "color_events", fallback=4))
     COLOR_DAYS           = int(conf.get("Colors", "color_days", fallback=7))
     COLOR_DAY_NAMES      = int(conf.get("Colors", "color_day_names", fallback=4))
     COLOR_WEEKENDS       = int(conf.get("Colors", "color_weekends", fallback=1))
@@ -203,6 +207,8 @@ try:
     COLOR_CONFIRMATIONS  = int(conf.get("Colors", "color_confirmations", fallback=1))
     COLOR_TIMER          = int(conf.get("Colors", "color_timer", fallback=2))
     COLOR_TIMER_PAUSED   = int(conf.get("Colors", "color_timer_paused", fallback=7))
+    COLOR_TIME           = int(conf.get("Colors", "color_time", fallback=7))
+    COLOR_WEATHER        = int(conf.get("Colors", "color_weather", fallback=2))
 
     # Journal colors:
     COLOR_TODO           = int(conf.get("Colors", "color_todo", fallback=7))
@@ -641,13 +647,15 @@ def display_day_names(stdscr, x_max):
                 pass
 
 
-def display_icon(name, selection_mode=False):
+def display_icon(name, screen, selection_mode=False):
     '''Check if event name contains a keyword and return corresponding icon'''
     if not selection_mode and DISPLAY_ICONS:
         icon = EVENT_ICON + " "
         for keyword in ICONS:
             if keyword in name.lower():
                 icon = ICONS[keyword] + " "
+    elif screen == "journal":
+        icon = "·"
     else:
         icon = ""
     return icon
@@ -695,37 +703,31 @@ def initialize_colors(stdscr):
     init_pair(14, COLOR_TIMER, -1)
     init_pair(15, COLOR_TIMER_PAUSED, -1)
     init_pair(16, COLOR_HOLIDAYS, -1)
-
-
-def check_weather(weather):
-    '''Check the weather in the current location if it was not checked before'''
-    if weather == None:
-        try:
-            # weather = str(subprocess.getstatusoutput(f"curl -s -m 3 wttr.in/?format=3")[1])
-            weather = str(subprocess.check_output(["curl","-s","wttr.in/?format=3"],
-                          timeout=2, encoding='utf-8'))[:-1]
-            weather = weather.split(':')[1]
-        except:
-            weather = " "
-    return weather
+    init_pair(17, COLOR_EVENTS, -1)
+    init_pair(18, COLOR_TIME, -1)
+    init_pair(19, COLOR_WEATHER, -1)
 
 
 def display_weather(stdscr, weather, month_year_string):
     '''Load the weather at launch and display weather widget.'''
     if SHOW_WEATHER:
         _, x_max = stdscr.getmaxyx()
-        max_load_time = 2 # seconds
-        if weather == None:
-            stdscr.addstr(0, x_max - 2, "·", color_pair(4)) # Loading icon
+        max_load_time = 2 # Time to wait in seconds
+
+        # If weather is not yet loaded, show the loading icon and load weather:
+        if weather is None:
+            stdscr.addstr(0, x_max - 2, "·", color_pair(19))
             stdscr.refresh()
             try:
                 weather = str(subprocess.check_output(["curl","-s","wttr.in/?format=3"],
                               timeout=max_load_time, encoding='utf-8'))[:-1]
                 weather = weather.split(':')[1]
-            except:
+            except Exception:
                 weather = " "
+
+        # Display the weather if space allows:
         if len(weather) < x_max-len(month_year_string):
-            stdscr.addstr(0, x_max - len(weather) - 0, weather, color_pair(4))
+            stdscr.addstr(0, x_max - len(weather) - 0, weather, color_pair(19))
     return weather
 
 
@@ -1119,7 +1121,7 @@ def display_time(stdscr, month_year_string):
     _, x_max   = stdscr.getmaxyx()
     if SHOW_CURRENT_TIME and (x_max > 2*len(month_year_string) + 6):
         time_string = time.strftime("%H:%M", time.localtime())
-        stdscr.addstr(0, x_max//2-2, time_string, color_pair(5))
+        stdscr.addstr(0, x_max//2-2, time_string, color_pair(18))
 
 
 def reset_to_today():
@@ -1170,7 +1172,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
             # Check if this event happens on this day, and screen space is okay:
             if datetime.date(year, month, day) == event_date:
                 if num_of_event_this_day < y_max - 3:
-                    icon = display_icon(event_name, selection_mode)
+                    icon = display_icon(event_name, "calendar", selection_mode)
 
                     # Check if this is a recurring event:
                     if event_id in ids_this_month:
@@ -1364,7 +1366,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                         # Check if this event happens in this day and screen space is okay:
                         if datetime.date(year, month, day) == event_date:
                             if num_of_event_this_day < y_cell - 1:
-                                icon = display_icon(event_name, selection_mode)
+                                icon = display_icon(event_name, "calendar", selection_mode)
 
                                 # Check if this is a recurring event:
                                 if event_id in ids_this_month:
@@ -1380,7 +1382,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 disp = disp + " "*abs(x_max - x_cell*d - len(disp))
-                                color = 13 if event_status == 'important' else 1
+                                color = 13 if event_status == 'important' else 17
                                 try:
                                     stdscr.addstr(3+num_of_event_this_day+w*y_cell,
                                                     d*x_cell, disp, color_pair(color))
@@ -1568,7 +1570,7 @@ def journal_screen(stdscr, state, privacy_on):
                     stdscr.addstr(index+shift, tab, IMPORTANT_ICON, color_pair(13))
                     stdscr.addstr(index+shift, tab+2, task, color_pair(13))
                 else:
-                    icon = display_icon(task)
+                    icon = display_icon(task, "journal")
                     stdscr.addstr(index+shift, tab, icon, color_pair(11))
                     stdscr.addstr(index+shift, tab+2, task, color_pair(11))
 
