@@ -151,10 +151,9 @@ calcurse_events_file = /home/username/.local/share/calcurse/apts
 default_view = calendar
 birthdays_from_abook = Yes
 show_keybindings = Yes
-show_holidays = Yes
-holiday_country = US
 privacy_mode = No
-show_weather = No
+show_weather = Yes
+weather_city = 
 show_day_names = Yes
 minimal_today_indicator = Yes
 minimal_days_indicator = Yes
@@ -162,22 +161,26 @@ minimal_weekend_indicator = Yes
 cut_titles_by_cell_length = No
 ask_confirmations = Yes
 use_unicode_icons = Yes
+show_current_time = No
+show_holidays = Yes
 start_week_day = 1
 refresh_interval = 1
 event_icon = •
 privacy_icon = •
 today_icon = •
 birthday_icon = ★
+holiday_icon = ☘️
 hidden_icon = ...
 done_icon = ✔
 todo_icon = •
 important_icon = ‣
 timer_icon = ⌚
-show_header = Yes
-header = JOURNAL
+show_journal_header = Yes
+journal_header = JOURNAL
 
 [Colors]
 color_today = 2
+color_events = 4
 color_days = 7
 color_day_names = 4
 color_weekends = 1
@@ -193,20 +196,22 @@ color_title = 4
 color_important = 1
 color_timer = 2
 color_timer_paused = 7
+color_time = 7
+color_weather = 2
 
 [Dialogues]
 calendar_hint = Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings
-todo_hint = Space · Calendar   a · Add   v · Done   i · Important   ? · Keybindings
- 
+todo_hint = Space · Calendar   a · Add   v · Done   i · Important   ? · All keybindings
+
 [Event icons]
 travel = ✈
 plane = ✈
-trip = ✈
 voyage = ✈
 flight = ✈
 airport = ✈
+trip = 🏕
 vacation = ⛱
-holyday = ⛱
+holiday = ⛱
 day-off = ⛱
 hair = ✂
 barber = ✂
@@ -215,15 +220,17 @@ nails = ✂
 game = ♟
 match = ♟
 play = ♟
-interview = ♟
+interview = 🎙️
+conference = 🎙️
+hearing = 🎙️
 date = ♥
 concert = ♪
 dance = ♪
 music = ♪
 rehersal = ♪
-call = ✆
-phone = ✆
-zoom = ✆
+call = 🕻
+phone = 🕻
+zoom = 🕻
 deadline = ⚑
 over = ⚑
 finish = ⚑
@@ -237,10 +244,8 @@ bar = ☘
 museum = ⛬
 meet = ⛬
 talk = ⛬
-conference = ⛬
-hearing = ⛬
 sport = ⛷
-gym = ⛷
+gym = 🏋
 training = ⛷
 email = ✉
 letter = ✉
@@ -254,7 +259,8 @@ When configuring colors, the numbers indicate standard colors of your terminal a
 
 - If you cannot install the program using proposed commands, try manually coping `calcure` file on your computer, making it executable (via file properties) and running it from terminal `./calcure`.
 - If your terminal shows empty squares insted of icons, probably it does not support unicode. In this case, in config set: `use_unicode_icons = No`.
-- Weather widget slows down launch of the program and requires internet. If that is a problem, switch off weather in config: `show_weather = No`.
+- Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
+- If weather is incorrect, set your city in config `weather_city = Tokyo`. By default, this setting is empty and program tries to detect your city automatically.
 
 ## Contribution and donations
 
