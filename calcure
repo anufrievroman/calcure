@@ -48,6 +48,7 @@ def create_config():
             "show_keybindings":          "Yes",
             "privacy_mode":              "No",
             "show_weather":              "No",
+            "weather_city":              "",
             "show_day_names":            "Yes",
             "minimal_today_indicator":   "Yes",
             "minimal_days_indicator":    "Yes",
@@ -147,6 +148,7 @@ def create_config():
             "email":       "✉",
             "letter":      "✉",
             }
+
     with open(config_file, 'w') as f:
         conf.write(f)
 
@@ -174,6 +176,7 @@ try:
 
     DEFAULT_VIEW     = conf.get("Parameters", "default_view", fallback="calendar")
     HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
+    WEATHER_CITY     = conf.get("Parameters", "weather_city", fallback="")
     TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if DISPLAY_ICONS else "·"
     PRIVACY_ICON     = conf.get("Parameters", "privacy_icon", fallback="•") if DISPLAY_ICONS else "·"
     HIDDEN_ICON      = conf.get("Parameters", "hidden_icon", fallback="...")
@@ -719,7 +722,8 @@ def display_weather(stdscr, weather, month_year_string):
             stdscr.addstr(0, x_max - 2, "·", color_pair(19))
             stdscr.refresh()
             try:
-                weather = str(subprocess.check_output(["curl","-s","wttr.in/?format=3"],
+                request_url = f"wttr.in/{WEATHER_CITY}?format=3"
+                weather = str(subprocess.check_output(["curl", "-s", request_url],
                               timeout=max_load_time, encoding='utf-8'))[:-1]
                 weather = weather.split(':')[1]
             except Exception:
