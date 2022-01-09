@@ -19,7 +19,7 @@ if not os.path.exists(config_folder):
     os.makedirs(config_folder)
 config_file = config_folder + "/config.ini"
 
-# Read config file from user arguments, if provided:
+# Read config.ini file from user arguments, if provided:
 try:
     opts, args = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
     for opt, arg in opts:
@@ -33,12 +33,12 @@ conf = configparser.ConfigParser()
 # Construct strings that will be used in config:
 calcurse_todo_file    = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
 calcurse_events_file  = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
-default_calendar_hint =  "Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings"
+default_calendar_hint = "Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings"
 default_todo_hint     = "Space · Calendar   a · Add   v · Done   i · Important   ? · All keybindings"
 
 
 def create_config():
-    '''Create config file if it does not exist yet'''
+    '''Create config.ini file if it does not exist yet'''
     conf["Parameters"] = {
             "folder_with_datafiles":     str(config_folder),
             "calcurse_todo_file":        str(calcurse_todo_file),
@@ -224,11 +224,11 @@ try:
 
     try:
         ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
-    except:
+    except Exception:
         ICONS = {}
 
     data_folder = conf.get("Parameters", "folder_with_datafiles", fallback=config_folder)
-except:
+except Exception:
     print("Error in the config.ini file. Try deleting the config file and run the program again.")
     exit()
 
@@ -252,7 +252,7 @@ try:
 except getopt.GetoptError:
     pass
 
-# Assigng data files:
+# Assigning data files:
 EVENTS_FILE = data_folder + "/events.csv"
 TASKS_FILE = data_folder + "/tasks.csv"
 if not os.path.exists(data_folder):
@@ -373,9 +373,9 @@ def load_events():
 
                         status = 'normal' if len(line) < 8 else line [7]
                         statuses.append(status)
-                    except:
+                    except Exception:
                         pass
-        except:
+        except Exception:
             pass
         events = {'id': ids, 'dates': dates, 'names': names, 'statuses': statuses}
     return events
@@ -934,7 +934,7 @@ def number_is_valid(number, tasks):
 
 
 def mark_as_done(stdscr, tasks, statuses, timestamps):
-    '''Promts the user to witch task to mark as done and changes the file'''
+    '''Ask user which task to mark as done and change the file'''
     y_max, x_max = stdscr.getmaxyx()
 
     # Display task numbers and ask which to edit:
@@ -961,7 +961,7 @@ def mark_as_done(stdscr, tasks, statuses, timestamps):
 
 
 def mark_as_important(stdscr, tasks, statuses, timestamps):
-    '''Promts the user to witch task to mark as done and changes the file'''
+    '''Ask user which task to mark as done and changes the file'''
     y_max, x_max = stdscr.getmaxyx()
 
     # Display task numbers and ask which to edit:
@@ -988,9 +988,7 @@ def mark_as_important(stdscr, tasks, statuses, timestamps):
 
 
 def unmark_task(stdscr, tasks, statuses, timestamps):
-    '''Promt the user which task to unmark as done and rewrites the file'''
-    y_max, x_max = stdscr.getmaxyx()
-
+    '''Ask user which task to unmark and rewrite the file'''
     # Display task numbers and ask which to edit:
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
@@ -1033,9 +1031,7 @@ def vim_style_exit(stdscr, running, state, key):
 
 
 def reset_timer(stdscr, tasks, statuses, timestamps):
-    '''Promt the user which task to unmark as done and rewrites the file'''
-    y_max, x_max = stdscr.getmaxyx()
-
+    '''Ask user which task to timer to reset and rewrite the file'''
     # Display task numbers and ask which to edit:
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
@@ -1070,8 +1066,6 @@ def write_tasks_file(tasks, statuses, timestamps):
 
 def add_timestamp(stdscr, tasks, statuses, timestamps):
     '''Ask user for which task to add timer and change the file'''
-    y_max, x_max = stdscr.getmaxyx()
-
     # Display task numbers and ask which to edit:
     shift = 2 if SHOW_TITLE else 0
     for	i in range(len(tasks)):
@@ -1091,7 +1085,7 @@ def calculate_passed_time(times, curently_counting):
     '''Calculate how much time passed in the unpaused intervals'''
     time_passed = 0
 
-    # Calculate passed time, considering that even timestamps are pauses:
+    # Calculate passed time, assuming that even timestamps are pauses:
     for index, _ in enumerate(times):
         if index > 0 and index%2 == 1:
             time_passed += float(times[index]) - float(times[index-1])
@@ -1121,7 +1115,7 @@ def calculate_passed_time(times, curently_counting):
 
 
 def display_time(stdscr, month_year_string):
-    '''Shot the widget with current time'''
+    '''Show the widget with current time if space allows'''
     _, x_max   = stdscr.getmaxyx()
     if SHOW_CURRENT_TIME and (x_max > 2*len(month_year_string) + 6):
         time_string = time.strftime("%H:%M", time.localtime())
@@ -1129,11 +1123,11 @@ def display_time(stdscr, month_year_string):
 
 
 def reset_to_today():
-    '''Reset the day, month, and yeat to current date'''
+    '''Reset the day, month, and year to the current date'''
     today = datetime.date.today()
     month = today.month
     year  = today.year
-    day = int(today.day)
+    day   = int(today.day)
     return day, month, year
 
 
@@ -1144,7 +1138,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
     selection_mode = False
     refresh_mode   = False
     running        = True
-    today = datetime.date.today()
+    today          = datetime.date.today()
 
     while running:
         stdscr.clear()
@@ -1154,7 +1148,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
         events = load_events()
         dates = my_cal.monthdayscalendar(year, month)
 
-        # Displaying the month, year, and days of the week with approprite color:
+        # Display month, year, and days of the week with appropriate color:
         if datetime.date(year, month, day) == today:
             color = 4
             icon = " " + TODAY_ICON
@@ -1200,7 +1194,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
 
                     num_of_event_this_day += 1
 
-                # If there is no more space, show "..." icon:
+                # If there is no more screen space, show "..." icon:
                 else:
                     hidden = HIDDEN_ICON + " "*(x_max - 3)
                     try:
@@ -1220,7 +1214,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
                         disp = disp[:x_max - 1]
                         try:
                             stdscr.addstr(2 + num_of_event_this_day, 1, disp, color_pair(7))
-                        except:
+                        except Exception:
                             pass
                         num_of_event_this_day += 1
                 except ValueError:
@@ -1236,7 +1230,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
                         disp = disp[:x_max - 1]
                         try:
                             stdscr.addstr(2 + num_of_event_this_day, 1, disp, color_pair(16))
-                        except:
+                        except Exception:
                             pass
                         num_of_event_this_day += 1
                 except ValueError:
@@ -1329,7 +1323,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
         y_cell = (y_max-2)//6
         x_cell = x_max//7
         events = load_events()
-        today = datetime.date.today()
+        today  = datetime.date.today()
 
         # Displaying the month, year, and days of the week
         month_year_string = str(calendar.month_name[month].upper()) + " " + str(year)
@@ -1415,7 +1409,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                                     try:
                                         stdscr.addstr(3+num_of_event_this_day+w*y_cell,
                                                         d*x_cell, disp, color_pair(7))
-                                    except:
+                                    except Exception:
                                         pass
                                     num_of_event_this_day += 1
                             except ValueError:
@@ -1432,7 +1426,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                                     try:
                                         stdscr.addstr(3+num_of_event_this_day+w*y_cell,
                                                         d*x_cell, disp, color_pair(16))
-                                    except:
+                                    except Exception:
                                         pass
                                     num_of_event_this_day += 1
                             except ValueError:
@@ -1757,19 +1751,19 @@ def help_screen(stdscr, state):
             if confirmed:
                 running = False
                 state = 'exit'
-        except:
+        except Exception:
             pass
     return state
 
 
 def main(stdscr):
-    '''This is the main function that runs and swithces screens'''
+    '''Main function that runs and switches screens'''
     my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
     month  = datetime.date.today().month
     year   = datetime.date.today().year
-    holidays = load_holidays(year)
-    privacy_on  = PRIVACY_MODE
-    weather     = None
+    holidays   = load_holidays(year)
+    weather    = None
+    privacy_on = PRIVACY_MODE
 
     # Decide how to start the program:
     if DEFAULT_VIEW == 'help':
@@ -1780,7 +1774,6 @@ def main(stdscr):
         state = 'journal_screen'
     else:
         state = 'monthly_screen'
-
 
     # Starting the curses screen:
     stdscr = initscr()
