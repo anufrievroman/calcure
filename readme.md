@@ -2,7 +2,7 @@
 
 Minimalist TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse).
 
-![screenshot](screenshot.jpeg)
+![screenshot](screenshot.jpg)
 
 ## Features
 
