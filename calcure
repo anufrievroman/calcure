@@ -149,7 +149,7 @@ def create_config():
             "letter":      "✉",
             }
 
-    with open(config_file, 'w') as f:
+    with open(config_file, 'w', encoding="utf8") as f:
         conf.write(f)
 
 # Load configuration file or create if it does not exist:
@@ -1654,46 +1654,47 @@ def journal_screen(stdscr, state, privacy_on):
 def help_screen(stdscr, state):
     '''This is the help view that shows all the keybinding'''
     y_max, x_max = stdscr.getmaxyx()
+
+    # Keybinding dictionaries:
+    keys_general = {
+            ' Space ': 'Switch between calendar and journal',
+            '   ?   ': 'Toggle this help',
+            '   *   ': 'Toggle privacy mode',
+            '   q   ': 'Quit',
+            }
+
+    keys_calendar = {
+            '  a(A) ': 'Add a (recurring) event',
+            '  n,🠒  ': 'Next month (day)',
+            '  p,🠐  ': 'Previous month (day)',
+            '  d,x  ': 'Delete an event',
+            '  e,c  ': 'Edit an event',
+            '   g   ': 'Go to a certain day',
+            '   i   ': 'Toggle event as important',
+            '   C   ': 'Import events from calcurse',
+            '   G   ': 'Return to current month',
+            }
+
+    keys_todo = {
+            '  a(A) ': 'Add new (sub)task',
+            '  i(I) ': 'Mark one (all) of the tasks as important',
+            '  v(V) ': 'Mark one (all) of the tasks as done',
+            '  u(U) ': 'Unmark one (all) of the tasks',
+            '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
+            '  t(T) ': 'Start/pause (reset) timer for a task',
+            '  e,c  ': 'Edit a task',
+            '   s   ': 'Toggle between task and subtask',
+            '   m   ': 'Move a task',
+            '   C   ': 'Import tasks from calcurse',
+                }
+
     running = True
     while (running):
         stdscr.clear()
         noecho()
         curs_set(False)
 
-        # Keybinding dictionaries:
-        keys_general = {
-                ' Space ': 'Switch between calendar and journal',
-                '   ?   ': 'Toggle this help',
-                '   *   ': 'Toggle privacy mode',
-                '   q   ': 'Quit',
-                }
-
-        keys_calendar = {
-                '  a(A) ': 'Add a (recurring) event',
-                '  n,🠒  ': 'Next month (day)',
-                '  p,🠐  ': 'Previous month (day)',
-                '  d,x  ': 'Delete an event',
-                '  e,c  ': 'Edit an event',
-                '   g   ': 'Go to a certain day',
-                '   i   ': 'Toggle event as important',
-                '   C   ': 'Import events from calcurse',
-                '   G   ': 'Return to current month',
-                }
-
-        keys_todo = {
-                '  a(A) ': 'Add new (sub)task',
-                '  i(I) ': 'Mark one (all) of the tasks as important',
-                '  v(V) ': 'Mark one (all) of the tasks as done',
-                '  u(U) ': 'Unmark one (all) of the tasks',
-                '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
-                '  t(T) ': 'Start/pause (reset) timer for a task',
-                '  e,c  ': 'Edit a task',
-                '   s   ': 'Toggle between task and subtask',
-                '   m   ': 'Move a task',
-                '   C   ': 'Import tasks from calcurse',
-                }
-
-        # Printing out the dictionaries:
+        # Print out the dictionaries:
         try:
             title = " CALCURE " + version
             stdscr.addstr(0, 0, title[:x_max-3], color_pair(6))
