@@ -151,7 +151,7 @@ def create_config():
             "letter":      "✉",
             }
 
-    with open(config_file, 'w', encoding="utf8") as f:
+    with open(config_file, 'w', encoding="utf-8") as f:
         conf.write(f)
 
 # Load configuration file or create if it does not exist:
