@@ -10,7 +10,7 @@ Minimalist TUI calendar and task manager with customizable interface. Manages yo
 - Operation with fewest key presses possible
 - Todo list with subtasks and timers ⌚
 - Birthdays of your abook contacts
-- Import of events and tasks from calcurse
+- Import of events and tasks from calcurse and taskwarrior
 - Icons according to the name ✈ ⛷ ⛱
 - Privacy mode ••••• to obfuscate events and tasks
 - Plain text database in your folder for cloud sync
@@ -143,6 +143,8 @@ Besides keybindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) 
 `e` · Edit a task
 
 `C` · Import tasks from Calcurse
+
+`W` · Import tasks from Taskwarrior
 
 
 ## Configuration
