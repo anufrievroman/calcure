@@ -31,6 +31,7 @@ except getopt.GetoptError:
 conf = configparser.ConfigParser()
 
 # Construct strings that will be used in config:
+taskwarrior_folder    = str(pathlib.Path.home()) + "/.task"
 calcurse_todo_file    = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
 calcurse_events_file  = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
 default_calendar_hint = "Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings"
@@ -43,6 +44,7 @@ def create_config():
             "folder_with_datafiles":     str(config_folder),
             "calcurse_todo_file":        str(calcurse_todo_file),
             "calcurse_events_file":      str(calcurse_events_file),
+            "taskwarrior_folder":        str(taskwarrior_folder),
             "default_view":              "calendar",
             "birthdays_from_abook":      "Yes",
             "show_keybindings":          "Yes",
@@ -187,6 +189,7 @@ try:
     # Journal settings:
     CALCURSE_TODO_FILE   = conf.get("Parameters", "calcurse_todo_file", fallback=calcurse_todo_file)
     CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=calcurse_events_file)
+    TASKWARRIOR_FOLDER   = conf.get("Parameters", "taskwarrior_folder", fallback=taskwarrior_folder)
     TITLE                = conf.get("Parameters", "jounal_header", fallback="JOURNAL")
     SHOW_TITLE           = conf.getboolean("Parameters", "show_journal_header", fallback=True)
     SHOW_KEYBINDINGS     = conf.getboolean("Parameters", "show_keybindings", fallback=True)
@@ -823,8 +826,8 @@ def delete_all_tasks(stdscr):
         write_tasks_file([], [], [])
 
 
-def calcurse_import(stdscr):
-    '''Import todo events from calcurse database'''
+def calcurse_task_import(stdscr, tasks):
+    '''Import tasks from calcurse database'''
     y_max, _ = stdscr.getmaxyx()
     prompt_string = "Import tasks from calcurse? (y/n) "
     confirmed = ask_confirmation(stdscr, prompt_string)
@@ -832,11 +835,28 @@ def calcurse_import(stdscr):
         with open(CALCURSE_TODO_FILE, 'r') as f:
             for task in f.readlines():
                 if len(task) > 0:
-                    with open(TASKS_FILE,"a") as f:
-                        if task[1] in ['1','2']:
-                            f.write('"'+task[4:-1]+'"' + ",important\n")
-                        else:
-                            f.write('"'+task[4:-1]+'"' + ",todo\n")
+                    if task[4:-1] not in tasks:
+                        with open(TASKS_FILE,"a") as f:
+                            if task[1] in ['1','2']:
+                                f.write('"'+task[4:-1]+'"' + ",important\n")
+                            else:
+                                f.write('"'+task[4:-1]+'"' + ",todo\n")
+
+
+def taskwarrior_task_import(stdscr, tasks):
+    '''Import tasks from taskwarrior database'''
+    y_max, _ = stdscr.getmaxyx()
+    prompt_string = "Import tasks from taskwarrior? (y/n) "
+    confirmed = ask_confirmation(stdscr, prompt_string)
+    if confirmed:
+        with open(taskwarrior_folder+"/pending.data", 'r') as f:
+            for task in f.readlines():
+                if len(task) > 0:
+                    task = task.split('description:"',1)[1]
+                    task = task.split('"',1)[0]
+                    if task not in tasks:
+                        with open(TASKS_FILE,"a") as f:
+                            f.write('"'+task+'"' + ",todo\n")
 
 
 def delete_task(stdscr, tasks, statuses, timestamps):
@@ -1619,7 +1639,8 @@ def journal_screen(stdscr, state, privacy_on):
             if key == "s": toggle_subtask(stdscr, tasks, statuses, timestamps)
             if key == "m": move_task(stdscr, tasks, statuses, timestamps)
             if key == "*": privacy_on = not privacy_on
-            if key == "C": calcurse_import(stdscr)
+            if key == "C": calcurse_task_import(stdscr, tasks)
+            if key == "W": taskwarrior_task_import(stdscr, tasks)
             if key in ["d", "x"]: delete_task(stdscr, tasks, statuses, timestamps)
             if key in ["e", "c"]: edit_task(stdscr, tasks, statuses, timestamps)
             if key == " ":
@@ -1685,7 +1706,7 @@ def help_screen(stdscr, state):
             '  e,c  ': 'Edit a task',
             '   s   ': 'Toggle between task and subtask',
             '   m   ': 'Move a task',
-            '   C   ': 'Import tasks from calcurse',
+            '  C(W) ': 'Import tasks from calcurse (taskwarrior)',
                 }
 
     running = True
