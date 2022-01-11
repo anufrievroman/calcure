@@ -160,7 +160,7 @@ if not os.path.exists(config_file):
 
 try:
     # Calendar settings:
-    conf.read(config_file)
+    conf.read(config_file, 'utf-8')
     SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
     SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names", fallback=True)
     MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_today_indicator", fallback=True)
@@ -355,7 +355,7 @@ def load_events():
         with open(EVENTS_FILE, "w+") as f:
             pass
 
-    with open(EVENTS_FILE,"r") as f:
+    with open(EVENTS_FILE, "r") as f:
         lines = csv.reader(f, delimiter = ',')
         ids, dates, names, statuses = [], [], [], []
         try:
@@ -827,7 +827,7 @@ def delete_all_tasks(stdscr):
 
 
 def calcurse_task_import(stdscr, tasks):
-    '''Import tasks from calcurse database'''
+    '''Import todo events from calcurse database'''
     y_max, _ = stdscr.getmaxyx()
     prompt_string = "Import tasks from calcurse? (y/n) "
     confirmed = ask_confirmation(stdscr, prompt_string)
