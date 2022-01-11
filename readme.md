@@ -37,6 +37,14 @@ chmod =rwx $HOME/.local/bin/calcure
 pip install holidays
 ```
 
+### On Windows
+
+1. Install `Windows Terminal` app from the app store
+2. Install `python 3.x` also from the app store (if you just type `python` in the Windows Terminal app it will offer you to install)
+3. Install a few libraries by typing in the Windows Terminal `pip install holidays windows-curses`
+4. Download this repository and extract the `calcure` file somewhere, for this example we'll use `Documents` folder.
+5. Now you can finally run it by typing in the Windows Terminal `python $HOME/Documents/calcure` (you can set up a shortcut for this command)
+
 ## Dependencies
 
 To run, it only requires python 3. On Linux and MacOS, you should have it by default, but if you don't, install `python` package from your standard repository.
