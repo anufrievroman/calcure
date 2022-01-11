@@ -156,8 +156,8 @@ You can edit parameters and colors in the `config.ini` file. Here is an example 
 ```
 [Parameters]
 folder_with_datafiles = /home/username/.config/calcure
-calcurse_todo_file = /home/username/.local/share/calcurse/todo
-calcurse_events_file = /home/username/.local/share/calcurse/apts
+calcurse_folder = /home/username/.local/share/calcurse
+taskwarrior_folder = /home/username/.task
 default_view = calendar
 birthdays_from_abook = Yes
 show_keybindings = Yes
