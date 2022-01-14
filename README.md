@@ -22,6 +22,8 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ## Installation
 
+### On Linux and Man OS
+
 `pip install calcure`
 
 
@@ -36,9 +38,8 @@ The package `calcure` is available in AUR.
 
 1. Install `Windows Terminal` app from the app store
 2. Install `python 3.x` also from the app store (if you just type `python` in the Windows Terminal app it will offer you to install)
-3. Install a few libraries by typing in the Windows Terminal `pip install holidays windows-curses`
-4. Download this repository and extract the `calcure.py` file somewhere, for this example we'll use `Documents` folder.
-5. Now you can finally run it by typing in the Windows Terminal `python $HOME\Documents\calcure` (you can set up a shortcut for this command)
+3. Install the program and libraries libraries by typing in the Windows Terminal `pip install holidays windows-curses calcure`
+4. Now you can finally run it by typing in the Windows Terminal `python -m calcure`
 
 
 ### Manual installation
@@ -47,7 +48,7 @@ Just copy the `calcure.py` file into a directory with your binaries, rename into
 
 ```
 git clone https://github.com/anufrievroman/calcure
-cp calcure/calcure.py calcure/calcure
+mv calcure/calcure.py calcure/calcure
 cp calcure/calcure $HOME/.local/bin
 chmod =rwx $HOME/.local/bin/calcure
 pip install holidays
