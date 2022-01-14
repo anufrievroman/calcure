@@ -11,7 +11,7 @@ import re
 import sys, getopt
 import time
 
-version = "1.5"
+__version__ = "1.6.0"
 
 # Write configuration file if it does not exist already:
 config_folder = str(pathlib.Path.home()) + "/.config/calcure"
@@ -37,6 +37,38 @@ calcurse_events_file  = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
 default_calendar_hint = "Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings"
 default_todo_hint     = "Space · Calendar   a · Add   v · Done   i · Important   ? · All keybindings"
 
+# Keybinding dictionaries:
+keys_general = {
+        ' Space ': 'Switch between calendar and journal',
+        '   ?   ': 'Toggle this help',
+        '   *   ': 'Toggle privacy mode',
+        '   q   ': 'Quit',
+        }
+
+keys_calendar = {
+        '  a(A) ': 'Add a (recurring) event',
+        '  n,🠒  ': 'Next month (day)',
+        '  p,🠐  ': 'Previous month (day)',
+        '  d,x  ': 'Delete an event',
+        '  e,c  ': 'Edit an event',
+        '   g   ': 'Go to a certain day',
+        '   i   ': 'Toggle event as important',
+        '   C   ': 'Import events from calcurse',
+        '   G   ': 'Return to current month',
+        }
+
+keys_todo = {
+        '  a(A) ': 'Add new (sub)task',
+        '  i(I) ': 'Mark one (all) of the tasks as important',
+        '  v(V) ': 'Mark one (all) of the tasks as done',
+        '  u(U) ': 'Unmark one (all) of the tasks',
+        '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
+        '  t(T) ': 'Start/pause (reset) timer for a task',
+        '  e,c  ': 'Edit a task',
+        '   s   ': 'Toggle between task and subtask',
+        '   m   ': 'Move a task',
+        '  C(W) ': 'Import tasks from calcurse (taskwarrior)',
+        }
 
 def create_config():
     '''Create config.ini file if it does not exist yet'''
@@ -251,7 +283,7 @@ try:
             DEFAULT_VIEW = 'help'
         elif opt in ("-v"):
             DEFAULT_VIEW = 'version'
-            print ("Calcure - version " + version)
+            print ("Calcure - version " + __version__)
 except getopt.GetoptError:
     pass
 
@@ -578,7 +610,7 @@ def previous_month(month, year):
     return month, year
 
 
-def next_day(day, month, year, dates):
+def next_day(day, month, year):
     '''Switch the daily veiw to the next day'''
     days_in_this_month = calendar.monthrange(year, month)[1]
     if day < days_in_this_month:
@@ -593,7 +625,7 @@ def next_day(day, month, year, dates):
     return day, month, year
 
 
-def previous_day(day, month, year, dates):
+def previous_day(day, month, year):
     '''Switch the daity view to the previous day'''
     if day > 1:
         day -= 1
@@ -1151,7 +1183,89 @@ def reset_to_today():
     return day, month, year
 
 
-def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, holidays):
+def handle_calendar_keys(stdscr, state, running, day, month, year, privacy, key, selection_mode):
+    '''Process user input for the calendar screen'''
+    running, state = vim_style_exit(stdscr, running, state, key)
+
+    # Key specific to monthly screen:
+    if state == "monthly_screen":
+        if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
+            month, year = next_month(month, year)
+        if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
+            month, year = previous_month(month, year)
+        if key in ["a"]: add_event(stdscr, None, month, year, recurring = False)
+        if key in ["A"]: add_event(stdscr, None, month, year, recurring = True)
+        if key == "q":
+            running = False
+            state   = 'exit'
+
+    # Key specific to daily screen:
+    else:
+        if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
+            day, month, year = next_day(day, month, year)
+        if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
+            day, month, year = previous_day(day, month, year)
+        if key in ["a"]: add_event(stdscr, day, month, year, recurring = False)
+        if key in ["A"]: add_event(stdscr, day, month, year, recurring = True)
+        if key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
+            running = False
+            state   = 'monthly_screen'
+
+    # General keys for calendar screen:
+    if key in ["d", "x"]: selection_mode = True
+    if key in ["e", "c"]: selection_mode = True
+    if key in ["i"]:      selection_mode = True
+    if key == "?":
+        running = False
+        state   = 'help_screen'
+    if key == "*": privacy = not privacy
+    if key == "C": import_events_from_calcurse()
+    if key in ["KEY_HOME", "G"]:
+        day, month, year = reset_to_today()
+    if key in ["KEY_TAB", " "]:
+        running = False
+        state   = 'journal_screen'
+    return state, running, day, month, year, privacy, selection_mode
+
+
+def handle_journal_keys(stdscr, tasks, statuses, timestamps, state, running, privacy, key):
+    '''Process user input for the journal screen'''
+    running, state = vim_style_exit(stdscr, running, state, key)
+
+    if key == "a": add_task(stdscr, tasks)
+    if key == "A": add_subtask(stdscr, tasks, statuses, timestamps)
+    if key == "v": mark_as_done(stdscr, tasks, statuses, timestamps)
+    if key == "i": mark_as_important(stdscr, tasks, statuses, timestamps)
+    if key == "u": unmark_task(stdscr, tasks, statuses, timestamps)
+    if key == "V": write_tasks_file(tasks, ['done']*len(tasks), timestamps)
+    if key == "I": write_tasks_file(tasks, ['important']*len(tasks), timestamps)
+    if key == "U": write_tasks_file(tasks, ['todo']*len(tasks), timestamps)
+    if key == "D": delete_all_tasks(stdscr)
+    if key == "t": add_timestamp(stdscr, tasks, statuses, timestamps)
+    if key == "T": reset_timer(stdscr, tasks, statuses, timestamps)
+    if key == "s": toggle_subtask(stdscr, tasks, statuses, timestamps)
+    if key == "m": move_task(stdscr, tasks, statuses, timestamps)
+    if key == "*": privacy = not privacy
+    if key == "C": calcurse_task_import(stdscr, tasks)
+    if key == "W": taskwarrior_task_import(stdscr, tasks)
+    if key in ["d", "x"]: delete_task(stdscr, tasks, statuses, timestamps)
+    if key in ["e", "c"]: edit_task(stdscr, tasks, statuses, timestamps)
+    if key == " ":
+        running = False
+        state = 'monthly_screen'
+    if key == "?":
+        running = False
+        state = 'help_screen'
+    if key == "q":
+        prompt_string = "Really exit? (y/n) "
+        confirmed = ask_confirmation(stdscr, prompt_string)
+        if confirmed:
+            running = False
+            state = 'exit'
+    return state, running, privacy
+
+
+def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holidays):
     '''This is the daily view that shows event of the day'''
     bd_dates, bd_names = parse_birthdays_from_abook()
     y_max, x_max   = stdscr.getmaxyx()
@@ -1202,7 +1316,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
 
                     # Display the event:
                     number = (str(event_number)+"·")*(selection_mode)
-                    if privacy_on: event_name = PRIVACY_ICON*len(event_name)
+                    if privacy: event_name = PRIVACY_ICON*len(event_name)
                     disp = icon + number + event_name
                     disp = disp[:x_max - 1]
                     color = 13 if event_status == 'important' else 1
@@ -1228,8 +1342,8 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
             for index, bd_date in enumerate(bd_dates):
                 try:
                     if bd_date == datetime.date(1, month, day):
-                        if privacy_on: event_name = PRIVACY_ICON*len(event_name)
-                        bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy_on else bd_names[index]
+                        if privacy: event_name = PRIVACY_ICON*len(event_name)
+                        bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy else bd_names[index]
                         disp = (BIRTHDAY_ICON+" ")*DISPLAY_ICONS+bd_name
                         disp = disp[:x_max - 1]
                         try:
@@ -1245,7 +1359,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
             for holyday_date, occasion in holidays.items():
                 try:
                     if holyday_date == datetime.date(year, month, day):
-                        occasion = PRIVACY_ICON*len(occasion) if privacy_on else occasion
+                        occasion = PRIVACY_ICON*len(occasion) if privacy else occasion
                         disp = (HOLIDAY_ICON+" ")*DISPLAY_ICONS+occasion
                         disp = disp[:x_max - 1]
                         try:
@@ -1280,9 +1394,6 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
             try:
                 key = stdscr.getkey()
 
-                # Handle vim-style exit on "ZZ" and "ZQ":
-                running, state = vim_style_exit(stdscr, running, state, key)
-
                 # Handle screen resize:
                 if key == "KEY_RESIZE":
                     y_max, x_max = stdscr.getmaxyx()
@@ -1290,28 +1401,8 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
                     stdscr.refresh()
 
                 # Handle rest of the keybindings:
-                if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
-                    day, month, year = next_day(day, month, year, dates)
-                if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
-                    day, month, year = previous_day(day, month, year, dates)
-                if key in ["a"]: add_event(stdscr, day, month, year, recurring = False)
-                if key in ["A"]: add_event(stdscr, day, month, year, recurring = True)
-                if key in ["d", "x"]: selection_mode = True
-                if key in ["e", "c"]: selection_mode = True
-                if key in ["i"]:      selection_mode = True
-                if key == "?":
-                    running = False
-                    state   = 'help_screen'
-                if key == "*": privacy_on = not privacy_on
-                if key == "C": import_events_from_calcurse()
-                if key in ["KEY_HOME", "G"]:
-                    day, month, year = reset_to_today()
-                if key in ["KEY_TAB", " "]:
-                    running = False
-                    state   = 'journal_screen'
-                if key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
-                    running = False
-                    state   = 'monthly_screen'
+                state, running, day, month, year, privacy, selection_mode = handle_calendar_keys(stdscr, state,
+                                            running, day, month, year, privacy, key, selection_mode)
 
             # Handle keyboard interruption with ctr+c:
             except KeyboardInterrupt:
@@ -1324,10 +1415,10 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy_on, weather, h
             # This except is necessary to prevent many various crashes:
             except Exception:
                 pass
-    return state, privacy_on, month, year, weather
+    return state, privacy, month, year, weather
 
 
-def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holidays):
+def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holidays):
     '''This is the calendar view that shows events of the month'''
     bd_dates, bd_names = parse_birthdays_from_abook()
     y_max, x_max   = stdscr.getmaxyx()
@@ -1345,7 +1436,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
         events = load_events()
         today  = datetime.date.today()
 
-        # Displaying the month, year, and days of the week
+        # Displaying the month, year, and days of the week:
         month_year_string = str(calendar.month_name[month].upper()) + " " + str(year)
         stdscr.addstr(0, 0, month_year_string)
         display_day_names(stdscr, x_max)
@@ -1396,7 +1487,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
 
                                 # Display the event:
                                 number = (str(event_number)+"·")*(selection_mode)
-                                if privacy_on: event_name = PRIVACY_ICON*len(event_name)
+                                if privacy: event_name = PRIVACY_ICON*len(event_name)
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 disp = disp + " "*abs(x_max - x_cell*d - len(disp))
@@ -1423,7 +1514,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                         for index, bd_date in enumerate(bd_dates):
                             try:
                                 if bd_date == datetime.date(1, month, day):
-                                    bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy_on else bd_names[index]
+                                    bd_name = PRIVACY_ICON*len(bd_names[index]) if privacy else bd_names[index]
                                     disp = (BIRTHDAY_ICON+" ")*DISPLAY_ICONS+bd_name*(x_cell > 5)
                                     disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                     try:
@@ -1440,7 +1531,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                         for holyday_date, occasion in holidays.items():
                             try:
                                 if holyday_date == datetime.date(year, month, day):
-                                    occasion = PRIVACY_ICON*len(occasion) if privacy_on else occasion
+                                    occasion = PRIVACY_ICON*len(occasion) if privacy else occasion
                                     disp = (HOLIDAY_ICON+" ")*DISPLAY_ICONS+occasion*(x_cell > 5)
                                     disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                     try:
@@ -1502,31 +1593,8 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
                     stdscr.refresh()
 
                 # Handle rest of the keybindings:
-                if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
-                    month, year = next_month(month, year)
-                if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
-                    month, year = previous_month(month, year)
-                if key in ["a"]: add_event(stdscr, None, month, year, recurring = False)
-                if key in ["A"]: add_event(stdscr, None, month, year, recurring = True)
-                if key in ["d", "x"]: selection_mode = True
-                if key in ["e", "c"]: selection_mode = True
-                if key in ["i"]:      selection_mode = True
-                if key == "q":
-                    prompt_string = "Really exit? (y/n)"
-                    confirmed = ask_confirmation(stdscr, prompt_string)
-                    if confirmed:
-                        running = False
-                        state   = 'exit'
-                if key == "?":
-                    running = False
-                    state   = 'help_screen'
-                if key == "*": privacy_on = not privacy_on
-                if key == "C": import_events_from_calcurse()
-                if key in ["KEY_TAB", " "]:
-                    running = False
-                    state   = 'journal_screen'
-                if key in ["KEY_HOME", "G"]:
-                    day, month, year = reset_to_today()
+                state, running, day, month, year, privacy, selection_mode = handle_calendar_keys(stdscr,
+                                        state, running, day, month, year, privacy, key, selection_mode)
 
             # Handle keyboard interruption with ctr+c:
             except KeyboardInterrupt:
@@ -1539,14 +1607,15 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy_on, weather, holi
             # This except is necessary to prevent many various crashes:
             except Exception:
                 pass
-    return state, privacy_on, day, month, year, weather
+    return state, privacy, day, month, year, weather
 
 
-def journal_screen(stdscr, state, privacy_on):
+def journal_screen(stdscr, state, privacy):
     '''This is the todo view that shows the screen with tasks'''
     y_max, x_max = stdscr.getmaxyx()
     running = True
     refresh_screen = True
+
     while (running):
         if refresh_screen:
             stdscr.clear()
@@ -1556,7 +1625,7 @@ def journal_screen(stdscr, state, privacy_on):
         curs_set(False)
         tasks, statuses, timestamps = load_tasks()
 
-        # Check if any of the timers is counting, and increase the update:
+        # Check if any of the timers is counting, and increase the update time:
         for times in timestamps:
             curently_counting = False if not times else (len(times)%2 == 1)
             if curently_counting:
@@ -1580,7 +1649,7 @@ def journal_screen(stdscr, state, privacy_on):
                     task = task[2:]
 
                 # Display the task name depending on its type:
-                if privacy_on: task = PRIVACY_ICON*len(task)
+                if privacy: task = PRIVACY_ICON*len(task)
                 if statuses[index] == "done":
                     stdscr.addstr(index+shift, tab, DONE_ICON, color_pair(12))
                     stdscr.addstr(index+shift, tab+2, task, color_pair(12))
@@ -1611,12 +1680,10 @@ def journal_screen(stdscr, state, privacy_on):
 
         stdscr.refresh()
 
-        # Getting user's input:
+        # Wait for user to press a key:
         try:
             key = stdscr.getkey()
-
-            # Handle vim-style exit on "ZZ" and "ZQ":
-            running, state = vim_style_exit(stdscr, running, state, key)
+            refresh_screen = True
 
             # Handle screen resize:
             if key == "KEY_RESIZE":
@@ -1624,39 +1691,9 @@ def journal_screen(stdscr, state, privacy_on):
                 stdscr.clear()
                 stdscr.refresh()
 
-            # Handle various keys:
-            if key == "a": add_task(stdscr, tasks)
-            if key == "A": add_subtask(stdscr, tasks, statuses, timestamps)
-            if key == "v": mark_as_done(stdscr, tasks, statuses, timestamps)
-            if key == "i": mark_as_important(stdscr, tasks, statuses, timestamps)
-            if key == "u": unmark_task(stdscr, tasks, statuses, timestamps)
-            if key == "V": write_tasks_file(tasks, ['done']*len(tasks), timestamps)
-            if key == "I": write_tasks_file(tasks, ['important']*len(tasks), timestamps)
-            if key == "U": write_tasks_file(tasks, ['todo']*len(tasks), timestamps)
-            if key == "D": delete_all_tasks(stdscr)
-            if key == "t": add_timestamp(stdscr, tasks, statuses, timestamps)
-            if key == "T": reset_timer(stdscr, tasks, statuses, timestamps)
-            if key == "s": toggle_subtask(stdscr, tasks, statuses, timestamps)
-            if key == "m": move_task(stdscr, tasks, statuses, timestamps)
-            if key == "*": privacy_on = not privacy_on
-            if key == "C": calcurse_task_import(stdscr, tasks)
-            if key == "W": taskwarrior_task_import(stdscr, tasks)
-            if key in ["d", "x"]: delete_task(stdscr, tasks, statuses, timestamps)
-            if key in ["e", "c"]: edit_task(stdscr, tasks, statuses, timestamps)
-            if key == " ":
-                running = False
-                state = 'monthly_screen'
-            if key == "?":
-                running = False
-                state = 'help_screen'
-            if key == "q":
-                prompt_string = "Really exit? (y/n) "
-                confirmed = ask_confirmation(stdscr, prompt_string)
-                if confirmed:
-                    running = False
-                    state = 'exit'
-
-            refresh_screen = True
+            # Handle keybindings:
+            state, running, privacy = handle_journal_keys(stdscr, tasks, statuses,
+                                        timestamps, state, running, privacy, key)
 
         # Handle keybard interruption with ctr+c:
         except KeyboardInterrupt:
@@ -1669,45 +1706,12 @@ def journal_screen(stdscr, state, privacy_on):
         # This except is necessary to prevent many various crashes:
         except Exception:
             pass
-    return state, privacy_on
+    return state, privacy
 
 
 def help_screen(stdscr, state):
     '''This is the help view that shows all the keybinding'''
     y_max, x_max = stdscr.getmaxyx()
-
-    # Keybinding dictionaries:
-    keys_general = {
-            ' Space ': 'Switch between calendar and journal',
-            '   ?   ': 'Toggle this help',
-            '   *   ': 'Toggle privacy mode',
-            '   q   ': 'Quit',
-            }
-
-    keys_calendar = {
-            '  a(A) ': 'Add a (recurring) event',
-            '  n,🠒  ': 'Next month (day)',
-            '  p,🠐  ': 'Previous month (day)',
-            '  d,x  ': 'Delete an event',
-            '  e,c  ': 'Edit an event',
-            '   g   ': 'Go to a certain day',
-            '   i   ': 'Toggle event as important',
-            '   C   ': 'Import events from calcurse',
-            '   G   ': 'Return to current month',
-            }
-
-    keys_todo = {
-            '  a(A) ': 'Add new (sub)task',
-            '  i(I) ': 'Mark one (all) of the tasks as important',
-            '  v(V) ': 'Mark one (all) of the tasks as done',
-            '  u(U) ': 'Unmark one (all) of the tasks',
-            '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
-            '  t(T) ': 'Start/pause (reset) timer for a task',
-            '  e,c  ': 'Edit a task',
-            '   s   ': 'Toggle between task and subtask',
-            '   m   ': 'Move a task',
-            '  C(W) ': 'Import tasks from calcurse (taskwarrior)',
-                }
 
     running = True
     while (running):
@@ -1717,7 +1721,7 @@ def help_screen(stdscr, state):
 
         # Print out the dictionaries:
         try:
-            title = " CALCURE " + version
+            title = " CALCURE " + __version__
             stdscr.addstr(0, 0, title[:x_max-3], color_pair(6))
             stdscr.addstr(2, 8, "GENERAL KEYBINDINGS"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_general):
@@ -1785,7 +1789,7 @@ def main(stdscr):
     year   = datetime.date.today().year
     holidays   = load_holidays(year)
     weather    = None
-    privacy_on = PRIVACY_MODE
+    privacy = PRIVACY_MODE
 
     # Decide how to start the program:
     if DEFAULT_VIEW == 'help':
@@ -1804,13 +1808,13 @@ def main(stdscr):
     # Running various screens depending on the state:
     while state != 'exit':
         if state == 'monthly_screen':
-            state, privacy_on, day, month, year, weather = monthly_screen(stdscr, my_cal,
-                                        month, year, state, privacy_on, weather, holidays)
+            state, privacy, day, month, year, weather = monthly_screen(stdscr, my_cal,
+                                        month, year, state, privacy, weather, holidays)
         elif state == 'daily_screen':
-            state, privacy_on, month, year, weather = daily_screen(stdscr, my_cal,
-                                    day, month, year, state, privacy_on, weather, holidays)
+            state, privacy, month, year, weather = daily_screen(stdscr, my_cal,
+                                    day, month, year, state, privacy, weather, holidays)
         elif state == 'journal_screen':
-            state, privacy_on = journal_screen(stdscr, state, privacy_on)
+            state, privacy = journal_screen(stdscr, state, privacy)
         elif state == 'help_screen':
             state = help_screen(stdscr, state)
         else:
@@ -1821,5 +1825,13 @@ def main(stdscr):
     curs_set(True)
     endwin()
 
+
+def cli() -> None:
+    try:
+        wrapper(main)
+    except KeyboardInterrupt:
+        pass
+
+
 if __name__ == "__main__":
-    wrapper(main)
+    cli()
