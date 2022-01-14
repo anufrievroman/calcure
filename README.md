@@ -22,7 +22,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ## Installation
 
-### On Linux and Man OS
+### On Linux and Mac OS
 
 `pip install calcure`
 
