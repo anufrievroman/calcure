@@ -128,6 +128,7 @@ def create_config():
             "color_timer_paused":  "7",
             "color_time":          "7",
             "color_weather":       "2",
+            "color_background":    "-1",
             }
 
     conf["Dialogues"] = {
@@ -247,6 +248,7 @@ try:
     COLOR_TIMER_PAUSED   = int(conf.get("Colors", "color_timer_paused", fallback=7))
     COLOR_TIME           = int(conf.get("Colors", "color_time", fallback=7))
     COLOR_WEATHER        = int(conf.get("Colors", "color_weather", fallback=2))
+    COLOR_BACKGROUND     = int(conf.get("Colors", "color_background", fallback=-1))
 
     # Journal colors:
     COLOR_TODO           = int(conf.get("Colors", "color_todo", fallback=7))
@@ -716,34 +718,34 @@ def initialize_colors(stdscr):
     '''Define all the color pairs'''
     start_color()
     use_default_colors()
-    init_pair(1, COLOR_DAY_NAMES, -1)
-    init_pair(6, COLOR_WEEKEND_NAMES, -1)
-    init_pair(3, COLOR_HINTS, -1)
-    init_pair(7, COLOR_BIRTHDAYS, -1)
-    init_pair(8, COLOR_PROMPTS, -1)
-    init_pair(9, COLOR_CONFIRMATIONS, -1)
+    init_pair(1, COLOR_DAY_NAMES, COLOR_BACKGROUND)
+    init_pair(6, COLOR_WEEKEND_NAMES, COLOR_BACKGROUND)
+    init_pair(3, COLOR_HINTS, COLOR_BACKGROUND)
+    init_pair(7, COLOR_BIRTHDAYS, COLOR_BACKGROUND)
+    init_pair(8, COLOR_PROMPTS, COLOR_BACKGROUND)
+    init_pair(9, COLOR_CONFIRMATIONS, COLOR_BACKGROUND)
     if MINIMAL_WEEKEND_INDICATOR:
-        init_pair(2, COLOR_WEEKENDS, -1)
+        init_pair(2, COLOR_WEEKENDS, COLOR_BACKGROUND)
     else:
         init_pair(2, COLOR_BLACK, COLOR_WEEKENDS)
     if MINIMAL_TODAY_INDICATOR:
-        init_pair(4, COLOR_TODAY, -1)
+        init_pair(4, COLOR_TODAY, COLOR_BACKGROUND)
     else:
         init_pair(4, COLOR_BLACK, COLOR_TODAY)
     if MINIMAL_DAYS_INDICATOR:
-        init_pair(5, COLOR_DAYS, -1)
+        init_pair(5, COLOR_DAYS, COLOR_BACKGROUND)
     else:
         init_pair(5, COLOR_BLACK, COLOR_DAYS)
-    init_pair(10, COLOR_TITLE, -1)
-    init_pair(11, COLOR_TODO, -1)
-    init_pair(12, COLOR_DONE, -1)
-    init_pair(13, COLOR_IMPORTANT, -1)
-    init_pair(14, COLOR_TIMER, -1)
-    init_pair(15, COLOR_TIMER_PAUSED, -1)
-    init_pair(16, COLOR_HOLIDAYS, -1)
-    init_pair(17, COLOR_EVENTS, -1)
-    init_pair(18, COLOR_TIME, -1)
-    init_pair(19, COLOR_WEATHER, -1)
+    init_pair(10, COLOR_TITLE, COLOR_BACKGROUND)
+    init_pair(11, COLOR_TODO, COLOR_BACKGROUND)
+    init_pair(12, COLOR_DONE, COLOR_BACKGROUND)
+    init_pair(13, COLOR_IMPORTANT, COLOR_BACKGROUND)
+    init_pair(14, COLOR_TIMER, COLOR_BACKGROUND)
+    init_pair(15, COLOR_TIMER_PAUSED, COLOR_BACKGROUND)
+    init_pair(16, COLOR_HOLIDAYS, COLOR_BACKGROUND)
+    init_pair(17, COLOR_EVENTS, COLOR_BACKGROUND)
+    init_pair(18, COLOR_TIME, COLOR_BACKGROUND)
+    init_pair(19, COLOR_WEATHER, COLOR_BACKGROUND)
 
 
 def display_weather(stdscr, weather, month_year_string):
@@ -1265,6 +1267,13 @@ def handle_journal_keys(stdscr, tasks, statuses, timestamps, state, running, pri
     return state, running, privacy
 
 
+def fill_background(stdscr):
+    '''Fill the background with background color'''
+    y_max, x_max = stdscr.getmaxyx()
+    for index in range(y_max-1):
+        stdscr.addstr(index, 0, " "*x_max, color_pair(1))
+
+
 def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holidays):
     '''This is the daily view that shows event of the day'''
     bd_dates, bd_names = parse_birthdays_from_abook()
@@ -1280,6 +1289,8 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holi
         noecho()
         curs_set(False)
         events = load_events()
+
+        fill_background(stdscr)
         dates = my_cal.monthdayscalendar(year, month)
 
         # Display month, year, and days of the week with appropriate color:
@@ -1431,6 +1442,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
         halfdelay(255)
         noecho()
         curs_set(False)
+        fill_background(stdscr)
         y_cell = (y_max-2)//6
         x_cell = x_max//7
         events = load_events()
@@ -1438,7 +1450,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
 
         # Displaying the month, year, and days of the week:
         month_year_string = str(calendar.month_name[month].upper()) + " " + str(year)
-        stdscr.addstr(0, 0, month_year_string)
+        stdscr.addstr(0, 0, month_year_string, color_pair(5))
         display_day_names(stdscr, x_max)
 
         # Displaying the dates and events:
@@ -1623,6 +1635,7 @@ def journal_screen(stdscr, state, privacy):
         noecho()
         halfdelay(255)
         curs_set(False)
+        fill_background(stdscr)
         tasks, statuses, timestamps = load_tasks()
 
         # Check if any of the timers is counting, and increase the update time:
@@ -1718,6 +1731,7 @@ def help_screen(stdscr, state):
         stdscr.clear()
         noecho()
         curs_set(False)
+        fill_background(stdscr)
 
         # Print out the dictionaries:
         try:
@@ -1826,12 +1840,13 @@ def main(stdscr):
     endwin()
 
 
+# example: https://gist.github.com/meskarune/63600e64df56a607efa211b9a87fb443
+
 def cli() -> None:
     try:
         wrapper(main)
     except KeyboardInterrupt:
         pass
-
 
 if __name__ == "__main__":
     cli()

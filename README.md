@@ -33,6 +33,10 @@ The package `calcure` is available in AUR.
 
 `yay -S calcure`
 
+Also, you need to install `holidays` library to see holidays:
+
+`pip install holidays`
+
 
 ### On Windows
 
@@ -218,6 +222,7 @@ color_timer = 2
 color_timer_paused = 7
 color_time = 7
 color_weather = 2
+color_background = -1
 
 [Dialogues]
 calendar_hint = Space · Tasks   n/p · Change month   a · Add event   ? · All keybindings
@@ -273,7 +278,7 @@ letter = ✉
 ```
 When configuring colors, the numbers indicate standard colors of your terminal and usually mean: 
 
-1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white
+1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white, -1 - transparent
 
 ## Troubleshooting
 
