@@ -71,15 +71,15 @@ Run `calcure` in your terminal.
 
 ### User arguments
 
-`-c` - Start on the calendar page (default)
+`-c` · Start on the calendar page (default)
 
-`-j` - Start on the journal page
+`-j` · Start on the journal page
 
-`-h` - Start on the help page
+`-h` · Start on the help page
 
-`-p` - Start in the privacy mode (text is obfuscated as •••••)
+`-p` · Start in the privacy mode (text is obfuscated as •••••)
 
-`-v` - Print the version and exit
+`-v` · Print the version and exit
 
 `--folder=FOLDERNAME` - Use datafiles (events and tasks) stored in a specific folder. For example, if you want to have separate databases for work and for personal things, you can start as `calcure --folder=$HOME/.calcure/work` or `calcure --folder=$HOME/.calcure/personal`. The same effect can basically be achived with the `--config` argument, as explained below.
 
@@ -140,6 +140,10 @@ Besides keybindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) 
 `i` · Mark a task as important
 
 `I` · Mark all tasks as important
+
+`l` · Mark a task as low priority
+
+`L` · Mark all tasks as low priority
 
 `d` · Delete a task and all its subtasks
 
@@ -218,6 +222,7 @@ color_todo = 7
 color_done = 6
 color_title = 4
 color_important = 1
+color_unimportant = 6
 color_timer = 2
 color_timer_paused = 7
 color_time = 7
@@ -278,7 +283,7 @@ letter = ✉
 ```
 When configuring colors, the numbers indicate standard colors of your terminal and usually mean: 
 
-1 - red, 2 - green, 3 - yellow, 4 - blue, 5 - magenta, 6 - cyan, 7 - white, -1 - transparent
+1 · red, 2 · green, 3 · yellow, 4 · blue, 5 · magenta, 6 · cyan, 7 · white, -1 · transparent
 
 ## Troubleshooting
 

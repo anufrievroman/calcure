@@ -11,7 +11,7 @@ import re
 import sys, getopt
 import time
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 
 # Write configuration file if it does not exist already:
 config_folder = str(pathlib.Path.home()) + "/.config/calcure"
@@ -60,6 +60,7 @@ keys_calendar = {
 keys_todo = {
         '  a(A) ': 'Add new (sub)task',
         '  i(I) ': 'Mark one (all) of the tasks as important',
+        '  l(L) ': 'Mark one (all) of the tasks as low priority',
         '  v(V) ': 'Mark one (all) of the tasks as done',
         '  u(U) ': 'Unmark one (all) of the tasks',
         '  d(D) ': 'Delete one (all) of the tasks (with all subtasks)',
@@ -124,6 +125,7 @@ def create_config():
             "color_done":          "6",
             "color_title":         "4",
             "color_important":     "1",
+            "color_unimportant":   "6",
             "color_timer":         "2",
             "color_timer_paused":  "7",
             "color_time":          "7",
@@ -255,6 +257,7 @@ try:
     COLOR_DONE           = int(conf.get("Colors", "color_done", fallback=6))
     COLOR_TITLE          = int(conf.get("Colors", "color_title", fallback=1))
     COLOR_IMPORTANT      = int(conf.get("Colors", "color_important", fallback=1))
+    COLOR_UNIMPORTANT    = int(conf.get("Colors", "color_unimportant", fallback=6))
 
     CALENDAR_HINT = conf.get("Dialogues", "calendar_hint", fallback=default_calendar_hint)
     TODO_HINT = conf.get("Dialogues", "todo_hint", fallback=default_todo_hint)
@@ -746,6 +749,7 @@ def initialize_colors(stdscr):
     init_pair(17, COLOR_EVENTS, COLOR_BACKGROUND)
     init_pair(18, COLOR_TIME, COLOR_BACKGROUND)
     init_pair(19, COLOR_WEATHER, COLOR_BACKGROUND)
+    init_pair(20, COLOR_UNIMPORTANT, COLOR_BACKGROUND)
 
 
 def display_weather(stdscr, weather, month_year_string):
@@ -824,10 +828,11 @@ def add_subtask(stdscr, tasks, statuses, timestamps):
     # If the provided number corresponds to a task, then edit:
     if number_is_valid(number, tasks):
         number = int(number)
+        level = '----'if (tasks[number-1][:2] == '--') else '--'
         prompt_string = "Enter the subtask: "
         new_task = user_input(stdscr, prompt_string, x_max - 1)
         if len(new_task) > 0:
-            tasks.insert(number, '--' + new_task)
+            tasks.insert(number, level + new_task)
             statuses.insert(number, statuses[number-1])
             timestamps.insert(number, [])
             write_tasks_file(tasks, statuses, timestamps)
@@ -873,6 +878,8 @@ def calcurse_task_import(stdscr, tasks):
                         with open(TASKS_FILE,"a") as f:
                             if task[1] in ['1','2']:
                                 f.write('"'+task[4:-1]+'"' + ",important\n")
+                            elif task[1] in ['8','9','10']:
+                                f.write('"'+task[4:-1]+'"' + ",unimportant\n")
                             else:
                                 f.write('"'+task[4:-1]+'"' + ",todo\n")
 
@@ -1036,6 +1043,33 @@ def mark_as_important(stdscr, tasks, statuses, timestamps):
             for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
                     statuses[i] = "important"
+                else:
+                    break
+        write_tasks_file(tasks, statuses, timestamps)
+
+
+def mark_as_unimportant(stdscr, tasks, statuses, timestamps):
+    '''Ask user which task to mark as unimportant and changes the file'''
+    y_max, x_max = stdscr.getmaxyx()
+
+    # Display task numbers and ask which to edit:
+    shift = 2 if SHOW_TITLE else 0
+    for	i in range(len(tasks)):
+        col = 1 if i+1 < 10 else 0
+        stdscr.addstr(shift+i, col, str(i+1))
+    prompt_string = "Mark as low priority task number: "
+    number = user_input(stdscr, prompt_string, 4)
+
+    # If the provided number corresponds to a task, then edit:
+    if number_is_valid(number, tasks):
+        number = int(number)
+        statuses[number-1] = "unimportant"
+
+        # if there are subtasks, mark them as well:
+        if tasks[number-1][:2] != '--':
+            for i in range(number, len(tasks)):
+                if tasks[i][:2] == '--':
+                    statuses[i] = "unimportant"
                 else:
                     break
         write_tasks_file(tasks, statuses, timestamps)
@@ -1238,10 +1272,12 @@ def handle_journal_keys(stdscr, tasks, statuses, timestamps, state, running, pri
     if key == "A": add_subtask(stdscr, tasks, statuses, timestamps)
     if key == "v": mark_as_done(stdscr, tasks, statuses, timestamps)
     if key == "i": mark_as_important(stdscr, tasks, statuses, timestamps)
+    if key == "l": mark_as_unimportant(stdscr, tasks, statuses, timestamps)
     if key == "u": unmark_task(stdscr, tasks, statuses, timestamps)
     if key == "V": write_tasks_file(tasks, ['done']*len(tasks), timestamps)
     if key == "I": write_tasks_file(tasks, ['important']*len(tasks), timestamps)
     if key == "U": write_tasks_file(tasks, ['todo']*len(tasks), timestamps)
+    if key == "L": write_tasks_file(tasks, ['unimportant']*len(tasks), timestamps)
     if key == "D": delete_all_tasks(stdscr)
     if key == "t": add_timestamp(stdscr, tasks, statuses, timestamps)
     if key == "T": reset_timer(stdscr, tasks, statuses, timestamps)
@@ -1657,7 +1693,10 @@ def journal_screen(stdscr, state, privacy):
 
                 # Check the tabbing for subtasks:
                 tab = 1
-                if task[:2] == '--':
+                if task[:4] == '----':
+                    tab += 4
+                    task = task[4:]
+                elif task[:2] == '--':
                     tab += 2
                     task = task[2:]
 
@@ -1669,6 +1708,9 @@ def journal_screen(stdscr, state, privacy):
                 elif statuses[index] == "important":
                     stdscr.addstr(index+shift, tab, IMPORTANT_ICON, color_pair(13))
                     stdscr.addstr(index+shift, tab+2, task, color_pair(13))
+                elif statuses[index] == "unimportant":
+                    stdscr.addstr(index+shift, tab, icon, color_pair(20))
+                    stdscr.addstr(index+shift, tab+2, task, color_pair(20))
                 else:
                     icon = display_icon(task, "journal")
                     stdscr.addstr(index+shift, tab, icon, color_pair(11))
