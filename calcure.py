@@ -11,7 +11,7 @@ import re
 import sys, getopt
 import time
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 
 # Write configuration file if it does not exist already:
 config_folder = str(pathlib.Path.home()) + "/.config/calcure"
@@ -52,14 +52,15 @@ keys_calendar = {
         '  d,x  ': 'Delete an event',
         '  e,c  ': 'Edit an event',
         '   g   ': 'Go to a certain day',
-        '   i   ': 'Toggle event as important',
+        '   h   ': 'Toggle event as high priority',
+        '   l   ': 'Toggle event as low priority',
         '   C   ': 'Import events from calcurse',
         '   G   ': 'Return to current month',
         }
 
 keys_todo = {
         '  a(A) ': 'Add new (sub)task',
-        '  i(I) ': 'Mark one (all) of the tasks as important',
+        '  h(H) ': 'Mark one (all) of the tasks as high priority',
         '  l(L) ': 'Mark one (all) of the tasks as low priority',
         '  v(V) ': 'Mark one (all) of the tasks as done',
         '  u(U) ': 'Unmark one (all) of the tasks',
@@ -452,7 +453,7 @@ def add_event(stdscr, day, month, year, recurring):
         event_id = 1 if not events['id'] else max(events['id']) + 1
         new_event = (str(event_id)+","+str(year)+","+str(month)+","+
                 str(event_date)+","+'"'+name+'"'+","+str(repetitions)+","+
-                str(frequency))
+                str(frequency))+",normal"
         if len(name) > 0 and int(repetitions) >= 0 and frequency in ["d","w","m","y","n"]:
             with open(EVENTS_FILE, "a") as f:
                 f.write(new_event+"\n")
@@ -496,7 +497,7 @@ def delete_event(stdscr, ids_this_month, names_this_month):
 def mark_event_as_important(stdscr, ids_this_month, names_this_month, month, year):
     '''Mark existing event as important'''
     y_max, x_max = stdscr.getmaxyx()
-    prompt_string = "Mark as important event number: "
+    prompt_string = "Mark as high priority event number: "
     num = (user_input(stdscr, prompt_string, 4))
     event_chosen = False
 
@@ -516,10 +517,56 @@ def mark_event_as_important(stdscr, ids_this_month, names_this_month, month, yea
                     if not line.startswith(str(event_id)+','):
                         write_obj.write(line)
                     else:
-                        if "important" in line[-11:]:
-                            line = re.sub(',important', '', line)
+                        if line[:-1].endswith(",important"):
+                            line = re.sub(',important', ',normal', line)
+                        elif line[:-1].endswith(",unimportant"):
+                            line = re.sub(',unimportant', ',important', line)
+                        elif line[:-1].endswith(",normal"):
+                            line = re.sub(',normal', ',important', line)
                         else:
                             line = line[:-1] + ',important\n'
+                        write_obj.write(line)
+                        line_edited = True
+            if line_edited:
+                os.remove(original_file)
+                os.rename(dummy_file, original_file)
+            else:
+                os.remove(dummy_file)
+    except:
+        pass
+
+
+def mark_event_as_unimportant(stdscr, ids_this_month, names_this_month, month, year):
+    '''Mark existing event as unimportant'''
+    y_max, x_max = stdscr.getmaxyx()
+    prompt_string = "Mark as low priority event number: "
+    num = (user_input(stdscr, prompt_string, 4))
+    event_chosen = False
+
+    # If provided number is correct, then change the status:
+    try:
+        if int(num) in range(1, len(ids_this_month)+1):
+            recurring = True
+            event_id = ids_this_month[int(num)-1]
+            event_name = names_this_month[int(num)-1]
+
+            # Here we work with a dummy file and replace the original in the last moment:
+            original_file = EVENTS_FILE
+            dummy_file = EVENTS_FILE + '.bak'
+            line_deleted = False
+            with open(original_file, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+                for line in read_obj:
+                    if not line.startswith(str(event_id)+','):
+                        write_obj.write(line)
+                    else:
+                        if line[:-1].endswith(",unimportant"):
+                            line = re.sub(',unimportant', ',normal', line)
+                        elif line[:-1].endswith(",important"):
+                            line = re.sub(',important', ',unimportant', line)
+                        elif line[:-1].endswith(",normal"):
+                            line = re.sub(',normal', ',unimportant', line)
+                        else:
+                            line = line[:-1] + ',unimportant\n'
                         write_obj.write(line)
                         line_edited = True
             if line_edited:
@@ -587,7 +634,7 @@ def edit_event(stdscr, ids_this_month, names_this_month, month, year):
                 events = load_events()
                 event_id = 1 if not events['id'] else max(events['id'])+1
                 new_event = (str(event_id)+","+str(year)+","+str(month)+","+
-                        event_date+","+'"'+name+'"'+","+str(repetitions)+","+str(frequency))
+                        event_date+","+'"'+name+'"'+","+str(repetitions)+","+str(frequency)+",normal")
                 if len(name) > 0 and int(repetitions) >= 0 and frequency in ["d","w","m","y","n"]:
                     with open(EVENTS_FILE, "a") as f:
                         f.write(new_event+"\n")
@@ -1030,7 +1077,7 @@ def mark_as_important(stdscr, tasks, statuses, timestamps):
     for	i in range(len(tasks)):
         col = 1 if i+1 < 10 else 0
         stdscr.addstr(shift+i, col, str(i+1))
-    prompt_string = "Mark as important task number: "
+    prompt_string = "Mark as high priority task number: "
     number = user_input(stdscr, prompt_string, 4)
 
     # If the provided number corresponds to a task, then edit:
@@ -1225,9 +1272,9 @@ def handle_calendar_keys(stdscr, state, running, day, month, year, privacy, key,
 
     # Key specific to monthly screen:
     if state == "monthly_screen":
-        if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
+        if key in ["n", "j", "KEY_UP", "KEY_RIGHT"]:
             month, year = next_month(month, year)
-        if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
+        if key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
             month, year = previous_month(month, year)
         if key in ["a"]: add_event(stdscr, None, month, year, recurring = False)
         if key in ["A"]: add_event(stdscr, None, month, year, recurring = True)
@@ -1237,9 +1284,9 @@ def handle_calendar_keys(stdscr, state, running, day, month, year, privacy, key,
 
     # Key specific to daily screen:
     else:
-        if key in ["n", "j", "l", "KEY_UP", "KEY_RIGHT"]:
+        if key in ["n", "j", "KEY_UP", "KEY_RIGHT"]:
             day, month, year = next_day(day, month, year)
-        if key in ["p", "h", "k", "KEY_DOWN", "KEY_LEFT"]:
+        if key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
             day, month, year = previous_day(day, month, year)
         if key in ["a"]: add_event(stdscr, day, month, year, recurring = False)
         if key in ["A"]: add_event(stdscr, day, month, year, recurring = True)
@@ -1250,7 +1297,8 @@ def handle_calendar_keys(stdscr, state, running, day, month, year, privacy, key,
     # General keys for calendar screen:
     if key in ["d", "x"]: selection_mode = True
     if key in ["e", "c"]: selection_mode = True
-    if key in ["i"]:      selection_mode = True
+    if key in ["i", "h"]: selection_mode = True
+    if key in ["l"]:      selection_mode = True
     if key == "?":
         running = False
         state   = 'help_screen'
@@ -1271,11 +1319,11 @@ def handle_journal_keys(stdscr, tasks, statuses, timestamps, state, running, pri
     if key == "a": add_task(stdscr, tasks)
     if key == "A": add_subtask(stdscr, tasks, statuses, timestamps)
     if key == "v": mark_as_done(stdscr, tasks, statuses, timestamps)
-    if key == "i": mark_as_important(stdscr, tasks, statuses, timestamps)
+    if key == "h": mark_as_important(stdscr, tasks, statuses, timestamps)
     if key == "l": mark_as_unimportant(stdscr, tasks, statuses, timestamps)
     if key == "u": unmark_task(stdscr, tasks, statuses, timestamps)
     if key == "V": write_tasks_file(tasks, ['done']*len(tasks), timestamps)
-    if key == "I": write_tasks_file(tasks, ['important']*len(tasks), timestamps)
+    if key == "H": write_tasks_file(tasks, ['important']*len(tasks), timestamps)
     if key == "U": write_tasks_file(tasks, ['todo']*len(tasks), timestamps)
     if key == "L": write_tasks_file(tasks, ['unimportant']*len(tasks), timestamps)
     if key == "D": delete_all_tasks(stdscr)
@@ -1308,6 +1356,17 @@ def fill_background(stdscr):
     y_max, x_max = stdscr.getmaxyx()
     for index in range(y_max-1):
         stdscr.addstr(index, 0, " "*x_max, color_pair(1))
+
+
+def check_color(status):
+    '''Provide color according to the status of importance'''
+    if status == 'important':
+        color = 13
+    elif status == 'unimportant':
+        color = 20
+    else:
+        color = 17
+    return color
 
 
 def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holidays):
@@ -1366,7 +1425,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holi
                     if privacy: event_name = PRIVACY_ICON*len(event_name)
                     disp = icon + number + event_name
                     disp = disp[:x_max - 1]
-                    color = 13 if event_status == 'important' else 1
+                    color = check_color(event_status)
                     try:
                         stdscr.addstr(2+num_of_event_this_day,
                                         1, disp, color_pair(color))
@@ -1402,7 +1461,7 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holi
                     pass
 
         # Display holidays:
-        if DISPLAY_HOLIDAYS and holidays is not None:
+        if DISPLAY_HOLIDAYS and not holidays is None:
             for holyday_date, occasion in holidays.items():
                 try:
                     if holyday_date == datetime.date(year, month, day):
@@ -1431,8 +1490,10 @@ def daily_screen(stdscr, my_cal, day, month, year, state, privacy, weather, holi
                 delete_event(stdscr, ids_this_month, names_this_month)
             elif key in ["e", "c"]:
                 edit_event(stdscr, ids_this_month, names_this_month, month, year)
-            elif key in ["i"]:
+            elif key in ["i", "h"]:
                 mark_event_as_important(stdscr, ids_this_month, names_this_month, month, year)
+            elif key in ["l"]:
+                mark_event_as_unimportant(stdscr, ids_this_month, names_this_month, month, year)
             selection_mode = False
             refresh_mode = True
 
@@ -1539,7 +1600,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
                                 disp = icon + number + event_name*(x_cell > 5)
                                 disp = disp[:x_cell] if CUT_TITLES else disp[:x_max-d*x_cell]
                                 disp = disp + " "*abs(x_max - x_cell*d - len(disp))
-                                color = 13 if event_status == 'important' else 17
+                                color = check_color(event_status)
                                 try:
                                     stdscr.addstr(3+num_of_event_this_day+w*y_cell,
                                                     d*x_cell, disp, color_pair(color))
@@ -1575,7 +1636,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
                                 pass
 
                     # Display holidays:
-                    if DISPLAY_HOLIDAYS and holidays is not None:
+                    if DISPLAY_HOLIDAYS and not holidays is None:
                         for holyday_date, occasion in holidays.items():
                             try:
                                 if holyday_date == datetime.date(year, month, day):
@@ -1606,8 +1667,10 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
                 delete_event(stdscr, ids_this_month, names_this_month)
             elif key in ["e", "c"]:
                 edit_event(stdscr, ids_this_month, names_this_month, month, year)
-            elif key in ["i"]:
+            elif key in ["i", "h"]:
                 mark_event_as_important(stdscr, ids_this_month, names_this_month, month, year)
+            elif key in ["l"]:
+                mark_event_as_unimportant(stdscr, ids_this_month, names_this_month, month, year)
             selection_mode = False
             refresh_mode = True
 
@@ -1775,35 +1838,46 @@ def help_screen(stdscr, state):
         curs_set(False)
         fill_background(stdscr)
 
+        # Depending on the available screen size, choose the layout:
+        if x_max < 102:
+            global_shift_x = 0
+            shift_x = 0
+            shift_y = 6 + len(keys_general) + len(keys_calendar)
+        else:
+            global_shift_x = (x_max - 102)//2
+            shift_x = 45
+            shift_y = 2
+
+        if y_max > 20 and x_max >= 102:
+            global_shift_y = (y_max - 20)//2
+        else:
+            global_shift_y = 0
+
         # Print out the dictionaries:
         try:
             title = " CALCURE " + __version__
-            stdscr.addstr(0, 0, title[:x_max-3], color_pair(6))
-            stdscr.addstr(2, 8, "GENERAL KEYBINDINGS"[:x_max-3], color_pair(4))
+            stdscr.addstr(global_shift_y, global_shift_x, title[:x_max-3], color_pair(6))
+            stdscr.addstr(global_shift_y + 2, global_shift_x + 8, "GENERAL KEYBINDINGS"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_general):
                 line = str(key+" "+keys_general[key])[:x_max-3]
-                stdscr.addstr(index+3, 0, line, color_pair(5))
+                stdscr.addstr(global_shift_y + index + 3, global_shift_x, line, color_pair(5))
 
-            stdscr.addstr(4+len(keys_general), 8, "CALENDAR KEYBINDINGS"[:x_max-3], color_pair(4))
+            stdscr.addstr(global_shift_y + 4+len(keys_general), global_shift_x + 8, "CALENDAR KEYBINDINGS"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_calendar):
                 line = str(key+" "+keys_calendar[key])[:x_max-3]
-                stdscr.addstr(index+5+len(keys_general), 0, line, color_pair(5))
+                stdscr.addstr(global_shift_y + index + 5 + len(keys_general), global_shift_x, line, color_pair(5))
 
-            # If screen allows, fit horizontally, else stack vertically:
-            if x_max < 102:
-                shift_x = 0
-                shift_y = 6 + len(keys_general) + len(keys_calendar)
-            else:
-                shift_x = 45
-                shift_y = 2
 
-            stdscr.addstr(shift_y, shift_x + 8, "JOURNAL KEYBINDINGS"[:x_max-3], color_pair(4))
+            stdscr.addstr(global_shift_y + shift_y, global_shift_x + shift_x + 8, "JOURNAL KEYBINDINGS"[:x_max-3], color_pair(4))
             for index, key in enumerate(keys_todo):
                 line = str(key + " " + keys_todo[key])[:x_max-3]
-                stdscr.addstr(index + 1 + shift_y, shift_x, line, color_pair(5))
-            stdscr.addstr(2 + len(keys_todo) + shift_y, shift_x + 8, "Vim hjkl keys work as well!", color_pair(6))
-            stdscr.addstr(4 + len(keys_todo) + shift_y, shift_x + 8, "For more information, visit:", color_pair(5))
-            stdscr.addstr(5 + len(keys_todo) + shift_y, shift_x + 8, "https://github.com/anufrievroman/calcure", color_pair(4))
+                stdscr.addstr(global_shift_y + index + 1 + shift_y, global_shift_x + shift_x, line, color_pair(5))
+            stdscr.addstr(global_shift_y + 2 + len(keys_todo) + shift_y, global_shift_x + shift_x + 8,
+                    "Vim's j and k work as well!", color_pair(6))
+            stdscr.addstr(global_shift_y + 4 + len(keys_todo) + shift_y, global_shift_x + shift_x + 8,
+                    "For more information, visit:", color_pair(5))
+            stdscr.addstr(global_shift_y + 5 + len(keys_todo) + shift_y, global_shift_x + shift_x + 8,
+                    "https://github.com/anufrievroman/calcure", color_pair(4))
         except Exception:
             pass
 
@@ -1840,12 +1914,12 @@ def help_screen(stdscr, state):
 
 def main(stdscr):
     '''Main function that runs and switches screens'''
-    my_cal = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
-    month  = datetime.date.today().month
-    year   = datetime.date.today().year
-    holidays   = load_holidays(year)
-    weather    = None
-    privacy = PRIVACY_MODE
+    my_cal   = calendar.Calendar(firstweekday=START_WEEK_DAY-1)
+    month    = datetime.date.today().month
+    year     = datetime.date.today().year
+    privacy  = PRIVACY_MODE
+    holidays = load_holidays(year)
+    weather  = None
 
     # Decide how to start the program:
     if DEFAULT_VIEW == 'help':
@@ -1882,13 +1956,12 @@ def main(stdscr):
     endwin()
 
 
-# example: https://gist.github.com/meskarune/63600e64df56a607efa211b9a87fb443
-
 def cli() -> None:
     try:
         wrapper(main)
     except KeyboardInterrupt:
         pass
+
 
 if __name__ == "__main__":
     cli()
