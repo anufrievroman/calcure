@@ -102,15 +102,17 @@ Besides keybindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) 
 
 ### Calendar view
 
-`n`,`j`,`l`,`↓`  · Next month
+`n`,`l`,`↓`  · Next month
 
-`p`,`h`,`k`,`↑` · Previous month
+`p`,`k`,`↑` · Previous month
 
 `a` · Add an event
 
 `A` · Add a recurring event
 
-`i` · Mark/unmark an event as important
+`h` · Mark/unmark an event as high priority
+
+`l` · Mark/unmark an event as low priority
 
 `d`,`x` · Delete an event
 
@@ -137,13 +139,13 @@ Besides keybindings listed below, various vim-style keybinding (`ZZ`, `ZQ` etc) 
 
 `U` · Unmark all tasks
 
-`i` · Mark a task as important
+`h` · Mark/unmark a task as important
 
-`I` · Mark all tasks as important
+`H` · Mark/unmark all tasks as important
 
-`l` · Mark a task as low priority
+`l` · Mark/unmark a task as low priority
 
-`L` · Mark all tasks as low priority
+`L` · Mark/unmark all tasks as low priority
 
 `d` · Delete a task and all its subtasks
 

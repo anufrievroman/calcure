@@ -10,8 +10,9 @@ import subprocess
 import re
 import sys, getopt
 import time
+import json
 
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 
 # Write configuration file if it does not exist already:
 config_folder = str(pathlib.Path.home()) + "/.config/calcure"
@@ -95,6 +96,7 @@ def create_config():
             "show_current_time":         "No",
             "show_holidays":             "Yes",
             "start_week_day":            "1",
+            "weekend_days":              "[6,7]",
             "refresh_interval":          "1",
             "event_icon":                "•",
             "privacy_icon":              "•",
@@ -211,6 +213,7 @@ try:
     CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
     BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
     START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
+    WEEKEND_DAYS              = json.loads(conf.get("Parameters", "weekend_days", fallback=[6,7]))
 
     DEFAULT_VIEW     = conf.get("Parameters", "default_view", fallback="calendar")
     HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
@@ -730,7 +733,7 @@ def display_day_names(stdscr, x_max):
             shift = START_WEEK_DAY-1
             day_number = i+shift - 7*((i+shift) > 6)
             name = calendar.day_name[day_number][:num].upper()
-            color = 1 if day_number < 5 else 6
+            color = 1 if (day_number + 1 not in WEEKEND_DAYS) else 6
             try:
                 stdscr.addstr(1, i*x_cell, name, color_pair(color))
             except:
@@ -1083,13 +1086,19 @@ def mark_as_important(stdscr, tasks, statuses, timestamps):
     # If the provided number corresponds to a task, then edit:
     if number_is_valid(number, tasks):
         number = int(number)
-        statuses[number-1] = "important"
+        if statuses[number-1] != "important":
+            statuses[number-1] = "important"
+        else:
+            statuses[number-1] = "todo"
 
         # if there are subtasks, mark them as well:
         if tasks[number-1][:2] != '--':
             for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
-                    statuses[i] = "important"
+                    if statuses[i] != "important":
+                        statuses[i] = "important"
+                    else:
+                        statuses[i] = "todo"
                 else:
                     break
         write_tasks_file(tasks, statuses, timestamps)
@@ -1110,13 +1119,19 @@ def mark_as_unimportant(stdscr, tasks, statuses, timestamps):
     # If the provided number corresponds to a task, then edit:
     if number_is_valid(number, tasks):
         number = int(number)
-        statuses[number-1] = "unimportant"
+        if statuses[number-1] != "unimportant":
+            statuses[number-1] = "unimportant"
+        else:
+            statuses[number-1] = "todo"
 
         # if there are subtasks, mark them as well:
         if tasks[number-1][:2] != '--':
             for i in range(number, len(tasks)):
                 if tasks[i][:2] == '--':
-                    statuses[i] = "unimportant"
+                    if statuses[i] != "unimportant":
+                        statuses[i] = "unimportant"
+                    else:
+                        statuses[i] = "todo"
                 else:
                     break
         write_tasks_file(tasks, statuses, timestamps)
@@ -1568,7 +1583,7 @@ def monthly_screen(stdscr, my_cal, month, year, state, privacy, weather, holiday
                     else:
                         shift = START_WEEK_DAY-1
                         day_number = d+shift - 7*((d+shift) > 6)
-                        color = 5 if day_number < 5 else 2
+                        color = 5 if day_number+1 not in WEEKEND_DAYS else 2
                         icon = ""
                     date_display = str(day) + icon + str(" "*(x_cell-len(str(day))-len(icon)))
                     try:
