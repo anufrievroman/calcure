@@ -194,6 +194,7 @@ use_unicode_icons = Yes
 show_current_time = No
 show_holidays = Yes
 start_week_day = 1
+weekend_days = 6,7
 refresh_interval = 1
 event_icon = •
 privacy_icon = •
