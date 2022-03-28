@@ -76,6 +76,7 @@ def help_screen_info():
             }
     return keys_general, keys_calendar, keys_todo
 
+
 def create_config():
     '''Create config.ini file if it does not exist yet'''
     conf["Parameters"] = {
@@ -137,6 +138,21 @@ def create_config():
             "color_time":          "7",
             "color_weather":       "2",
             "color_background":    "-1",
+            }
+
+    conf["Styles"] = {
+            "bold_today":               "No",
+            "bold_days":                "No",
+            "bold_day_names":           "No",
+            "bold_weekends":            "No",
+            "bold_weekend_names":       "No",
+            "bold_title":               "No",
+            "underlined_today":         "No",
+            "underlined_days":          "No",
+            "underlined_day_names":     "No",
+            "underlined_weekends":      "No",
+            "underlined_weekend_names": "No",
+            "underlined_title":         "No",
             }
 
     conf["Dialogues"] = {
@@ -267,8 +283,23 @@ try:
     COLOR_IMPORTANT      = int(conf.get("Colors", "color_important", fallback=1))
     COLOR_UNIMPORTANT    = int(conf.get("Colors", "color_unimportant", fallback=6))
 
+    # Font styles:
+    BOLD_TODAY               = conf.getboolean("Styles", "bold_today", fallback=False)
+    BOLD_DAYS                = conf.getboolean("Styles", "bold_days", fallback=False)
+    BOLD_DAY_NAMES           = conf.getboolean("Styles", "bold_day_names", fallback=False)
+    BOLD_WEEKENDS            = conf.getboolean("Styles", "bold_weekends", fallback=False)
+    BOLD_WEEKEND_NAMES       = conf.getboolean("Styles", "bold_weekend_names", fallback=False)
+    BOLD_TITLE               = conf.getboolean("Styles", "bold_title", fallback=False)
+    UNDERLINED_TODAY         = conf.getboolean("Styles", "underlined_today", fallback=False)
+    UNDERLINED_DAYS          = conf.getboolean("Styles", "underlined_days", fallback=False)
+    UNDERLINED_DAY_NAMES     = conf.getboolean("Styles", "underlined_day_names", fallback=False)
+    UNDERLINED_WEEKENDS      = conf.getboolean("Styles", "underlined_weekends", fallback=False)
+    UNDERLINED_WEEKEND_NAMES = conf.getboolean("Styles", "underlined_weekend_names", fallback=False)
+    UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
+
+    # Dialogues:
     CALENDAR_HINT = conf.get("Dialogues", "calendar_hint", fallback=default_calendar_hint)
-    TODO_HINT = conf.get("Dialogues", "todo_hint", fallback=default_todo_hint)
+    TODO_HINT     = conf.get("Dialogues", "todo_hint", fallback=default_todo_hint)
 
     try:
         ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
@@ -277,7 +308,7 @@ try:
 
     data_folder = conf.get("Parameters", "folder_with_datafiles", fallback=config_folder)
 except Exception:
-    print("Error in the config.ini file. Try deleting the config file and run the program again.")
+    print("Looks like there is a problem in your config.ini file. Perhaps you edited it and entered a wrong line. Try removing your config.ini file and run the program again, it will create a fresh working config file.")
     exit()
 
 # Read user arguments:
@@ -726,6 +757,18 @@ def user_input_for_tasks(stdscr, prompt_string, answer_length, task_number, subt
     return user_input
 
 
+def display_line(stdscr, y, x, text, color, bold=False, underlined=False):
+    '''Display the line of text respecting the slyling'''
+    if bold and underlined:
+        stdscr.addstr(y, x, text, color_pair(color) | A_BOLD | A_UNDERLINE)
+    elif bold and not underlined:
+        stdscr.addstr(y, x, text, color_pair(color) | A_BOLD)
+    elif underlined and not bold:
+        stdscr.addstr(y, x, text, color_pair(color) | A_UNDERLINE)
+    else:
+        stdscr.addstr(y, x, text, color_pair(color))
+
+
 def display_day_names(stdscr, x_max):
     '''Display day name depending on the screen available'''
     if SHOW_DAY_NAMES:
@@ -736,10 +779,7 @@ def display_day_names(stdscr, x_max):
             day_number = i+shift - 7*((i+shift) > 6)
             name = calendar.day_name[day_number][:num].upper()
             color = 1 if (day_number + 1 not in WEEKEND_DAYS) else 6
-            try:
-                stdscr.addstr(1, i*x_cell, name, color_pair(color))
-            except:
-                pass
+            display_line(stdscr, 1, i*x_cell, name, color, BOLD_DAY_NAMES, UNDERLINED_DAY_NAMES)
 
 
 def display_icon(name, screen, selection_mode=False):
@@ -1558,7 +1598,7 @@ def draw_monthly_screen(stdscr, my_cal, month, year, state, privacy, y_max, x_ma
 
     # Displaying the month, year, and days of the week:
     month_year_string = str(calendar.month_name[month].upper()) + " " + str(year)
-    stdscr.addstr(0, 0, month_year_string, color_pair(5))
+    display_line(stdscr, 0, 0, month_year_string, 5, BOLD_TITLE, UNDERLINED_TITLE)
     display_day_names(stdscr, x_max)
 
     # Displaying the dates and events:
@@ -1572,20 +1612,18 @@ def draw_monthly_screen(stdscr, my_cal, month, year, state, privacy, y_max, x_ma
             day = dates[w][d]
             if day > 0:
 
-                # Display dates of the month with proper colors:
+                # Display dates of the month with proper styles:
+                shift = START_WEEK_DAY-1
+                day_number = d+shift - 7*((d+shift) > 6)
+                # Today:
                 if datetime.date(year, month, day) == today:
-                    color = 4
-                    icon = TODAY_ICON
+                    display_line(stdscr, 2+w*y_cell, d*x_cell, str(day)+TODAY_ICON, 4, BOLD_TODAY, UNDERLINED_TODAY)
+                # Week days:
+                elif day_number+1 not in WEEKEND_DAYS:
+                    display_line(stdscr, 2+w*y_cell, d*x_cell, str(day), 5, BOLD_DAYS, UNDERLINED_DAYS)
+                # Weekends:
                 else:
-                    shift = START_WEEK_DAY-1
-                    day_number = d+shift - 7*((d+shift) > 6)
-                    color = 5 if day_number+1 not in WEEKEND_DAYS else 2
-                    icon = ""
-                date_display = str(day) + icon + str(" "*(x_cell-len(str(day))-len(icon)))
-                try:
-                    stdscr.addstr(2+w*y_cell, d*x_cell, date_display, color_pair(color))
-                except:
-                    pass
+                    display_line(stdscr, 2+w*y_cell, d*x_cell, str(day), 2, BOLD_WEEKENDS, UNDERLINED_WEEKENDS)
 
                 # Display events of this month:
                 num_of_event_this_day = 0
@@ -1781,7 +1819,7 @@ def draw_journal_screen(stdscr, tasks, statuses, timestamps, state, privacy, y_m
     try:
         # Display the header:
         if SHOW_TITLE:
-            stdscr.addstr(0, 1, TITLE[:x_max-3], color_pair(10))
+            display_line(stdscr, 0, 1, TITLE[:x_max-3], 10, BOLD_TITLE, UNDERLINED_TITLE)
         shift = 2 if SHOW_TITLE else 0
 
         # Display the tasks:
@@ -1942,20 +1980,23 @@ def draw_help_screen(stdscr, y_max, x_max):
 
     # Print out the dictionaries:
     try:
-        title = " CALCURE " + __version__
-        stdscr.addstr(global_shift_y, global_shift_x, title[:x_max-3], color_pair(6))
-        stdscr.addstr(global_shift_y + 2, global_shift_x + 8, "GENERAL KEYBINDINGS"[:x_max-3], color_pair(4))
+        title = "CALCURE " + __version__
+        display_line(stdscr, global_shift_y, global_shift_x + 1, title[:x_max-3], 6, BOLD_TITLE, UNDERLINED_TITLE)
+
+        display_line(stdscr, global_shift_y + 2, global_shift_x + 8,
+                "GENERAL KEYBINDINGS"[:x_max-3], 4, BOLD_TITLE, UNDERLINED_TITLE)
         for index, key in enumerate(keys_general):
             line = str(key+" "+keys_general[key])[:x_max-3]
             stdscr.addstr(global_shift_y + index + 3, global_shift_x, line, color_pair(5))
 
-        stdscr.addstr(global_shift_y + 4+len(keys_general), global_shift_x + 8, "CALENDAR KEYBINDINGS"[:x_max-3], color_pair(4))
+        display_line(stdscr, global_shift_y + 4+len(keys_general), global_shift_x + 8,
+                "CALENDAR KEYBINDINGS"[:x_max-3], 4, BOLD_TITLE, UNDERLINED_TITLE)
         for index, key in enumerate(keys_calendar):
             line = str(key+" "+keys_calendar[key])[:x_max-3]
             stdscr.addstr(global_shift_y + index + 5 + len(keys_general), global_shift_x, line, color_pair(5))
 
-
-        stdscr.addstr(global_shift_y + shift_y, global_shift_x + shift_x + 8, "JOURNAL KEYBINDINGS"[:x_max-3], color_pair(4))
+        display_line(stdscr, global_shift_y + shift_y, global_shift_x + shift_x + 8,
+                "JOURNAL KEYBINDINGS"[:x_max-3], 4, BOLD_TITLE, UNDERLINED_TITLE)
         for index, key in enumerate(keys_todo):
             line = str(key + " " + keys_todo[key])[:x_max-3]
             stdscr.addstr(global_shift_y + index + 1 + shift_y, global_shift_x + shift_x, line, color_pair(5))
