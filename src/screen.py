@@ -12,7 +12,7 @@ class Screen():
         self.privacy = privacy
         self.state = state
         self.selection_mode = False
-        self.refresh_now = True
+        self.refresh_now = False
         self.key = None
 
     @property

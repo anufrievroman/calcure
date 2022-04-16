@@ -213,17 +213,17 @@ class DailyView():
 
 class DayNumberView:
     @staticmethod
-    def render(stdscr, y, x, screen, day, day_in_week):
+    def render(stdscr, y, x, screen, day, day_in_week, x_cell):
         '''Display number of the day in month with proper styling'''
         # Today:
         if datetime.date(screen.year, screen.month, day) == datetime.date.today():
-            display_line(stdscr, y, x, str(day)+cf.TODAY_ICON, 4, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
+            display_line(stdscr, y, x, str(day)+cf.TODAY_ICON+' '*x_cell, 4, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
         # Week days:
         elif day_in_week+1 in cf.WEEKEND_DAYS:
-            display_line(stdscr, y, x, str(day), 2, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
+            display_line(stdscr, y, x, str(day)+' '*x_cell, 2, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
         # Weekend days:
         else:
-            display_line(stdscr, y, x, str(day), 5, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
+            display_line(stdscr, y, x, str(day)+' '*x_cell, 5, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 
 class WeatherView:
@@ -301,36 +301,16 @@ class DaysNameView:
 ##################### SCREENS ################################
 
 
-class JournalScreenView:
-    @staticmethod
-    def render(stdscr, weather, user_tasks, screen):
-        '''Journal view showing all tasks'''
-        stdscr.clear()
-        fill_background(stdscr)
-
-        # Check if any of the timers is counting, and increase the update time:
-        curses.halfdelay(255)
-        for task in user_tasks.items:
-            if task.timer.is_counting:
-                curses.halfdelay(cf.REFRESH_INTERVAL*10)
-                break
-
-        # Display header and footer:
-        HeaderView.render(stdscr, cf.JOURNAL_HEADER, weather, screen.x_max)
-        FooterView.render(stdscr, screen.y_max, TODO_HINT)
-
-        # Display the tasks:
-        journal_view = JournalView(user_tasks)
-        journal_view.render(stdscr, 2, 1, screen)
 
 
 class DailyScreenView:
     @staticmethod
     def render(stdscr, screen, weather, user_events, holidays, birthdays):
         '''Daily view showing events of the day'''
-        curses.halfdelay(255)
         stdscr.clear()
+        if screen.x_max < 6 or screen.y_max < 3: return
         fill_background(stdscr)
+        curses.halfdelay(255)
 
         # Form a string with month, year, and day with today icon:
         icon = cf.TODAY_ICON if screen.date == datetime.date.today() else ''
@@ -350,8 +330,9 @@ class MonthlyScreenView:
     @staticmethod
     def render(stdscr, screen, weather, user_events, holidays, birthdays):
         '''Monthly view showing events of the month'''
-        curses.halfdelay(255)
         stdscr.clear()
+        if screen.x_max < 6 or screen.y_max < 3: return
+        curses.halfdelay(255)
         fill_background(stdscr)
 
         y_cell = (screen.y_max-2)//6
@@ -374,12 +355,43 @@ class MonthlyScreenView:
                 if day != 0:
                     # Display dates of the month with proper styles:
                     day_in_week = col+(cf.START_WEEK_DAY-1) - 7*((col+(cf.START_WEEK_DAY-1)) > 6)
-                    DayNumberView.render(stdscr, 2+row*y_cell, col*x_cell, screen, day, day_in_week)
+                    DayNumberView.render(stdscr, 2+row*y_cell, col*x_cell, screen, day, day_in_week, x_cell)
 
                     # Display the events:
                     screen.day = day
                     daily_view = DailyView(user_events, holidays, birthdays, screen)
                     daily_view.render(stdscr, 3+row*y_cell, col*x_cell, screen, y_cell, x_cell)
+
+class JournalScreenView:
+    def __init__(self):
+        self.refresh_time = 255
+        self.refresh_now = True
+
+    def calculate_refresh_rate(self, user_tasks):
+        '''Check if a timer is running and change the refresh rate'''
+        for task in user_tasks.items:
+            if task.timer.is_counting:
+                self.refresh_time = cf.REFRESH_INTERVAL*10
+                self.refresh_now = False
+                break
+
+    def render(self, stdscr, weather, user_tasks, screen):
+        '''Journal view showing all tasks'''
+        if self.refresh_now: stdscr.clear()
+        if screen.x_max < 6 or screen.y_max < 3: return
+        fill_background(stdscr)
+
+        # Check if any of the timers is counting, and increase the update time:
+        self.calculate_refresh_rate(user_tasks)
+        curses.halfdelay(self.refresh_time)
+
+        # Display header and footer:
+        HeaderView.render(stdscr, cf.JOURNAL_HEADER, weather, screen.x_max)
+        FooterView.render(stdscr, screen.y_max, TODO_HINT)
+
+        # Display the tasks:
+        journal_view = JournalView(user_tasks)
+        journal_view.render(stdscr, 2, 1, screen)
 
 
 class HelpScreenView:
@@ -408,6 +420,7 @@ class HelpScreenView:
 
     def render(self, stdscr, screen):
         '''Draw the help screen'''
+        if screen.x_max < 6 or screen.y_max < 3: return
         stdscr.clear()
         fill_background(stdscr)
 
@@ -450,19 +463,23 @@ class HelpScreenView:
 def main(stdscr):
     '''Main function that runs and switches screens'''
 
+    # Load the data
+    weather = Weather(cf.WEATHER_CITY)
+    if cf.SHOW_WEATHER:
+        print("Weather is loading...")
+        WeatherLoader.load_from_wttr(weather)
+    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW)
+    user_events = UserEventsLoader.load_from_file(cf.EVENTS_FILE)
+    holidays = HolidaysLoader.load_holidays(screen.year, cf.HOLIDAY_COUNTRY)
+    birthdays = BirthdaysLoader.load_birthdays_from_abook()
+    user_tasks = UserTasksLoader.load_from_file(cf.TASKS_FILE)
+
+
     # Initialise the terminal screen
     stdscr = curses.initscr()
     curses.noecho()
     curses.curs_set(False)
     initialize_colors(stdscr)
-    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW)
-
-    # Load the data
-    user_events = UserEventsLoader.load_from_file(cf.EVENTS_FILE)
-    holidays = HolidaysLoader.load_holidays(screen.year, cf.HOLIDAY_COUNTRY)
-    birthdays = BirthdaysLoader.load_birthdays_from_abook()
-    user_tasks = UserTasksLoader.load_from_file(cf.TASKS_FILE)
-    weather = WeatherLoader.load_from_wttr(cf.WEATHER_CITY)
 
     # Running different screens depending on the state:
     while screen.state != 'exit':
@@ -487,8 +504,9 @@ def main(stdscr):
 
         # Journal screen:
         elif screen.state == 'journal':
+            journal_screen_view = JournalScreenView()
             while screen.state == 'journal':
-                JournalScreenView.render(stdscr, weather, user_tasks, screen)
+                journal_screen_view.render(stdscr, weather, user_tasks, screen)
                 control_journal_screen(stdscr, user_tasks, screen)
                 if user_tasks.changed:
                     UserTasksSaver.save_to_file(user_tasks, cf.TASKS_FILE)
@@ -496,8 +514,8 @@ def main(stdscr):
 
         # Help screen:
         elif screen.state == 'help':
+            help_screen_view = HelpScreenView()
             while screen.state == 'help':
-                help_screen_view = HelpScreenView()
                 help_screen_view.render(stdscr, screen)
                 control_help_screen(stdscr, screen)
 

@@ -410,16 +410,14 @@ class EventImporters:
 
 class WeatherLoader:
     @staticmethod
-    def load_from_wttr(city):
+    def load_from_wttr(weather):
         '''Load the weather at launch and display weather widget.'''
-        weather = Weather(city)
         try:
             max_load_time = 2 # seconds
-            request_url = f"wttr.in/{city}?format=3"
+            request_url = f"wttr.in/{weather.city}?format=3"
             weather.forcast = str(subprocess.check_output(["curl", "-s", request_url],
                           timeout=max_load_time, encoding='utf-8'))[:-1]
             weather.forcast = weather.forcast.split(':')[1]
             weather.loaded = True
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             pass
-        return weather

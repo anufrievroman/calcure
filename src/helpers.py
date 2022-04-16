@@ -64,22 +64,22 @@ def calculate_recurring_events(year, month, day, fr):
 
 def display_line(stdscr, y, x, text, color, bold=False, underlined=False):
     '''Display the line of text respecting the slyling and available space'''
-    try:
-        _, x_max = stdscr.getmaxyx()
-        # Cut the text if it does not fit the screen:
-        text = text[:(x_max-1-x)]
 
-        if bold and underlined:
-            stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD | curses.A_UNDERLINE)
-        elif bold and not underlined:
-            stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD)
-        elif underlined and not bold:
-            stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_UNDERLINE)
-        else:
-            stdscr.addstr(y, x, text, curses.color_pair(color))
-    # Prevent crash on small space:
-    except Exception:
-        pass
+    # Make sure that we display inside the screen:
+    y_max, x_max = stdscr.getmaxyx()
+    if y >= y_max or x >= x_max: return
+
+    # Cut the text if it does not fit the screen:
+    text = text[:(x_max-1-x)]
+
+    if bold and underlined:
+        stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD | curses.A_UNDERLINE)
+    elif bold and not underlined:
+        stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD)
+    elif underlined and not bold:
+        stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_UNDERLINE)
+    else:
+        stdscr.addstr(y, x, text, curses.color_pair(color))
 
 
 def fill_background(stdscr):
@@ -94,8 +94,11 @@ def initialize_colors(stdscr):
     curses.start_color()
     curses.use_default_colors()
     curses.init_pair(1, cf.COLOR_DAY_NAMES, cf.COLOR_BACKGROUND)
-    curses.init_pair(6, cf.COLOR_WEEKEND_NAMES, cf.COLOR_BACKGROUND)
+    curses.init_pair(2, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
     curses.init_pair(3, cf.COLOR_HINTS, cf.COLOR_BACKGROUND)
+    curses.init_pair(4, cf.COLOR_TODAY, cf.COLOR_BACKGROUND)
+    curses.init_pair(5, cf.COLOR_DAYS, cf.COLOR_BACKGROUND)
+    curses.init_pair(6, cf.COLOR_WEEKEND_NAMES, cf.COLOR_BACKGROUND)
     curses.init_pair(7, cf.COLOR_BIRTHDAYS, cf.COLOR_BACKGROUND)
     curses.init_pair(8, cf.COLOR_PROMPTS, cf.COLOR_BACKGROUND)
     curses.init_pair(9, cf.COLOR_CONFIRMATIONS, cf.COLOR_BACKGROUND)
@@ -111,15 +114,10 @@ def initialize_colors(stdscr):
     curses.init_pair(19, cf.COLOR_WEATHER, cf.COLOR_BACKGROUND)
     curses.init_pair(20, cf.COLOR_UNIMPORTANT, cf.COLOR_BACKGROUND)
     curses.init_pair(21, cf.COLOR_CALENDAR_HEADER, cf.COLOR_BACKGROUND)
-    if cf.MINIMAL_WEEKEND_INDICATOR:
-        curses.init_pair(2, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
-    else:
-        curses.init_pair(2, cf.COLOR_BLACK, cf.COLOR_WEEKENDS)
-    if cf.MINIMAL_TODAY_INDICATOR:
-        curses.init_pair(4, cf.COLOR_TODAY, cf.COLOR_BACKGROUND)
-    else:
-        curses.init_pair(4, cf.COLOR_BLACK, cf.COLOR_TODAY)
-    if cf.MINIMAL_DAYS_INDICATOR:
-        curses.init_pair(5, cf.COLOR_DAYS, cf.COLOR_BACKGROUND)
-    else:
-        curses.init_pair(5, cf.COLOR_BLACK, cf.COLOR_DAYS)
+
+    if not cf.MINIMAL_WEEKEND_INDICATOR:
+        curses.init_pair(2, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)
+    if not cf.MINIMAL_TODAY_INDICATOR:
+        curses.init_pair(4, curses.COLOR_BLACK, cf.COLOR_TODAY)
+    if not cf.MINIMAL_DAYS_INDICATOR:
+        curses.init_pair(5, curses.COLOR_BLACK, cf.COLOR_DAYS)
