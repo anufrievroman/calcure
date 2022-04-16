@@ -151,7 +151,7 @@ class UserEventView(EventView):
         if privacy: icon = cf.PRIVACY_ICON
         return icon
 
-    def render(self, stdscr, y, x, privacy):
+    def render(self, stdscr, y, x, privacy, x_cell):
         '''Display a line with an event'''
         display_line(stdscr, y, x, self.icon(privacy), self.color())
         display_line(stdscr, y, x+2, self.obfuscate_name(privacy), self.color())
@@ -177,7 +177,7 @@ class DailyView():
         self.holidays = holidays.filter_events_that_day(screen.date)
         self.birthdays = birthdays
 
-    def render(self, stdscr, y, x, screen):
+    def render(self, stdscr, y, x, screen, y_cell, x_cell):
         '''Display all events occuring on this days'''
         index = 0
 
@@ -199,9 +199,12 @@ class DailyView():
         # Show user events:
         for event in self.user_events.items:
             user_event_view = UserEventView(event)
-            user_event_view.render(stdscr, y+index, x, screen.privacy)
-            if screen.selection_mode:
-                display_line(stdscr, y+index, 1, str(index+1), 4)
+            if index < y_cell-2:
+                user_event_view.render(stdscr, y+index, x, screen.privacy, x_cell)
+                if screen.selection_mode:
+                    display_line(stdscr, y+index, x, str(index+1), 4)
+            else:
+                display_line(stdscr, y+y_cell-2, x, cf.HIDDEN_ICON, 17)
             index += 1
 
 
@@ -212,7 +215,6 @@ class DayNumberView:
     @staticmethod
     def render(stdscr, y, x, screen, day, day_in_week):
         '''Display number of the day in month with proper styling'''
-        if day == 0: return
         # Today:
         if datetime.date(screen.year, screen.month, day) == datetime.date.today():
             display_line(stdscr, y, x, str(day)+cf.TODAY_ICON, 4, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
@@ -231,7 +233,8 @@ class WeatherView:
         if not cf.SHOW_WEATHER: return
         _, x_max   = stdscr.getmaxyx()
         if weather.loaded:
-            stdscr.addstr(0, x_max - len(weather.forcast) - 0, weather.forcast, curses.color_pair(19))
+            stdscr.addstr(0, x_max - len(weather.forcast), weather.forcast, curses.color_pair(19))
+            display_line(stdscr, 0, x_max-len(weather.forcast), weather.forcast, 19)
 
 
 class CurrentTimeView:
@@ -340,7 +343,7 @@ class DailyScreenView:
 
         # Display the events:
         daily_view = DailyView(user_events, holidays, birthdays, screen)
-        daily_view.render(stdscr, 2, 1, screen)
+        daily_view.render(stdscr, 2, 0, screen, screen.y_max-4, screen.x_max)
 
 
 class MonthlyScreenView:
@@ -366,15 +369,17 @@ class MonthlyScreenView:
         # Displaying the dates and events:
         day_number = 0
         event_number = 0
-        for w, week in enumerate(dates):
-            for d, day in enumerate(week):
-                # Display dates of the month with proper styles:
-                day_in_week = d+(cf.START_WEEK_DAY-1) - 7*((d+(cf.START_WEEK_DAY-1)) > 6)
-                DayNumberView.render(stdscr, 2+w*y_cell, d*x_cell, screen, day, day_in_week)
+        for row, week in enumerate(dates):
+            for col, day in enumerate(week):
+                if day != 0:
+                    # Display dates of the month with proper styles:
+                    day_in_week = col+(cf.START_WEEK_DAY-1) - 7*((col+(cf.START_WEEK_DAY-1)) > 6)
+                    DayNumberView.render(stdscr, 2+row*y_cell, col*x_cell, screen, day, day_in_week)
 
-                # Display the events:
-                # daily_view = DailyView(user_events, holidays, birthdays)
-                # daily_view.render(stdscr, 2, 1, screen)
+                    # Display the events:
+                    screen.day = day
+                    daily_view = DailyView(user_events, holidays, birthdays, screen)
+                    daily_view.render(stdscr, 3+row*y_cell, col*x_cell, screen, y_cell, x_cell)
 
 
 class HelpScreenView:
@@ -390,7 +395,7 @@ class HelpScreenView:
         if screen.x_max < 102:
             self.global_shift_x = 0
             self.shift_x = 0
-            self.shift_y = 6 + len(cf.KEYS_GENERAL) + len(cf.KEYS_CALENDAR)
+            self.shift_y = 6 + len(KEYS_GENERAL) + len(KEYS_CALENDAR)
         else:
             self.global_shift_x = (screen.x_max - 102)//2
             self.shift_x = 45

@@ -14,10 +14,11 @@ def input_string(stdscr, y, x, prompt_string, answer_length):
     _, x_max = stdscr.getmaxyx()
     curses.echo()
     curses.curs_set(True)
-    display_string = prompt_string[:(x_max-1-x-answer_length)]
+    # display_string = prompt_string[:(x_max-x-answer_length)]
+    display_string = prompt_string
     display_line(stdscr, y, x, display_string, 8)
     stdscr.refresh()
-    string = stdscr.getstr(y, len(display_string)+1, answer_length).decode(encoding="utf-8")
+    string = stdscr.getstr(y, len(display_string)+x, answer_length).decode(encoding="utf-8")
     curses.noecho()
     curses.curs_set(False)
     return string
@@ -79,45 +80,45 @@ def control_monthly_screen(stdscr, screen, user_events):
 
             # Chance event status:
             if screen.key in ['i', 'h']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_HIGH)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'important')
             if screen.key == 'l':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_LOW)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'unimportant')
             if screen.key == 'u':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_RESET)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'normal')
 
             # Delete event:
             if screen.key in ['d', 'x']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_DEL)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.delete_item(id)
 
             # Edit event:
             if screen.key in ['e', 'c']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_REN)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
-                    new_name = input_string(stdscr, screen.y_max-2, 1, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
+                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
                     user_events.rename_item(id, new_name)
 
             # Move event:
             if screen.key == 'm':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_MOVE)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
+                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
                     question = f'{MSG_EVENT_MOVE_TO} {screen.year}/{screen.month}/'
-                    day = input_day(stdscr, screen.y_max-2, 1, question)
+                    day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
                         user_events.change_day(id, day)
 
@@ -141,7 +142,7 @@ def control_monthly_screen(stdscr, screen, user_events):
             # Handle "g" as go to selected day:
             if screen.key == "g":
                 question = "Go to date: "+str(screen.year)+"/"+str(screen.month)+"/"
-                day = input_day(stdscr, screen.y_max-2, 1, question)
+                day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
                     screen.day = day
                     screen.state = 'daily_calendar'
@@ -149,23 +150,23 @@ def control_monthly_screen(stdscr, screen, user_events):
             # Add single event:
             if screen.key == "a":
                 question = f'{MSG_EVENT_DATE} {screen.year}/{screen.month}/'
-                day = input_day(stdscr, screen.y_max-2, 1, question)
+                day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
-                    name = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
+                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
                     user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, 1, 'n', 'normal'))
 
             # Add a recurring event:
             if screen.key == "A":
                 question = f'{MSG_EVENT_DATE}{screen.year}/{screen.month}/'
-                day = input_day(stdscr, screen.y_max-2, 1, question)
+                day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
                     display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
-                    name = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
+                    name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
-                    reps = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_REP)
-                    freq = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_FR, 1)
+                    reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
+                    freq = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_FR, 1)
                     if int(reps) > 0 and freq in ["d","w","m","y","n"]:
                         user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, reps+1, freq, 'normal'))
 
@@ -189,8 +190,6 @@ def control_monthly_screen(stdscr, screen, user_events):
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
                 screen.y_max, screen.x_max = stdscr.getmaxyx()
-                stdscr.clear()
-                stdscr.refresh()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
@@ -214,45 +213,45 @@ def control_daily_screen(stdscr, screen, user_events):
 
             # Chance event status:
             if screen.key in ['i', 'h']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_HIGH)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'important')
             if screen.key == 'l':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_LOW)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'unimportant')
             if screen.key == 'u':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_RESET)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.toggle_item_status(id, 'normal')
 
             # Delete event:
             if screen.key in ['d', 'x']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_DEL)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
                     user_events.delete_item(id)
 
             # Edit event:
             if screen.key in ['e', 'c']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_REN)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
-                    new_name = input_string(stdscr, screen.y_max-2, 1, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
+                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
                     user_events.rename_item(id, new_name)
 
             # Move event:
             if screen.key == 'm':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_MOVE)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
                 if user_events.filter_events_that_day(screen.date).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen.date).items[number].id
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
+                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
                     question = f'{MSG_EVENT_MOVE_TO}{screen.year}/{screen.month}/'
-                    day = input_day(stdscr, screen.y_max-2, 1, question)
+                    day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
                         user_events.change_day(id, day)
 
@@ -275,16 +274,16 @@ def control_daily_screen(stdscr, screen, user_events):
 
             # Add single event:
             if screen.key == "a":
-                name = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
+                name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
                 user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, 1, 'n', 'normal'))
 
             # Add a recurring event:
             if screen.key == "A":
-                name = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
+                name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
-                reps = input_integer(stdscr, screen.y_max-2, 1, MSG_EVENT_REP)
-                freq = input_string(stdscr, screen.y_max-2, 1, MSG_EVENT_FR, 1)
+                reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
+                freq = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_FR, 1)
                 if int(reps) > 0 and freq in ["d","w","m","y","n"]:
                     user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, reps+1, freq, 'normal'))
 
@@ -307,8 +306,6 @@ def control_daily_screen(stdscr, screen, user_events):
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
                 screen.y_max, screen.x_max = stdscr.getmaxyx()
-                stdscr.clear()
-                stdscr.refresh()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
@@ -331,39 +328,39 @@ def control_journal_screen(stdscr, user_tasks, screen):
 
             # Timer operations:
             if screen.key == 't':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TM_ADD)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_ADD)
                 user_tasks.add_timestamp_for_task(number)
             if screen.key == 'T':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TM_RESET)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
                 user_tasks.reset_timer_for_task(number)
 
             # Change the status:
             if screen.key in ['i', 'h']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_HIGH)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_HIGH)
                 user_tasks.toggle_item_status(number, 'important')
             if screen.key == 'l':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_LOW)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
                 user_tasks.toggle_item_status(number, 'unimportant')
             if screen.key == 'u':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_RES)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_RES)
                 user_tasks.toggle_item_status(number, 'normal')
             if screen.key == 'v':
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_LOW)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
                 user_tasks.toggle_item_status(number, 'done')
 
             # Modify the task:
             if screen.key in ['d', 'x']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_DEL)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEL)
                 user_tasks.delete_item(number)
             if screen.key == 'm':
-                number_from = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_MOVE)
+                number_from = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE)
                 if user_tasks.is_valid_number(number_from):
-                    number_to = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_MOVE_TO)
+                    number_to = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE_TO)
                     user_tasks.move_task(number_from, number_to)
             if screen.key in ['e', 'c']:
-                number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_EDIT)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_EDIT)
                 if user_tasks.is_valid_number(number):
-                    new_name = input_string(stdscr, number+2, 2, '·', screen.x_max-1)
+                    new_name = input_string(stdscr, number+2, 1, cf.TODO_ICON+' ', screen.x_max-4)
                     user_tasks.rename_item(number, new_name)
 
             # Subtask operations:
@@ -373,7 +370,7 @@ def control_journal_screen(stdscr, user_tasks, screen):
             if screen.key == 'A':
                 number = input_integer(stdscr, screen.y_max-2, 1, MSG_TS_SUB)
                 if user_tasks.is_valid_number(number):
-                    task_name = input_string(stdscr, screen.y_max-2, 1, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
+                    task_name = input_string(stdscr, screen.y_max-2, 0, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
                     user_tasks.add_subtask(Task(None, task_name, 'normal', Timer([])), number)
             screen.selection_mode = False
 
@@ -428,8 +425,6 @@ def control_journal_screen(stdscr, user_tasks, screen):
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
                 screen.y_max, screen.x_max = stdscr.getmaxyx()
-                stdscr.clear()
-                stdscr.refresh()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
@@ -460,8 +455,6 @@ def control_help_screen(stdscr, screen):
         # Handle screen resize:
         if screen.key == "KEY_RESIZE":
             screen.y_max, screen.x_max = stdscr.getmaxyx()
-            stdscr.clear()
-            stdscr.refresh()
 
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT)
