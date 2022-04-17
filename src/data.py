@@ -172,13 +172,21 @@ class Events(Collection):
     def __init__(self):
         Collection.__init__(self)
 
-    def filter_events_that_day(self, date):
+    def filter_events_that_day(self, screen):
         '''Filter only events that happen on the particular day'''
         events_of_the_day = Events()
         for event in self.items:
-            if event.date == date:
+            if event.date == screen.date:
                 events_of_the_day.add_item(event)
         return events_of_the_day
+
+    def filter_events_that_month(self, screen):
+        '''Filter only events that happen on the particular day'''
+        events_of_the_month = Events()
+        for event in self.items:
+            if event.month == screen.month and event.year == screen.year:
+                events_of_the_month.add_item(event)
+        return events_of_the_month
 
     def change_day(self, id, new_day):
         '''Move task from certain place to another in the list'''

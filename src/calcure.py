@@ -18,7 +18,7 @@ from screen import Screen
 from data import *
 from translation_en import *
 from controls import *
-
+from helpers import *
 
 #################### TASK VIEWS ########################
 
@@ -114,7 +114,7 @@ class JournalView:
             task_view = TaskView(task)
             task_view.render(stdscr, y, x, screen.privacy)
             if screen.selection_mode:
-                display_line(stdscr, y, 1, str(index+1), 4)
+                display_line(stdscr, y, x, str(index+1), 4)
             y += 1
 
 class EventView:
@@ -172,10 +172,11 @@ class HolidayView(EventView):
 
 
 class DailyView():
-    def __init__(self, user_events, holidays, birthdays, screen):
-        self.user_events = user_events.filter_events_that_day(screen.date)
-        self.holidays = holidays.filter_events_that_day(screen.date)
+    def __init__(self, user_events, holidays, birthdays, screen, index_offset):
+        self.user_events = user_events.filter_events_that_day(screen)
+        self.holidays = holidays.filter_events_that_day(screen)
         self.birthdays = birthdays
+        self.index_offset = index_offset
 
     def render(self, stdscr, y, x, screen, y_cell, x_cell):
         '''Display all events occuring on this days'''
@@ -202,7 +203,7 @@ class DailyView():
             if index < y_cell-2:
                 user_event_view.render(stdscr, y+index, x, screen.privacy, x_cell)
                 if screen.selection_mode:
-                    display_line(stdscr, y+index, x, str(index+1), 4)
+                    display_line(stdscr, y+index, x, str(index+self.index_offset+1), 4)
             else:
                 display_line(stdscr, y+y_cell-2, x, cf.HIDDEN_ICON, 17)
             index += 1
@@ -322,7 +323,7 @@ class DailyScreenView:
         FooterView.render(stdscr, screen.y_max, CALENDAR_HINT)
 
         # Display the events:
-        daily_view = DailyView(user_events, holidays, birthdays, screen)
+        daily_view = DailyView(user_events, holidays, birthdays, screen, 0)
         daily_view.render(stdscr, 2, 0, screen, screen.y_max-4, screen.x_max)
 
 
@@ -335,12 +336,12 @@ class MonthlyScreenView:
         curses.halfdelay(255)
         fill_background(stdscr)
 
-        y_cell = (screen.y_max-2)//6
-        x_cell = screen.x_max//7
-
         # Info about the month:
         month_year_string = calendar.month_name[screen.month].upper() + " " + str(screen.year)
         dates = calendar.Calendar(firstweekday=cf.START_WEEK_DAY-1).monthdayscalendar(screen.year, screen.month)
+
+        y_cell = (screen.y_max-3)//6
+        x_cell = screen.x_max//7
 
         # Displaying header and footer:
         HeaderView.render(stdscr, month_year_string, weather, screen.x_max)
@@ -348,8 +349,7 @@ class MonthlyScreenView:
         FooterView.render(stdscr, screen.y_max, CALENDAR_HINT)
 
         # Displaying the dates and events:
-        day_number = 0
-        event_number = 0
+        num_events_this_month = 0
         for row, week in enumerate(dates):
             for col, day in enumerate(week):
                 if day != 0:
@@ -359,8 +359,10 @@ class MonthlyScreenView:
 
                     # Display the events:
                     screen.day = day
-                    daily_view = DailyView(user_events, holidays, birthdays, screen)
+                    daily_view = DailyView(user_events, holidays, birthdays, screen, num_events_this_month)
                     daily_view.render(stdscr, 3+row*y_cell, col*x_cell, screen, y_cell, x_cell)
+                    num_events_this_month += len(user_events.filter_events_that_day(screen).items)
+
 
 class JournalScreenView:
     def __init__(self):
@@ -391,7 +393,7 @@ class JournalScreenView:
 
         # Display the tasks:
         journal_view = JournalView(user_tasks)
-        journal_view.render(stdscr, 2, 1, screen)
+        journal_view.render(stdscr, 2, 0, screen)
 
 
 class HelpScreenView:
@@ -428,7 +430,8 @@ class HelpScreenView:
         self.calculate_shift(screen)
 
         # Left column:
-        display_line(stdscr,self.global_shift_y,self.global_shift_x + 1, MSG_NAME[:screen.x_max-3], 6, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+        display_line(stdscr,self.global_shift_y,self.global_shift_x + 1,
+                MSG_NAME[:screen.x_max-3], 6, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         display_line(stdscr,self.global_shift_y + 2,self.global_shift_x + 8,
                 TITLE_KEYS_GENERAL[:screen.x_max-3], 4, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_GENERAL):
