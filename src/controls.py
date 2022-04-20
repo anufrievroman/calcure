@@ -71,7 +71,7 @@ def vim_style_exit(stdscr, screen):
 ########################## MONTHLY SCREEN CONTROL ###################################
 
 
-def control_monthly_screen(stdscr, screen, user_events):
+def control_monthly_screen(stdscr, user_events, screen):
     '''Handle user input on the daily screen'''
     try:
         # If we previously entered the selection mode, now we perform the action:
@@ -204,7 +204,7 @@ def control_monthly_screen(stdscr, screen, user_events):
 ########################## DAILY SCREEN CONTROL ###################################
 
 
-def control_daily_screen(stdscr, screen, user_events):
+def control_daily_screen(stdscr, user_events, screen):
     '''Handle user input on the daily screen'''
     try:
         # If we previously entered the selection mode, now we perform the action:
