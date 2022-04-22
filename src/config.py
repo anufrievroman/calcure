@@ -5,6 +5,7 @@ import sys
 import getopt
 
 from translation_en import ERR_FILE1, ERR_FILE2
+from data import State
 
 class Config:
     '''User configuration loaded from the config.ini file'''
@@ -160,6 +161,15 @@ class Config:
             conf = configparser.ConfigParser()
             conf.read(self.config_file, 'utf-8')
 
+            # Reading default view:
+            default_view = conf.get("Parameters", "default_view", fallback="calendar")
+            if default_view == 'calendar':
+                self.DEFAULT_VIEW = State.MONTHLY
+            elif default_view == 'journal':
+                self.DEFAULT_VIEW = State.JOURNAL
+            elif default_view == 'daily':
+                self.DEFAULT_VIEW = State.DAILY
+
             # Calendar settings:
             self.SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
             self.SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names", fallback=True)
@@ -178,7 +188,6 @@ class Config:
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
 
-            self.DEFAULT_VIEW     = conf.get("Parameters", "default_view", fallback="calendar")
             self.HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
             self.WEATHER_CITY     = conf.get("Parameters", "weather_city", fallback="")
             self.TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if self.DISPLAY_ICONS else "·"
@@ -281,15 +290,15 @@ class Config:
                 elif opt == '-p':
                     self.PRIVACY_MODE = True
                 elif opt == '-j':
-                    self.DEFAULT_VIEW = 'journal'
+                    self.DEFAULT_VIEW = State.JOURNAL
                 elif opt == '-d':
-                    self.DEFAULT_VIEW = 'daily_calendar'
+                    self.DEFAULT_VIEW = State.DAILY
                 elif opt == '-c':
-                    self.DEFAULT_VIEW = 'calendar'
+                    self.DEFAULT_VIEW = State.MONTHLY
                 elif opt in ('-h'):
-                    self.DEFAULT_VIEW = 'help'
+                    self.DEFAULT_VIEW = State.HELP
                 elif opt in ('-v'):
-                    self.DEFAULT_VIEW = 'exit'
+                    self.DEFAULT_VIEW = State.EXIT
                     print ('Calcure - version 2.0')
         except getopt.GetoptError:
             pass

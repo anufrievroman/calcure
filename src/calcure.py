@@ -22,7 +22,7 @@ from helpers import *
 
 
 class View:
-    '''Parent clalls of a view that displays information at certain coordinates'''
+    '''Parent class of a view that displays information at certain coordinates'''
     def __init__(self, stdsrc, y, x):
         self.stdscr = stdsrc
         self.y = y
@@ -68,11 +68,11 @@ class TaskView(View):
     def color(self):
         '''Select the color depending on the status'''
         color = 11
-        if self.task.status == 'done':
+        if self.task.status == Status.DONE:
             color = 12
-        if self.task.status == 'important':
+        if self.task.status == Status.IMPORTANT:
             color = 13
-        if self.task.status == 'unimportant':
+        if self.task.status == Status.UNIMPORTANT:
             color = 20
         return color
 
@@ -84,9 +84,9 @@ class TaskView(View):
             for keyword in cf.ICONS:
                 if keyword in self.task.name.lower():
                     icon = cf.ICONS[keyword]
-        if self.task.status == 'done':
+        if self.task.status == Status.DONE:
             icon = cf.DONE_ICON
-        if self.task.status == 'important':
+        if self.task.status == Status.IMPORTANT:
             icon = cf.IMPORTANT_ICON
         if self.privacy:
             icon = cf.PRIVACY_ICON
@@ -106,7 +106,7 @@ class TaskView(View):
     def title(self):
         '''Obfuscate the name if privacy mode is on'''
         if self.privacy:
-            return cf.PRIVACY_ICON*len(self.task.name[tab:])
+            return cf.PRIVACY_ICON*len(self.task.name[self.tab:])
         else:
             return self.task.name[self.tab:]
 
@@ -143,7 +143,7 @@ class TimerView(View):
     def render(self):
         '''Display a line with a timer and icon'''
         if self.timer.is_started:
-            time_string = self.icon + self.timer.calculate_passed_time()
+            time_string = self.icon + self.timer.passed_time
             self.display_line(self.y, self.x, time_string, self.color)
 
 
@@ -178,9 +178,9 @@ class EventView(View):
     def color(self):
         '''Select the color depending on the status and type'''
         color = 17
-        if self.event.status == 'important':
+        if self.event.status == Status.IMPORTANT:
             color = 13
-        if self.event.status == 'unimportant':
+        if self.event.status == Status.UNIMPORTANT:
             color = 20
         return color
 
@@ -289,42 +289,6 @@ class DayNumberView(View):
             self.display_line(self.y, self.x, str(self.day)+' '*self.x_cell, 5, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 
-class WeatherView(View):
-    '''Display weather forcast in the corner'''
-    def __init__(self, stdscr, y, x, weather):
-        super().__init__(stdscr, y, x)
-        self.weather = weather
-
-    def render(self):
-        '''Display the weather if space allows'''
-        if not cf.SHOW_WEATHER or not self.weather.loaded: return
-        _, x_max   = self.stdscr.getmaxyx()
-
-        self.display_line(0, x_max-len(self.weather.forcast), self.weather.forcast, 19)
-
-
-class CurrentTimeView(View):
-    '''Display current time in the center'''
-    def render(self):
-        if not cf.SHOW_CURRENT_TIME: return
-        time_string = time.strftime("%H:%M", time.localtime())
-        self.display_line(self.y, self.x, time_string, 18)
-
-
-class TitleView(View):
-    '''Show the title such as month, date, of jounal name'''
-    def __init__(self, stdscr, y, x, title):
-        super().__init__(stdscr, y, x)
-        self.title = title
-
-    def render(self):
-        if not cf.SHOW_TITLE: return
-
-        _, x_max = self.stdscr.getmaxyx()
-        if x_max > 2*len(self.title) + 6:
-            self.display_line(0, 0, self.title, 21, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
-
-
 class HeaderView(View):
     '''Show the header that includes the weather, time, and title'''
     def __init__(self, stdscr, y, x, title, weather, screen):
@@ -334,14 +298,20 @@ class HeaderView(View):
         self.screen = screen
 
     def render(self):
-        title_view = TitleView(self.stdscr, 0, 0, self.title)
-        current_time_view = CurrentTimeView(self.stdscr, 0, (self.screen.x_max//2-2))
-        weather_view = WeatherView(self.stdscr, 0, 0, self.weather)
+        _, x_max = self.stdscr.getmaxyx()
 
-        title_view.render()
-        current_time_view.render()
-        if len(self.weather.forcast) < self.screen.x_max - len(self.title):
-            weather_view.render()
+        # Show title:
+        if cf.SHOW_TITLE and (x_max > 2*len(self.title) + 6):
+            self.display_line(0, 0, self.title, 21, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+
+        # Show time:
+        if cf.SHOW_CURRENT_TIME:
+            time_string = time.strftime("%H:%M", time.localtime())
+            self.display_line(0, (self.screen.x_max//2-2), time_string, 18)
+
+        # Show weather:
+        if cf.SHOW_WEATHER and self.weather.forcast is not None:
+            self.display_line(0, x_max-len(self.weather.forcast)-1, self.weather.forcast, 19)
 
 
 class FooterView(View):
@@ -351,8 +321,8 @@ class FooterView(View):
         self.info = info
 
     def render(self):
-        if not cf.SHOW_KEYBINDINGS: return
-        self.display_line(self.y, self.x, self.info, 3)
+        if cf.SHOW_KEYBINDINGS:
+            self.display_line(self.y, self.x, self.info, 3)
 
 
 class DaysNameView(View):
@@ -403,7 +373,7 @@ class DailyScreenView(View):
 
         # Display header and footer:
         header_view = HeaderView(self.stdscr, 0, 0, date_string, self.weather, self.screen)
-        footer_view = FooterView(self.stdscr, self.screen.y_max-2, 0, CALENDAR_HINT)
+        footer_view = FooterView(self.stdscr, self.screen.y_max - 1, 0, CALENDAR_HINT)
         header_view.render()
         footer_view.render()
 
@@ -439,7 +409,7 @@ class MonthlyScreenView(View):
         # Displaying header and footer:
         header_view = HeaderView(self.stdscr, 0, 0, month_year_string, self.weather, self.screen)
         days_name_view = DaysNameView(self.stdscr, 1, 0, self.screen)
-        footer_view = FooterView(self.stdscr, self.screen.y_max-2, 0, CALENDAR_HINT)
+        footer_view = FooterView(self.stdscr, self.screen.y_max - 1, 0, CALENDAR_HINT)
         header_view.render()
         days_name_view.render()
         footer_view.render()
@@ -491,7 +461,7 @@ class JournalScreenView(View):
 
         # Display header and footer:
         header_view = HeaderView(self.stdscr, 0, 0, cf.JOURNAL_HEADER, self.weather, self.screen)
-        footer_view = FooterView(self.stdscr, self.screen.y_max-2, 0, TODO_HINT)
+        footer_view = FooterView(self.stdscr, self.screen.y_max - 1, 0, TODO_HINT)
         header_view.render()
         footer_view.render()
 
@@ -565,7 +535,7 @@ class HelpScreenView(View):
 def main(stdscr):
     '''Main function that runs and switches screens'''
 
-    # Load the data
+    # Load the data:
     weather = Weather(cf.WEATHER_CITY)
     if cf.SHOW_WEATHER:
         print("Weather is loading...")
@@ -576,53 +546,49 @@ def main(stdscr):
     birthdays = BirthdaysLoader.load_birthdays_from_abook()
     user_tasks = UserTasksLoader.load_from_file(cf.TASKS_FILE)
 
-
-    # Initialise the terminal screen
+    # Initialise terminal screen:
     stdscr = curses.initscr()
     curses.noecho()
     curses.curs_set(False)
     initialize_colors(stdscr)
 
+    # Initialise screens views:
+    monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
+    daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
+    journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
+    help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
 
     # Running different screens depending on the state:
-    while screen.state != 'exit':
-
-        # Initialise screens:
-        monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
-        daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
-        journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
-        help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
+    while screen.state != State.EXIT:
 
         # Monthly screen:
-        if screen.state == 'calendar':
+        if screen.state == State.MONTHLY:
             monthly_screen_view.render()
             control_monthly_screen(stdscr, user_events, screen)
 
         # Daily screen:
-        elif screen.state == 'daily_calendar':
+        elif screen.state == State.DAILY:
             daily_screen_view.render()
             control_daily_screen(stdscr, user_events, screen)
 
         # Journal screen:
-        elif screen.state == 'journal':
+        elif screen.state == State.JOURNAL:
             journal_screen_view.render()
             control_journal_screen(stdscr, user_tasks, screen)
 
         # Help screen:
-        elif screen.state == 'help':
+        elif screen.state == State.HELP:
             help_screen_view.render()
             control_help_screen(stdscr, screen)
 
         else:
             break
 
-        # If something changed, save and reload the data:
+        # If something changed, save the data:
         if user_events.changed:
             UserEventsSaver.save_to_file(user_events, cf.EVENTS_FILE)
-            user_events = UserEventsLoader.load_from_file(cf.EVENTS_FILE)
         if user_tasks.changed:
             UserTasksSaver.save_to_file(user_tasks, cf.TASKS_FILE)
-            user_tasks = UserTasksLoader.load_from_file(cf.TASKS_FILE)
 
     # Cleaning up before quitting:
     curses.echo()

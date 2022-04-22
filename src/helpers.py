@@ -82,13 +82,6 @@ def display_line(stdscr, y, x, text, color, bold=False, underlined=False):
         stdscr.addstr(y, x, text, curses.color_pair(color))
 
 
-def fill_background(stdscr):
-    '''Fill the screen background with background color'''
-    y_max, x_max = stdscr.getmaxyx()
-    for index in range(y_max-1):
-        stdscr.addstr(index, 0, " "*x_max, curses.color_pair(1))
-
-
 def initialize_colors(stdscr):
     '''Define all the color pairs'''
     curses.start_color()

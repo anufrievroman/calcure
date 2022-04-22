@@ -63,9 +63,9 @@ def vim_style_exit(stdscr, screen):
             screen.key = stdscr.getkey()
             if screen.key in ["Z", "Q"]:
                 confirmed = ask_confirmation(stdscr, MSG_EXIT)
-                if confirmed: screen.state = 'exit'
+                if confirmed: screen.state = State.EXIT
         except KeyboardInterrupt:
-            screen.state = 'exit'
+            screen.state = State.EXIT
 
 
 ########################## MONTHLY SCREEN CONTROL ###################################
@@ -83,17 +83,17 @@ def control_monthly_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     id = user_events.filter_events_that_month(screen).items[number].id
-                    user_events.toggle_item_status(id, 'important')
+                    user_events.toggle_item_status(id, Status.IMPORTANT)
             if screen.key == 'l':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     id = user_events.filter_events_that_month(screen).items[number].id
-                    user_events.toggle_item_status(id, 'unimportant')
+                    user_events.toggle_item_status(id, Status.UNIMPORTANT)
             if screen.key == 'u':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     id = user_events.filter_events_that_month(screen).items[number].id
-                    user_events.toggle_item_status(id, 'normal')
+                    user_events.toggle_item_status(id, Status.NORMAL)
 
             # Delete event:
             if screen.key in ['d', 'x']:
@@ -145,7 +145,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                 day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
                     screen.day = day
-                    screen.state = 'daily_calendar'
+                    screen.state = State.DAILY
 
             # Add single event:
             if screen.key == "a":
@@ -155,7 +155,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                     display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
                     name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
-                    user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, 1, 'n', 'normal'))
+                    user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, 1, 'n', Status.NORMAL))
 
             # Add a recurring event:
             if screen.key == "A":
@@ -168,7 +168,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                     reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                     freq = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_FR, 1)
                     if int(reps) > 0 and freq in ["d","w","m","y","n"]:
-                        user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, reps+1, freq, 'normal'))
+                        user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, reps+1, freq, Status.NORMAL))
 
             # Imports:
             if screen.key == "C":
@@ -180,12 +180,12 @@ def control_monthly_screen(stdscr, user_events, screen):
             vim_style_exit(stdscr, screen)
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = 'journal'
+                screen.state = State.JOURNAL
             if screen.key == "?":
-                screen.state = 'help'
+                screen.state = State.HELP
             if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
                 confirmed = ask_confirmation(stdscr, MSG_EXIT)
-                if confirmed: screen.state = 'exit'
+                if confirmed: screen.state = State.EXIT
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
@@ -194,7 +194,7 @@ def control_monthly_screen(stdscr, user_events, screen):
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT)
-        if confirmed: screen.state = 'exit'
+        if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
     except Exception:
@@ -216,17 +216,17 @@ def control_daily_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
                 if user_events.filter_events_that_day(screen).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen).items[number].id
-                    user_events.toggle_item_status(id, 'important')
+                    user_events.toggle_item_status(id, Status.IMPORTANT)
             if screen.key == 'l':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
                 if user_events.filter_events_that_day(screen).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen).items[number].id
-                    user_events.toggle_item_status(id, 'unimportant')
+                    user_events.toggle_item_status(id, Status.UNIMPORTANT)
             if screen.key == 'u':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
                 if user_events.filter_events_that_day(screen).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen).items[number].id
-                    user_events.toggle_item_status(id, 'normal')
+                    user_events.toggle_item_status(id, Status.NORMAL)
 
             # Delete event:
             if screen.key in ['d', 'x']:
@@ -276,7 +276,7 @@ def control_daily_screen(stdscr, user_events, screen):
             if screen.key == "a":
                 name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
-                user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, 1, 'n', 'normal'))
+                user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, 1, 'n', Status.NORMAL))
 
             # Add a recurring event:
             if screen.key == "A":
@@ -285,7 +285,7 @@ def control_daily_screen(stdscr, user_events, screen):
                 reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                 freq = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_FR, 1)
                 if int(reps) > 0 and freq in ["d","w","m","y","n"]:
-                    user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, reps+1, freq, 'normal'))
+                    user_events.add_item(UserEvent(id, screen.year, screen.month, screen.day, name, reps+1, freq, Status.NORMAL))
 
             # Import from calcurse:
             if screen.key == "C":
@@ -297,11 +297,11 @@ def control_daily_screen(stdscr, user_events, screen):
             vim_style_exit(stdscr, screen)
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = 'journal'
+                screen.state = State.JOURNAL
             if screen.key == "?":
-                screen.state = 'help'
+                screen.state = State.HELP
             if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
-                screen.state = 'calendar'
+                screen.state = State.MONTHLY
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
@@ -310,7 +310,7 @@ def control_daily_screen(stdscr, user_events, screen):
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT)
-        if confirmed: screen.state = 'exit'
+        if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
     except Exception:
@@ -337,16 +337,16 @@ def control_journal_screen(stdscr, user_tasks, screen):
             # Change the status:
             if screen.key in ['i', 'h']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_HIGH)
-                user_tasks.toggle_item_status(number, 'important')
+                user_tasks.toggle_item_status(number, Status.IMPORTANT)
             if screen.key == 'l':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                user_tasks.toggle_item_status(number, 'unimportant')
+                user_tasks.toggle_item_status(number, Status.UNIMPORTANT)
             if screen.key == 'u':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_RES)
-                user_tasks.toggle_item_status(number, 'normal')
+                user_tasks.toggle_item_status(number, Status.NORMAL)
             if screen.key == 'v':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                user_tasks.toggle_item_status(number, 'done')
+                user_tasks.toggle_item_status(number, Status.DONE)
 
             # Modify the task:
             if screen.key in ['d', 'x']:
@@ -371,7 +371,7 @@ def control_journal_screen(stdscr, user_tasks, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_SUB)
                 if user_tasks.is_valid_number(number):
                     task_name = input_string(stdscr, screen.y_max-2, 0, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
-                    user_tasks.add_subtask(Task(None, task_name, 'normal', Timer([])), number)
+                    user_tasks.add_subtask(Task(None, task_name, Status.NORMAL, Timer([])), number)
             screen.selection_mode = False
 
         # Otherwise, we check for user input:
@@ -386,17 +386,17 @@ def control_journal_screen(stdscr, user_tasks, screen):
             # Add single task:
             if screen.key == 'a':
                 task_name = input_string(stdscr, len(user_tasks.items)+2, 0, cf.TODO_ICON+' ', screen.x_max-4)
-                user_tasks.add_item(Task(None, task_name, 'normal', Timer([])))
+                user_tasks.add_item(Task(None, task_name, Status.NORMAL, Timer([])))
 
             # Bulk operations:
             if screen.key == "V":
-                user_tasks.change_all_statuses('done')
+                user_tasks.change_all_statuses(Status.DONE)
             if screen.key == "U":
-                user_tasks.change_all_statuses('normal')
+                user_tasks.change_all_statuses(Status.NORMAL)
             if screen.key == "L":
-                user_tasks.change_all_statuses('unimportant')
+                user_tasks.change_all_statuses(Status.UNIMPORTANT)
             if screen.key in ['I','H']:
-                user_tasks.change_all_statuses('important')
+                user_tasks.change_all_statuses(Status.IMPORTANT)
             if screen.key in ['D','X']:
                 confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL)
                 if confirmed: user_tasks.delete_all_items()
@@ -415,12 +415,12 @@ def control_journal_screen(stdscr, user_tasks, screen):
             vim_style_exit(stdscr, screen)
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = 'calendar'
+                screen.state = State.MONTHLY
             if screen.key == "?":
-                screen.state = 'help'
+                screen.state = State.HELP
             if screen.key == "q":
                 confirmed = ask_confirmation(stdscr, MSG_EXIT)
-                if confirmed: screen.state = 'exit'
+                if confirmed: screen.state = State.EXIT
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
@@ -429,7 +429,7 @@ def control_journal_screen(stdscr, user_tasks, screen):
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT)
-        if confirmed: screen.state = 'exit'
+        if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
     except Exception:
@@ -450,7 +450,7 @@ def control_help_screen(stdscr, screen):
 
         # Handle keys to exit the help screen:
         if screen.key in [" ", "?", "q", "KEY_BACKSPACE", "^[", "\x7f"]:
-            screen.state = 'calendar'
+            screen.state = State.MONTHLY
 
         # Handle screen resize:
         if screen.key == "KEY_RESIZE":
@@ -458,7 +458,7 @@ def control_help_screen(stdscr, screen):
 
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT)
-        if confirmed: screen.state = 'exit'
+        if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
     except Exception:

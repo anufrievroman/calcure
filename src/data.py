@@ -5,12 +5,30 @@ import datetime
 import configparser
 import pathlib
 import subprocess
+import enum
+
+
+class State(enum.Enum):
+    '''Possible states of the screen'''
+    EXIT    = 1
+    MONTHLY = 2
+    DAILY   = 3
+    JOURNAL = 4
+    HELP    = 5
+
+
+class Status(enum.Enum):
+    '''Status of events and tasks'''
+    NORMAL      = 1
+    DONE        = 2
+    IMPORTANT   = 3
+    UNIMPORTANT = 4
+
 
 class Weather():
     '''Information about the weather loaded from wttr.in'''
     def __init__(self, city):
-        self.loaded = False
-        self.forcast = " "
+        self.forcast = None
         self.city = city
 
 
@@ -68,7 +86,8 @@ class Timer:
         '''Evaluate whether the timer has started'''
         return True if self.stamps else False
 
-    def calculate_passed_time(self):
+    @property
+    def passed_time(self):
         '''Calculate how much time passed in the unpaused intervals'''
         time_passed = 0
 
@@ -132,7 +151,7 @@ class Collection:
         for item in self.items:
             if item.id == id:
                 if item.status == new_status:
-                    item.status = 'normal'
+                    item.status = Status.NORMAL
                 else:
                     item.status = new_status
                 self.changed = True
@@ -192,7 +211,7 @@ class Events(Collection):
         '''Move task from certain place to another in the list'''
         for item in self.items:
             if item.id == id:
-                item.day == new_day
+                item.day = new_day
                 self.changed = True
                 break
 
@@ -250,7 +269,7 @@ class UserTasksLoader:
                 for index, row in enumerate(lines):
                     id = index
                     name   = row[0]
-                    status = row[1]
+                    status = Status[row[1].upper()]
                     stamps = row[2:] if len(row) > 2 else []
                     user_tasks.add_item(Task(id, name, status, Timer(stamps) ))
         # Create file if it does not exist:
@@ -272,7 +291,7 @@ class UserTasksSaver:
         dummy_file = file + '.bak'
         with open(dummy_file, "w") as f:
             for task in user_tasks.items:
-                f.write(f'"{task.name}",{task.status}')
+                f.write(f'"{task.name}",{task.status.name.lower()}')
                 for stamp in task.timer.stamps:
                     f.write(f',{str(stamp)}')
                 f.write("\n")
@@ -290,11 +309,11 @@ class TasksImporters:
                 importance = task[1]
                 if (name > 0) and not user_tasks.item_exists(name):
                     if importance in ['1','2']:
-                        user_tasks.add_item(Task(name, 'important', Timer([])))
+                        user_tasks.add_item(Task(name, Status.IMPORTANT, Timer([])))
                     elif importance in ['8','9','10']:
-                        user_tasks.add_item(Task(name, 'unimportant', Timer([])))
+                        user_tasks.add_item(Task(name, Status.UNIMPORTANT, Timer([])))
                     else:
-                        user_tasks.add_item(Task(name, 'todo', Timer([])))
+                        user_tasks.add_item(Task(name, Status.NORMAL, Timer([])))
 
     @staticmethod
     def import_from_taskwarrior(user_tasks, taskwarrior_folder):
@@ -305,7 +324,7 @@ class TasksImporters:
                     name = task.split('description:"',1)[1]
                     name = name.split('"',1)[0]
                     if not user_tasks.item(name):
-                        user_tasks.add_item(Task(name, 'todo', Timer([])))
+                        user_tasks.add_item(Task(name, Status.NORMAL, Timer([])))
 
 
 class UserEventsLoader:
@@ -331,9 +350,9 @@ class UserEventsLoader:
                         repetition = '1'
                         frequency = 'n'
                     if len(row) > 7:
-                        status = row[7]
+                        status = Status[row[7].upper()]
                     else:
-                        status = 'normal'
+                        status = Status.NORMAL
 
                     user_events.add_item(UserEvent(id, year, month, day,
                                 name, repetition, frequency, status))
@@ -355,7 +374,7 @@ class UserEventsSaver:
         dummy_file = original_file + '.bak'
         with open(dummy_file, "w") as f:
             for ev in user_events.items:
-                f.write(f'{ev.id},{ev.year},{ev.month},{ev.day},"{ev.name}",{ev.repetition},{ev.frequency},{ev.status}\n')
+                f.write(f'{ev.id},{ev.year},{ev.month},{ev.day},"{ev.name}",{ev.repetition},{ev.frequency},{ev.status.name.lower()}\n')
         os.remove(original_file)
         os.rename(dummy_file, original_file)
 
@@ -367,7 +386,7 @@ class HolidaysLoader:
         try:
             import holidays as hl
             holidays = Events()
-            holiday_events = eval("hl."+country+"(years=[year-1, year, year+1])")
+            holiday_events = eval("hl."+country+"(years=[year-1, year, year+3])")
             for date, name in holiday_events.items():
                 holidays.add_item(Event(date.year, date.month, date.day, name))
 
@@ -426,6 +445,5 @@ class WeatherLoader:
             weather.forcast = str(subprocess.check_output(["curl", "-s", request_url],
                           timeout=max_load_time, encoding='utf-8'))[:-1]
             weather.forcast = weather.forcast.split(':')[1]
-            weather.loaded = True
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             pass

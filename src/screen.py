@@ -1,5 +1,8 @@
 import datetime
+import enum
+
 from helpers import monthrange_gregorian
+
 
 class Screen():
     '''Main state of the program that describes what is displayed and how'''
