@@ -71,8 +71,8 @@ MSG_TS_TITLE      = 'Enter subtask: '
 MSG_TS_IM         = "Import tasks from Calcurse? (y/n)"
 MSG_TS_TW         = "Import tasks from Taskwarrior? (y/n)"
 
-CALENDAR_HINT = "Space · Journal   n/p · Change month   a · Add event   ? · All keybindings"
-TODO_HINT     = "Space · Calendar   a · Add   v · Done   i · Important   ? · All keybindings"
+CALENDAR_HINT = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
+JOURNAL_HINT  = "Space · Switch to calendar   a · Add task   v · Done   i · Important   ? · All keybindings"
 
 ERR_FILE1 = "Looks like there is a problem in your config.ini file.Perhaps you edited it and entered a wrong line."
 ERR_FILE2 = "Try removing your config.ini file and run the program again, it will create a fresh working config file."

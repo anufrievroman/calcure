@@ -2,58 +2,8 @@ import curses
 
 from config import cf
 from translation_en import *
-from helpers import *
 from data import *
-
-
-##################### DIALOGUES #########################
-
-
-def input_string(stdscr, y, x, prompt_string, answer_length):
-    '''Ask user to input something and return it as a string'''
-    _, x_max = stdscr.getmaxyx()
-    curses.echo()
-    curses.curs_set(True)
-    # display_string = prompt_string[:(x_max-x-answer_length)]
-    display_string = prompt_string
-    display_line(stdscr, y, x, display_string, 8)
-    stdscr.refresh()
-    string = stdscr.getstr(y, len(display_string)+x, answer_length).decode(encoding="utf-8")
-    curses.noecho()
-    curses.curs_set(False)
-    return string
-
-
-def input_integer(stdscr, y, x, prompt_string):
-    '''Ask user for an integer number and check if it is an integer'''
-    number = input_string(stdscr, y, x, prompt_string, 3)
-    try:
-        number = int(number) - 1
-    except ValueError:
-        return None
-    return number
-
-
-def input_day(stdscr, y, x, prompt_string):
-    '''Ask user for an integer number and check if it is an integer'''
-    number = input_string(stdscr, y, x, prompt_string, 2)
-    try:
-        number = int(number)
-    except ValueError:
-        return None
-    return number
-
-
-def ask_confirmation(stdscr, prompt_string):
-    '''Ask user confirmation for an action'''
-    if not cf.ASK_CONFIRMATIONS: return True
-    y_max, x_max = stdscr.getmaxyx()
-    curses.halfdelay(255)
-    prompt = prompt_string + " "*abs(x_max - len(prompt_string) - 1)
-    display_line(stdscr, y_max-2, 0, prompt[:x_max-1], 9)
-    key = stdscr.getkey()
-    confirmed = True if key == "y" else False
-    return confirmed
+from dialogues import *
 
 
 def vim_style_exit(stdscr, screen):
@@ -61,11 +11,11 @@ def vim_style_exit(stdscr, screen):
     if screen.key == "Z":
         try:
             screen.key = stdscr.getkey()
-            if screen.key in ["Z", "Q"]:
-                confirmed = ask_confirmation(stdscr, MSG_EXIT)
-                if confirmed: screen.state = State.EXIT
+            return True if screen.key in ["Z", "Q"] else False
         except KeyboardInterrupt:
-            screen.state = State.EXIT
+            return True
+    else:
+        return False
 
 
 ########################## MONTHLY SCREEN CONTROL ###################################
@@ -107,7 +57,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     id = user_events.filter_events_that_month(screen).items[number].id
-                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
                     user_events.rename_item(id, new_name)
 
@@ -116,7 +66,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     id = user_events.filter_events_that_month(screen).items[number].id
-                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     question = f'{MSG_EVENT_MOVE_TO} {screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
@@ -152,7 +102,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                 question = f'{MSG_EVENT_DATE} {screen.year}/{screen.month}/'
                 day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
-                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
                     user_events.add_item(UserEvent(id, screen.year, screen.month, day, name, 1, 'n', Status.NORMAL))
@@ -162,7 +112,7 @@ def control_monthly_screen(stdscr, user_events, screen):
                 question = f'{MSG_EVENT_DATE}{screen.year}/{screen.month}/'
                 day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
-                    display_line(stdscr, screen.y_max-2, 1, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     id = user_events.items[-1].id + 1 if not user_events.is_empty() else 1
                     reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
@@ -172,28 +122,34 @@ def control_monthly_screen(stdscr, user_events, screen):
 
             # Imports:
             if screen.key == "C":
-                confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP)
+                confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     EventImporters.import_from_calcurse(user_events, cf.CALCURSE_EVENTS_FILE)
 
             # Other actions:
-            vim_style_exit(stdscr, screen)
+            if vim_style_exit(stdscr, screen):
+                confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+                if confirmed: screen.state = State.EXIT
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
                 screen.state = State.JOURNAL
             if screen.key == "?":
                 screen.state = State.HELP
             if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
-                confirmed = ask_confirmation(stdscr, MSG_EXIT)
+                confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
                 if confirmed: screen.state = State.EXIT
+            if screen.key in ["/"]:
+                screen.split = not screen.split
+                screen.refresh_now = True
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
-                screen.y_max, screen.x_max = stdscr.getmaxyx()
+                # screen.y_max, screen.x_max = stdscr.getmaxyx()
+                screen.y_max, _ = stdscr.getmaxyx()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
-        confirmed = ask_confirmation(stdscr, MSG_EXIT)
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
@@ -240,7 +196,7 @@ def control_daily_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
                 if user_events.filter_events_that_day(screen).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen).items[number].id
-                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
                     user_events.rename_item(id, new_name)
 
@@ -249,7 +205,7 @@ def control_daily_screen(stdscr, user_events, screen):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
                 if user_events.filter_events_that_day(screen).is_valid_number(number):
                     id = user_events.filter_events_that_day(screen).items[number].id
-                    display_line(stdscr, screen.y_max-2, 0, " "*(screen.x_max-2), 21)
+                    clear_line(stdscr, screen.y_max-2)
                     question = f'{MSG_EVENT_MOVE_TO}{screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
@@ -289,12 +245,14 @@ def control_daily_screen(stdscr, user_events, screen):
 
             # Import from calcurse:
             if screen.key == "C":
-                confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP)
+                confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     EventImporters.import_from_calcurse(user_events, cf.CALCURSE_EVENTS_FILE)
 
             # Other actions:
-            vim_style_exit(stdscr, screen)
+            if vim_style_exit(stdscr, screen):
+                confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+                if confirmed: screen.state = State.EXIT
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
                 screen.state = State.JOURNAL
@@ -302,14 +260,18 @@ def control_daily_screen(stdscr, user_events, screen):
                 screen.state = State.HELP
             if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
                 screen.state = State.MONTHLY
+            if screen.key in ["/"]:
+                screen.split = not screen.split
+                screen.refresh_now = True
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
-                screen.y_max, screen.x_max = stdscr.getmaxyx()
+                # screen.y_max, screen.x_max = stdscr.getmaxyx()
+                screen.y_max, _ = stdscr.getmaxyx()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
-        confirmed = ask_confirmation(stdscr, MSG_EXIT)
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
@@ -337,21 +299,26 @@ def control_journal_screen(stdscr, user_tasks, screen):
             # Change the status:
             if screen.key in ['i', 'h']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_HIGH)
-                user_tasks.toggle_item_status(number, Status.IMPORTANT)
+                task_id = user_tasks.items[number].id
+                user_tasks.toggle_item_status(task_id, Status.IMPORTANT)
             if screen.key == 'l':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                user_tasks.toggle_item_status(number, Status.UNIMPORTANT)
+                task_id = user_tasks.items[number].id
+                user_tasks.toggle_item_status(task_id, Status.UNIMPORTANT)
             if screen.key == 'u':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_RES)
-                user_tasks.toggle_item_status(number, Status.NORMAL)
+                task_id = user_tasks.items[number].id
+                user_tasks.toggle_item_status(task_id, Status.NORMAL)
             if screen.key == 'v':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                user_tasks.toggle_item_status(number, Status.DONE)
+                task_id = user_tasks.items[number].id
+                user_tasks.toggle_item_status(task_id, Status.DONE)
 
             # Modify the task:
             if screen.key in ['d', 'x']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEL)
-                user_tasks.delete_item(number)
+                task_id = user_tasks.items[number].id
+                user_tasks.delete_item(task_id)
             if screen.key == 'm':
                 number_from = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE)
                 if user_tasks.is_valid_number(number_from):
@@ -360,8 +327,9 @@ def control_journal_screen(stdscr, user_tasks, screen):
             if screen.key in ['e', 'c']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_EDIT)
                 if user_tasks.is_valid_number(number):
-                    new_name = input_string(stdscr, number+2, 0, cf.TODO_ICON+' ', screen.x_max-4)
-                    user_tasks.rename_item(number, new_name)
+                    task_id = user_tasks.items[number].id
+                    new_name = input_string(stdscr, number+2, screen.x_min, cf.TODO_ICON+' ', screen.x_max-4)
+                    user_tasks.rename_item(task_id, new_name)
 
             # Subtask operations:
             if screen.key == 's':
@@ -370,6 +338,7 @@ def control_journal_screen(stdscr, user_tasks, screen):
             if screen.key == 'A':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_SUB)
                 if user_tasks.is_valid_number(number):
+                    clear_line(stdscr, screen.y_max-2)
                     task_name = input_string(stdscr, screen.y_max-2, 0, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
                     user_tasks.add_subtask(Task(None, task_name, Status.NORMAL, Timer([])), number)
             screen.selection_mode = False
@@ -385,8 +354,8 @@ def control_journal_screen(stdscr, user_tasks, screen):
 
             # Add single task:
             if screen.key == 'a':
-                task_name = input_string(stdscr, len(user_tasks.items)+2, 0, cf.TODO_ICON+' ', screen.x_max-4)
-                user_tasks.add_item(Task(None, task_name, Status.NORMAL, Timer([])))
+                task_name = input_string(stdscr, len(user_tasks.items) + 2, screen.x_min, cf.TODO_ICON+' ', screen.x_max - 4)
+                user_tasks.add_item(Task(len(user_tasks.items), task_name, Status.NORMAL, Timer([])))
 
             # Bulk operations:
             if screen.key == "V":
@@ -398,37 +367,43 @@ def control_journal_screen(stdscr, user_tasks, screen):
             if screen.key in ['I','H']:
                 user_tasks.change_all_statuses(Status.IMPORTANT)
             if screen.key in ['D','X']:
-                confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL)
+                confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
                 if confirmed: user_tasks.delete_all_items()
 
             # Imports:
             if screen.key == "C":
-                confirmed = ask_confirmation(stdscr, MSG_TS_IM)
+                confirmed = ask_confirmation(stdscr, MSG_TS_IM, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     TasksImporters.import_from_calcurse(user_tasks, cf.CALCURSE_TODO_FILE)
             if screen.key == "W":
-                confirmed = ask_confirmation(stdscr, MSG_TS_TW)
+                confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     TasksImporters.import_from_taskwarrior(user_tasks, cf.TASKWARRIOR_FOLDER)
 
             # Other actions:
-            vim_style_exit(stdscr, screen)
+            if vim_style_exit(stdscr, screen):
+                confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+                if confirmed: screen.state = State.EXIT
             if screen.key == "*": screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
                 screen.state = State.MONTHLY
             if screen.key == "?":
                 screen.state = State.HELP
             if screen.key == "q":
-                confirmed = ask_confirmation(stdscr, MSG_EXIT)
+                confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
                 if confirmed: screen.state = State.EXIT
+            if screen.key in ["/"]:
+                screen.split = not screen.split
+                screen.refresh_now = True
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
-                screen.y_max, screen.x_max = stdscr.getmaxyx()
+                # screen.y_max, screen.x_max = stdscr.getmaxyx()
+                screen.y_max, _ = stdscr.getmaxyx()
 
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
-        confirmed = ask_confirmation(stdscr, MSG_EXIT)
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
@@ -446,7 +421,9 @@ def control_help_screen(stdscr, screen):
         screen.key = stdscr.getkey()
 
         # Handle vim-style exit on "ZZ" and "ZQ":
-        vim_style_exit(stdscr, screen)
+        if vim_style_exit(stdscr, screen):
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            if confirmed: screen.state = State.EXIT
 
         # Handle keys to exit the help screen:
         if screen.key in [" ", "?", "q", "KEY_BACKSPACE", "^[", "\x7f"]:
@@ -454,10 +431,11 @@ def control_help_screen(stdscr, screen):
 
         # Handle screen resize:
         if screen.key == "KEY_RESIZE":
-            screen.y_max, screen.x_max = stdscr.getmaxyx()
+            # screen.y_max, screen.x_max = stdscr.getmaxyx()
+            screen.y_max, _ = stdscr.getmaxyx()
 
     except KeyboardInterrupt:
-        confirmed = ask_confirmation(stdscr, MSG_EXIT)
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:

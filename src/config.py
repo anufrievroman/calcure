@@ -50,6 +50,9 @@ class Config:
                 "start_week_day":            "1",
                 "weekend_days":              "6,7",
                 "refresh_interval":          "1",
+                "split_screen":              "Yes",
+                "right_pane_percentage":     "25",
+                "journal_header":            "JOURNAL",
                 "event_icon":                "•",
                 "privacy_icon":              "•",
                 "today_icon":                "•",
@@ -60,8 +63,7 @@ class Config:
                 "todo_icon":                 "•",
                 "important_icon":            "‣",
                 "timer_icon":                "⌚",
-                "show_journal_header":       "Yes",
-                "journal_header":            "JOURNAL",
+                "separator_icon":            "│",
                 }
 
         conf["Colors"] = {
@@ -86,6 +88,8 @@ class Config:
                 "color_timer_paused":    "7",
                 "color_time":            "7",
                 "color_weather":         "2",
+                "color_active_pane":     "2",
+                "color_separator":       "7",
                 "color_background":      "-1",
                 }
 
@@ -96,12 +100,14 @@ class Config:
                 "bold_weekends":            "No",
                 "bold_weekend_names":       "No",
                 "bold_title":               "No",
+                "bold_active_pane":         "No",
                 "underlined_today":         "No",
                 "underlined_days":          "No",
                 "underlined_day_names":     "No",
                 "underlined_weekends":      "No",
                 "underlined_weekend_names": "No",
                 "underlined_title":         "No",
+                "underlined_active_pane":   "No",
                 }
 
         conf["Event icons"] = {
@@ -184,6 +190,7 @@ class Config:
             self.PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
+            self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
@@ -196,19 +203,20 @@ class Config:
             self.EVENT_ICON       = conf.get("Parameters", "event_icon", fallback="•") if self.DISPLAY_ICONS else ""
             self.BIRTHDAY_ICON    = conf.get("Parameters", "birthday_icon", fallback="★")
             self.HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="☘️")
+            self.SEPARATOR_ICON   = conf.get("Parameters", "separator_icon", fallback="│")
 
             # Journal settings:
             self.CALCURSE_TODO_FILE    = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
             self.CALCURSE_EVENTS_FILE  = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
             self.TASKWARRIOR_FOLDER    = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
-            self.SHOW_TITLE            = conf.getboolean("Parameters", "show_journal_header", fallback=True)
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)
             self.DONE_ICON             = conf.get("Parameters", "done_icon", fallback="✔") if self.DISPLAY_ICONS else "×"
             self.TODO_ICON             = conf.get("Parameters", "todo_icon", fallback="•") if self.DISPLAY_ICONS else "·"
             self.IMPORTANT_ICON        = conf.get("Parameters", "important_icon", fallback="‣") if self.DISPLAY_ICONS else "!"
             self.TIMER_ICON            = conf.get("Parameters", "timer_icon", fallback="⌚") if self.DISPLAY_ICONS else "!"
             self.REFRESH_INTERVAL      = int(conf.get("Parameters", "refresh_interval", fallback=1))
+            self.RIGHT_PANE_PERCENTAGE = int(conf.get("Parameters", "right_pane_percentage", fallback=25))
 
             # Calendar colors:
             self.COLOR_TODAY           = int(conf.get("Colors", "color_today", fallback=2))
@@ -228,6 +236,8 @@ class Config:
             self.COLOR_WEATHER         = int(conf.get("Colors", "color_weather", fallback=2))
             self.COLOR_BACKGROUND      = int(conf.get("Colors", "color_background", fallback=-1))
             self.COLOR_CALENDAR_HEADER = int(conf.get("Colors", "color_calendar_header", fallback=4))
+            self.COLOR_ACTIVE_PANE     = int(conf.get("Colors", "color_active_pane", fallback=2))
+            self.COLOR_SEPARATOR       = int(conf.get("Colors", "color_separator", fallback=7))
 
             # Journal colors:
             self.COLOR_TODO           = int(conf.get("Colors", "color_todo", fallback=7))
@@ -243,12 +253,14 @@ class Config:
             self.BOLD_WEEKENDS            = conf.getboolean("Styles", "bold_weekends", fallback=False)
             self.BOLD_WEEKEND_NAMES       = conf.getboolean("Styles", "bold_weekend_names", fallback=False)
             self.BOLD_TITLE               = conf.getboolean("Styles", "bold_title", fallback=False)
+            self.BOLD_ACTIVE_PANE         = conf.getboolean("Styles", "bold_active_pane", fallback=False)
             self.UNDERLINED_TODAY         = conf.getboolean("Styles", "underlined_today", fallback=False)
             self.UNDERLINED_DAYS          = conf.getboolean("Styles", "underlined_days", fallback=False)
             self.UNDERLINED_DAY_NAMES     = conf.getboolean("Styles", "underlined_day_names", fallback=False)
             self.UNDERLINED_WEEKENDS      = conf.getboolean("Styles", "underlined_weekends", fallback=False)
             self.UNDERLINED_WEEKEND_NAMES = conf.getboolean("Styles", "underlined_weekend_names", fallback=False)
             self.UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
+            self.UNDERLINED_ACTIVE_PANE   = conf.getboolean("Styles", "underlined_active_pane", fallback=False)
 
             try:
                 self.ICONS = {word: icon for (word, icon) in conf.items("Event icons")}

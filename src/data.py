@@ -25,13 +25,6 @@ class Status(enum.Enum):
     UNIMPORTANT = 4
 
 
-class Weather():
-    '''Information about the weather loaded from wttr.in'''
-    def __init__(self, city):
-        self.forcast = None
-        self.city = city
-
-
 ######################## ITEMS ###########################
 
 
@@ -68,21 +61,26 @@ class UserEvent(Event):
         self.status = status
 
 
+class UserRepeatedEvent(Event):
+    '''Events that are repetitions of the original user events'''
+    def __init__(self, id, year, month, day, name, status):
+        super().__init__(year, month, day, name)
+        self.id = id
+        self.status = status
+
+
 class Timer:
     '''Timer for a task'''
     def __init__(self, stamps):
         self.stamps = stamps
 
     @property
-    def is_counting(self) -> bool:
-        '''Evaluate whether the time is currently counting'''
-        if not self.stamps:
-            return False
-        else:
-            return (len(self.stamps)%2 == 1)
+    def is_counting(self):
+        '''Evaluate if the time is currently counting'''
+        return False if not self.stamps else (len(self.stamps)%2 == 1)
 
     @property
-    def is_started(self) -> bool:
+    def is_started(self):
         '''Evaluate whether the timer has started'''
         return True if self.stamps else False
 
@@ -131,25 +129,25 @@ class Collection:
             self.items.append(item)
             self.changed = True
 
-    def delete_item(self, id):
+    def delete_item(self, selected_task_id):
         '''Delete an item with provided id from the collection'''
         for index, item in enumerate(self.items):
-            if item.id == id:
-                del self.items[index]
+            if item.id == selected_task_id:
+                self.items.remove(item)
                 self.changed = True
                 break
 
-    def rename_item(self, id, new_name):
+    def rename_item(self, selected_task_id, new_name):
         '''Edit an item name in the collection'''
         for item in self.items:
-            if item.id == id and len(new_name) > 0:
+            if item.id == selected_task_id and len(new_name) > 0:
                 item.name = new_name
                 self.changed = True
 
-    def toggle_item_status(self, id, new_status):
+    def toggle_item_status(self, selected_task_id, new_status):
         '''Toggle the status for the item with provided id'''
         for item in self.items:
-            if item.id == id:
+            if item.id == selected_task_id:
                 if item.status == new_status:
                     item.status = Status.NORMAL
                 else:
@@ -172,7 +170,7 @@ class Collection:
 
     def delete_all_items(self):
         '''Delete all items from the collection'''
-        self.items = []
+        self.items.clear()
         self.changed = True
 
     def is_empty(self):
@@ -188,8 +186,13 @@ class Collection:
 
 class Events(Collection):
     '''List of events created by the user or imported'''
-    def __init__(self):
-        Collection.__init__(self)
+
+    def event_exists(self, new_event):
+        '''Check if such event already exists in collection'''
+        for event in self.items:
+            if event.name == new_event.name and event.date == new_event.date:
+                return True
+        return False
 
     def filter_events_that_day(self, screen):
         '''Filter only events that happen on the particular day'''
@@ -200,11 +203,12 @@ class Events(Collection):
         return events_of_the_day
 
     def filter_events_that_month(self, screen):
-        '''Filter only events that happen on the particular day'''
+        '''Filter only events that happen on the particular month and sort them by day'''
         events_of_the_month = Events()
         for event in self.items:
             if event.month == screen.month and event.year == screen.year:
                 events_of_the_month.add_item(event)
+        events_of_the_month.items = sorted(events_of_the_month.items, key=lambda event: event.day)
         return events_of_the_month
 
     def change_day(self, id, new_day):
@@ -214,6 +218,76 @@ class Events(Collection):
                 item.day = new_day
                 self.changed = True
                 break
+
+    @staticmethod
+    def monthrange_gregorian(year, month):
+        '''Return number of days (28-31) in this gregorian month and year'''
+
+        def isleap(year):
+            '''Return True for leap years, False for non-leap years'''
+            return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+        mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        return mdays[month] + (month == 2 and isleap(year))
+
+    @staticmethod
+    def monthrange_persian(year, month):
+        '''Return number of days (28-31) in this Jalali month and year'''
+
+        def isleap(year):
+            '''Return True for leap years, False for non-leap years'''
+            return jdatetime.date(year, 1, 1).isleap()
+
+        mdays = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]
+        return mdays[month] + (month == 12 and isleap(year))
+
+
+class RepeatedEvents(Events):
+    '''List of events that are repetitions of the main events'''
+    def __init__(self, user_events):
+        super().__init__()
+        self.user_events = user_events
+        for event in self.user_events.items:
+            if event.repetition >= 1:
+                for r in range(1, event.repetition):
+                    temp_year  = event.year + r*(event.frequency == 'y')
+                    temp_month = event.month + r*(event.frequency == 'm')
+                    temp_day   = event.day + r*(event.frequency == 'd') + 7*r*(event.frequency == 'w')
+                    year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
+                    self.add_item(UserRepeatedEvent(event.id, year, month, day, event.name, event.status))
+
+    def calculate_recurring_events(self, year, month, day, frequency):
+        '''Calculate the date of recurring events so that they occur in the next month or year'''
+        new_day   = day
+        new_month = month
+        new_year  = year
+        skip_days = 0
+
+        # Weekly and daily recurrence:
+        if frequency in ["w","d"]:
+            for i in range(1000):
+                if month + i > 12:
+                    year = year + 1
+                    month = month - 12
+                if day > skip_days + self.monthrange_gregorian(year, month + i):
+                    skip_days += self.monthrange_gregorian(year, month + i)
+                    skip_months = i + 1
+                else:
+                    skip_months = i
+                    break
+            new_day = day - skip_days
+            new_month = month + skip_months
+            new_year = year
+
+        # Monthly recurrence:
+        if frequency == "m":
+            if month > 12:
+                new_year = year + (month - 1)//12
+                new_month = month - 12*(new_year - year)
+        return new_year, new_month, new_day
+
+
+
 
 
 class Tasks(Collection):
@@ -297,6 +371,7 @@ class UserTasksSaver:
                 f.write("\n")
         os.remove(original_file)
         os.rename(dummy_file, original_file)
+        user_tasks.changed = False
 
 
 class TasksImporters:
@@ -307,13 +382,15 @@ class TasksImporters:
             for task in f.readlines():
                 name = task[4:-1]
                 importance = task[1]
-                if (name > 0) and not user_tasks.item_exists(name):
-                    if importance in ['1','2']:
-                        user_tasks.add_item(Task(name, Status.IMPORTANT, Timer([])))
-                    elif importance in ['8','9','10']:
-                        user_tasks.add_item(Task(name, Status.UNIMPORTANT, Timer([])))
+                if (len(name) > 0) and not user_tasks.item_exists(name):
+                    if importance in ['1', '2']:
+                        status = Status.IMPORTANT
+                    elif importance in ['8', '9', '10']:
+                        status = Status.UNIMPORTANT
                     else:
-                        user_tasks.add_item(Task(name, Status.NORMAL, Timer([])))
+                        status = Status.NORMAL
+                    task_id = len(user_tasks.items)
+                    user_tasks.add_item(Task(task_id, name, status, Timer([])))
 
     @staticmethod
     def import_from_taskwarrior(user_tasks, taskwarrior_folder):
@@ -321,10 +398,11 @@ class TasksImporters:
         with open(taskwarrior_folder+"/pending.data", 'r') as f:
             for task in f.readlines():
                 if len(task) > 0:
-                    name = task.split('description:"',1)[1]
-                    name = name.split('"',1)[0]
-                    if not user_tasks.item(name):
-                        user_tasks.add_item(Task(name, Status.NORMAL, Timer([])))
+                    name = task.split('description:"', 1)[1]
+                    name = name.split('"', 1)[0]
+                    if not user_tasks.item_exists(name):
+                        task_id = len(user_tasks.items)
+                        user_tasks.add_item(Task(task_id, name, Status.NORMAL, Timer([])))
 
 
 class UserEventsLoader:
@@ -344,7 +422,7 @@ class UserEventsLoader:
 
                     # Account for old versions of the datafile:
                     if len(row) > 5:
-                        repetition = row[5]
+                        repetition = int(row[5])
                         frequency = row[6]
                     else:
                         repetition = '1'
@@ -377,6 +455,7 @@ class UserEventsSaver:
                 f.write(f'{ev.id},{ev.year},{ev.month},{ev.day},"{ev.name}",{ev.repetition},{ev.frequency},{ev.status.name.lower()}\n')
         os.remove(original_file)
         os.rename(dummy_file, original_file)
+        user_events.changed = False
 
 
 class HolidaysLoader:
@@ -419,31 +498,41 @@ class EventImporters:
         '''Importing events from calcurse apt file into our events file'''
         with open(calcurse_events_file, "r") as f:
             lines = f.readlines()
-        for index, line in enumerate(lines):
+        for line in lines:
             month = int(line[0:2])
             day = int(line[3:5])
             year = int(line[6:10])
+            status = Status.NORMAL
             if line[11] == "[":
                 name = line[15:-1]
             elif line[11] == "@":
                 name = line[35:-1]
                 name = name.replace('|',' ')
-            if len(user_events.items) > 0:
+            if user_events.items == []:
                 id = 0
             else:
-                id = user_events.items[-1].id+1
-            user_events.add_item(UserEvent(id, year, month, day, name, 1, n, 'normal'))
+                id = user_events.items[-1].id + 1
+            imported_event = UserEvent(id, year, month, day, name, 1, 'n', status)
+            if not user_events.event_exists(imported_event):
+                user_events.add_item(imported_event)
 
 
-class WeatherLoader:
-    @staticmethod
-    def load_from_wttr(weather):
-        '''Load the weather at launch and display weather widget.'''
+################### WEATHER ######################
+
+
+class Weather():
+    '''Information about the weather today'''
+    def __init__(self, city):
+        self.forcast = None
+        self.city = city
+        self.max_load_time = 2 # seconds
+
+    def load_from_wttr(self):
+        '''Load the weather info from wttr.in'''
         try:
-            max_load_time = 2 # seconds
-            request_url = f"wttr.in/{weather.city}?format=3"
-            weather.forcast = str(subprocess.check_output(["curl", "-s", request_url],
-                          timeout=max_load_time, encoding='utf-8'))[:-1]
-            weather.forcast = weather.forcast.split(':')[1]
+            request_url = f"wttr.in/{self.city}?format=3"
+            self.forcast = str(subprocess.check_output(["curl", "-s", request_url],
+                          timeout=self.max_load_time, encoding='utf-8'))[:-1]
+            self.forcast = self.forcast.split(':')[1]
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             pass
