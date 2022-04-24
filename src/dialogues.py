@@ -1,18 +1,19 @@
 import curses
-from data import Frequency
+from data import Frequency, Color
+
 
 def display_question(stdscr, y, x, question, color):
     """Display the line of text respecting the slyling and available space"""
     y_max, x_max = stdscr.getmaxyx()
     if y >= y_max or x >= x_max: return
     question = question[:(x_max - x - 1)]
-    stdscr.addstr(y, x, question, curses.color_pair(color))
+    stdscr.addstr(y, x, question, curses.color_pair(color.value))
 
 
 def clear_line(stdscr, y, x = 0):
     """Clear a line from any text"""
     _, x_max = stdscr.getmaxyx()
-    stdscr.addstr(y, x, " "*(x_max - x - 2), curses.color_pair(21))
+    stdscr.addstr(y, x, " "*(x_max - x - 2), curses.color_pair(Color.DAYS.value))
 
 
 def input_string(stdscr, y, x, question, answer_length):
@@ -20,7 +21,7 @@ def input_string(stdscr, y, x, question, answer_length):
     _, x_max = stdscr.getmaxyx()
     curses.echo()
     curses.curs_set(True)
-    display_question(stdscr, y, x, question, 8)
+    display_question(stdscr, y, x, question, Color.PROMPTS)
     stdscr.refresh()
     answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
     curses.noecho()
@@ -70,10 +71,10 @@ def ask_confirmation(stdscr, question, confirmations_enabled):
     if not confirmations_enabled: return True
     y_max, x_max = stdscr.getmaxyx()
     curses.halfdelay(255)
-    display_question(stdscr, y_max-2, 0, question, 9)
+    display_question(stdscr, y_max-2, 0, question, Color.CONFIRMATIONS)
     key = stdscr.getkey()
-    confirmed = True if key == "y" else False
-    return confirmed
+    confirmed = 
+    return True if key == "y" else False
 
 
 def vim_style_exit(stdscr, screen):

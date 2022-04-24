@@ -380,7 +380,6 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
 
             # Handle screen resize:
             if screen.key == "KEY_RESIZE":
-                # screen.y_max, screen.x_max = stdscr.getmaxyx()
                 screen.y_max, _ = stdscr.getmaxyx()
 
     # Handle keybard interruption with ctr+c:
@@ -410,7 +409,6 @@ def control_help_screen(stdscr, screen):
 
         # Handle screen resize:
         if screen.key == "KEY_RESIZE":
-            # screen.y_max, screen.x_max = stdscr.getmaxyx()
             screen.y_max, _ = stdscr.getmaxyx()
 
     except KeyboardInterrupt:

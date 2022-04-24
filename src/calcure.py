@@ -16,40 +16,43 @@ from translation_en import *
 from controls import *
 
 
+__version__ = "2.0.0"
+
+
 def initialize_colors(stdscr):
     """Define all the color pairs"""
     curses.start_color()
     curses.use_default_colors()
-    curses.init_pair(1, cf.COLOR_DAY_NAMES, cf.COLOR_BACKGROUND)
-    curses.init_pair(2, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
-    curses.init_pair(3, cf.COLOR_HINTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(4, cf.COLOR_TODAY, cf.COLOR_BACKGROUND)
-    curses.init_pair(5, cf.COLOR_DAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(6, cf.COLOR_WEEKEND_NAMES, cf.COLOR_BACKGROUND)
-    curses.init_pair(7, cf.COLOR_BIRTHDAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(8, cf.COLOR_PROMPTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(9, cf.COLOR_CONFIRMATIONS, cf.COLOR_BACKGROUND)
-    curses.init_pair(10, cf.COLOR_TITLE, cf.COLOR_BACKGROUND)
-    curses.init_pair(11, cf.COLOR_TODO, cf.COLOR_BACKGROUND)
-    curses.init_pair(12, cf.COLOR_DONE, cf.COLOR_BACKGROUND)
-    curses.init_pair(13, cf.COLOR_IMPORTANT, cf.COLOR_BACKGROUND)
-    curses.init_pair(14, cf.COLOR_TIMER, cf.COLOR_BACKGROUND)
-    curses.init_pair(15, cf.COLOR_TIMER_PAUSED, cf.COLOR_BACKGROUND)
-    curses.init_pair(16, cf.COLOR_HOLIDAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(17, cf.COLOR_EVENTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(18, cf.COLOR_TIME, cf.COLOR_BACKGROUND)
-    curses.init_pair(19, cf.COLOR_WEATHER, cf.COLOR_BACKGROUND)
-    curses.init_pair(20, cf.COLOR_UNIMPORTANT, cf.COLOR_BACKGROUND)
-    curses.init_pair(21, cf.COLOR_CALENDAR_HEADER, cf.COLOR_BACKGROUND)
-    curses.init_pair(22, cf.COLOR_ACTIVE_PANE, cf.COLOR_BACKGROUND)
-    curses.init_pair(23, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.DAY_NAMES.value, cf.COLOR_DAY_NAMES, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.WEEKENDS.value, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.HINTS.value, cf.COLOR_HINTS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TODAY.value, cf.COLOR_TODAY, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.DAYS.value, cf.COLOR_DAYS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.WEEKEND_NAMES.value, cf.COLOR_WEEKEND_NAMES, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.BIRTHDAYS.value, cf.COLOR_BIRTHDAYS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.PROMPTS.value, cf.COLOR_PROMPTS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.CONFIRMATIONS.value, cf.COLOR_CONFIRMATIONS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TITLE.value, cf.COLOR_TITLE, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TODO.value, cf.COLOR_TODO, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.DONE.value, cf.COLOR_DONE, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.IMPORTANT.value, cf.COLOR_IMPORTANT, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TIMER.value, cf.COLOR_TIMER, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TIMER_PAUSED.value, cf.COLOR_TIMER_PAUSED, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.HOLIDAYS.value, cf.COLOR_HOLIDAYS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.EVENTS.value, cf.COLOR_EVENTS, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.TIME.value, cf.COLOR_TIME, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.WEATHER.value, cf.COLOR_WEATHER, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.UNIMPORTANT.value, cf.COLOR_UNIMPORTANT, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.CALENDAR_HEADER.value, cf.COLOR_CALENDAR_HEADER, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.ACTIVE_PANE.value, cf.COLOR_ACTIVE_PANE, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.SEPARATOR.value, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
 
     if not cf.MINIMAL_WEEKEND_INDICATOR:
-        curses.init_pair(2, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)
+        curses.init_pair(Color.WEEKENDS.value, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)
     if not cf.MINIMAL_TODAY_INDICATOR:
-        curses.init_pair(4, curses.COLOR_BLACK, cf.COLOR_TODAY)
+        curses.init_pair(Color.TODAY.value, curses.COLOR_BLACK, cf.COLOR_TODAY)
     if not cf.MINIMAL_DAYS_INDICATOR:
-        curses.init_pair(5, curses.COLOR_BLACK, cf.COLOR_DAYS)
+        curses.init_pair(Color.DAYS.value, curses.COLOR_BLACK, cf.COLOR_DAYS)
 
 
 class View:
@@ -76,13 +79,13 @@ class View:
         text = text[:(x_max - 1 - x)]
 
         if bold and underlined:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD | curses.A_UNDERLINE)
+            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD | curses.A_UNDERLINE)
         elif bold and not underlined:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_BOLD)
+            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD)
         elif underlined and not bold:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color) | curses.A_UNDERLINE)
+            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_UNDERLINE)
         else:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color))
+            self.stdscr.addstr(y, x, text, curses.color_pair(color.value))
 
 
 #################### TASK VIEWS ########################
@@ -98,13 +101,13 @@ class TaskView(View):
     @property
     def color(self):
         """Select the color depending on the status"""
-        color = 11
+        color = Color.TODO
         if self.task.status == Status.DONE:
-            color = 12
+            color = Color.DONE
         if self.task.status == Status.IMPORTANT:
-            color = 13
+            color = Color.IMPORTANT
         if self.task.status == Status.UNIMPORTANT:
-            color = 20
+            color = Color.UNIMPORTANT
         return color
 
     @property
@@ -157,7 +160,7 @@ class TimerView(View):
     @property
     def color(self):
         """Select the color depending on the timer status"""
-        color = 14 if self.timer.is_counting else 15
+        color = Color.TIMER if self.timer.is_counting else Color.TIMER_PAUSED
         return color
 
     @property
@@ -188,12 +191,12 @@ class JournalView(View):
     def render(self):
         """Render the list of tasks"""
         if not self.user_tasks.items:
-            self.display_line(self.y, self.x, MSG_TS_NOTHING, 20)
+            self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
         for index, task in enumerate(self.user_tasks.items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode:
-                self.display_line(self.y, self.x, str(index + 1), 4)
+                self.display_line(self.y, self.x, str(index + 1), Color.TODAY)
             self.y += 1
 
 
@@ -210,11 +213,11 @@ class EventView(View):
     @property
     def color(self):
         """Select the color depending on the status and type"""
-        color = 17
+        color = Color.EVENTS
         if self.event.status == Status.IMPORTANT:
-            color = 13
+            color = Color.IMPORTANT
         if self.event.status == Status.UNIMPORTANT:
-            color = 20
+            color = Color.UNIMPORTANT
         return color
 
     def obfuscate_name(self, privacy):
@@ -258,14 +261,14 @@ class BirthdayView(EventView):
         """Display a line with birthday icon and name"""
         title = self.obfuscate_name(self.screen.privacy)
         title = self.cut_name(title)
-        self.display_line(self.y, self.x, f'{cf.BIRTHDAY_ICON} {title}', 7)
+        self.display_line(self.y, self.x, f'{cf.BIRTHDAY_ICON} {title}', Color.BIRTHDAYS)
 
 
 class HolidayView(EventView):
     def render(self):
         """Display a line with holiday icon and occasion"""
         title = self.cut_name(self.event.name)
-        self.display_line(self.y, self.x, f'{cf.HOLIDAY_ICON} {title}', 16)
+        self.display_line(self.y, self.x, f'{cf.HOLIDAY_ICON} {title}', Color.HOLIDAYS)
 
 
 class DailyView(View):
@@ -307,7 +310,7 @@ class DailyView(View):
                 if self.screen.selection_mode:
                     self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), 4)
             else:
-                self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, 17)
+                self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, Color.EVENTS)
             index += 1
 
         # Show repeated user events:
@@ -316,7 +319,7 @@ class DailyView(View):
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
             else:
-                self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, 17)
+                self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, Color.EVENTS)
             index += 1
 
 
@@ -335,15 +338,15 @@ class DayNumberView(View):
         """Display number of the day in month with proper styling"""
         # Today:
         if datetime.date(self.screen.year, self.screen.month, self.day) == datetime.date.today():
-            self.display_line(self.y, self.x, str(self.day) + cf.TODAY_ICON + ' ' * self.x_cell, 4, cf.BOLD_TODAY,
+            self.display_line(self.y, self.x, str(self.day) + cf.TODAY_ICON + ' ' * self.x_cell, Color.TODAY, cf.BOLD_TODAY,
                               cf.UNDERLINED_TODAY)
-        # Week days:
-        elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
-            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, 2, cf.BOLD_WEEKENDS,
-                              cf.UNDERLINED_WEEKENDS)
         # Weekend days:
+        elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
+            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, Color.WEEKENDS, cf.BOLD_WEEKENDS,
+                              cf.UNDERLINED_WEEKENDS)
+        # Week days:
         else:
-            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, 5, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
+            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 
 class TitleView(View):
@@ -356,9 +359,9 @@ class TitleView(View):
 
     def render(self):
         if self.screen.active_pane and self.screen.split:
-            self.display_line(0, self.screen.x_min, self.title, 22, cf.BOLD_ACTIVE_PANE, cf.UNDERLINED_ACTIVE_PANE)
+            self.display_line(0, self.screen.x_min, self.title, Color.ACTIVE_PANE, cf.BOLD_ACTIVE_PANE, cf.UNDERLINED_ACTIVE_PANE)
         else:
-            self.display_line(0, self.screen.x_min, self.title, 21, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+            self.display_line(0, self.screen.x_min, self.title, Color.CALENDAR_HEADER, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
 
 
 class HeaderView(View):
@@ -383,11 +386,11 @@ class HeaderView(View):
         # Show time:
         if cf.SHOW_CURRENT_TIME:
             time_string = time.strftime("%H:%M", time.localtime())
-            self.display_line(0, (self.screen.x_max // 2 - 2), time_string, 18)
+            self.display_line(0, (self.screen.x_max // 2 - 2), time_string, Color.TIME)
 
         # Show weather:
         if cf.SHOW_WEATHER and self.weather.forcast is not None:
-            self.display_line(0, self.screen.x_max - len(self.weather.forcast) - 1, self.weather.forcast, 19)
+            self.display_line(0, self.screen.x_max - len(self.weather.forcast) - 1, self.weather.forcast, Color.WEATHER)
 
 
 class FooterView(View):
@@ -399,11 +402,11 @@ class FooterView(View):
 
     def render(self):
         if not cf.SHOW_KEYBINDINGS: return
-        clear_line(self.stdscr, self.y)
+        clear_line(self.stdscr, self.screen.y_max - 1)
         if self.screen.state in [State.MONTHLY, State.DAILY]:
-            self.display_line(self.y, self.x, CALENDAR_HINT, 3)
+            self.display_line(self.screen.y_max - 1, 0, CALENDAR_HINT, Color.HINTS)
         elif self.screen.state == State.JOURNAL:
-            self.display_line(self.y, self.x, JOURNAL_HINT, 3)
+            self.display_line(self.screen.y_max - 1, 0, JOURNAL_HINT, Color.HINTS)
 
 
 class SeparatorView(View):
@@ -417,7 +420,7 @@ class SeparatorView(View):
         _, x_max = self.stdscr.getmaxyx()
         x_separator = x_max - self.screen.journal_pane_width
         for i in range(self.screen.y_max):
-            self.display_line(i, x_separator, cf.SEPARATOR_ICON, 23)
+            self.display_line(i, x_separator, cf.SEPARATOR_ICON, Color.SEPARATOR)
 
 
 class DaysNameView(View):
@@ -438,11 +441,11 @@ class DaysNameView(View):
             day_number = i + shift - 7 * ((i + shift) > 6)
             name = DAYS[day_number][:num]
             if day_number + 1 not in cf.WEEKEND_DAYS:
-                self.display_line(self.y, self.x + i * x_cell, name, 1,
-                                cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
+                self.display_line(self.y, self.x + i * x_cell, name, Color.DAY_NAMES,
+                                    cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
             else:
-                self.display_line(self.y, self.x + i * x_cell, name, 6,
-                                cf.BOLD_WEEKEND_NAMES, cf.UNDERLINED_WEEKEND_NAMES)
+                self.display_line(self.y, self.x + i * x_cell, name, Color.WEEKEND_NAMES,
+                                    cf.BOLD_WEEKEND_NAMES, cf.UNDERLINED_WEEKEND_NAMES)
 
 
 ##################### SCREENS ##########################
@@ -467,7 +470,7 @@ class DailyScreenView(View):
 
         # Form a string with month, year, and day with today icon:
         icon = cf.TODAY_ICON if self.screen.date == datetime.date.today() else ''
-        month_string = str(MONTHS[self.screen.month])
+        month_string = str(MONTHS[self.screen.month-1])
         date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
 
         # Display header and footer:
@@ -499,9 +502,8 @@ class MonthlyScreenView(View):
         # self.fill_background()
 
         # Info about the month:
-        month_year_string = MONTHS[self.screen.month] + " " + str(self.screen.year)
-        dates = calendar.Calendar(firstweekday=cf.START_WEEK_DAY - 1).monthdayscalendar(self.screen.year,
-                                                                                        self.screen.month)
+        month_year_string = MONTHS[self.screen.month-1] + " " + str(self.screen.year)
+        dates = calendar.Calendar(firstweekday=cf.START_WEEK_DAY - 1).monthdayscalendar(self.screen.year, self.screen.month)
 
         y_cell = (self.screen.y_max - 3) // 6
         x_cell = self.screen.x_max // 7
@@ -520,15 +522,13 @@ class MonthlyScreenView(View):
                 if day != 0:
                     # Display dates of the month with proper styles:
                     day_in_week = col + (cf.START_WEEK_DAY - 1) - 7 * ((col + (cf.START_WEEK_DAY - 1)) > 6)
-                    day_number_view = DayNumberView(self.stdscr, 2 + row * y_cell, col * x_cell, self.screen, day,
-                                                    day_in_week, x_cell)
+                    day_number_view = DayNumberView(self.stdscr, 2 + row * y_cell, col * x_cell, self.screen, day, day_in_week, x_cell)
                     day_number_view.render()
 
                     # Display the events:
                     self.screen.day = day
                     daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events,
-                                           self.user_events,
-                                           self.holidays, self.birthdays, self.screen, num_events_this_month)
+                                           self.user_events, self.holidays, self.birthdays, self.screen, num_events_this_month)
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
@@ -575,9 +575,11 @@ class HelpScreenView(View):
     def __init__(self, stdscr, y, x, screen):
         super().__init__(stdscr, y, x)
         self.screen = screen
+
+    def calibrate_position(self):
+        """Depending on the screen space calculate the best position"""
         self.y_max, self.x_max = self.stdscr.getmaxyx()
 
-        # Depending on the screen space calculate the best position:
         if self.x_max < 102:
             self.global_shift_x = 0
             self.shift_x = 0
@@ -594,40 +596,41 @@ class HelpScreenView(View):
 
     def render(self):
         """Draw the help screen"""
+        self.calibrate_position()
         if self.x_max < 6 or self.y_max < 3: return
         curses.halfdelay(255)
         self.stdscr.clear()
         self.fill_background()
 
         # Left column:
-        self.display_line(self.global_shift_y, self.global_shift_x + 1,
-                          MSG_NAME[:self.x_max - 3], 6, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+        self.display_line(self.global_shift_y, self.global_shift_x + 1, f"{MSG_NAME} {__version__}",
+                            Color.ACTIVE_PANE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         self.display_line(self.global_shift_y + 2, self.global_shift_x + 8,
-                          TITLE_KEYS_GENERAL, 4, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+                          TITLE_KEYS_GENERAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_GENERAL):
-            line = str(key + " " + KEYS_GENERAL[key])
-            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, line, 5)
+            line = f"{key} {KEYS_GENERAL[key]}"
+            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, line, Color.DAYS)
 
         self.display_line(self.global_shift_y + 4 + len(KEYS_GENERAL), self.global_shift_x + 8,
-                          TITLE_KEYS_CALENDAR[:self.x_max - 3], 4, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+                          TITLE_KEYS_CALENDAR, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_CALENDAR):
-            line = str(key + " " + KEYS_CALENDAR[key])
-            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, line, 5)
+            line = f"{key} {KEYS_CALENDAR[key]}"
+            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, line, Color.DAYS)
 
         # Right column:
         d_x = self.global_shift_x + self.shift_x
         d_y = self.global_shift_y + self.shift_y
-        self.display_line(d_y, d_x + 8, TITLE_KEYS_JOURNAL, 4, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
+        self.display_line(d_y, d_x + 8, TITLE_KEYS_JOURNAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_TODO):
-            line = str(key + " " + KEYS_TODO[key])
-            self.display_line(d_y + index + 1, d_x, line, 5)
+            line = f"{key} {KEYS_TODO[key]}"
+            self.display_line(d_y + index + 1, d_x, line, Color.DAYS)
 
         # Additional info:
         d_x = self.global_shift_x + self.shift_x + 8
         d_y = self.global_shift_y + len(KEYS_TODO) + self.shift_y
-        self.display_line(d_y + 2, d_x, MSG_VIM, 6)
-        self.display_line(d_y + 4, d_x, MSG_INFO, 5)
-        self.display_line(d_y + 5, d_x, MSG_SITE, 4)
+        self.display_line(d_y + 2, d_x, MSG_VIM, Color.ACTIVE_PANE)
+        self.display_line(d_y + 4, d_x, MSG_INFO, Color.DAYS)
+        self.display_line(d_y + 5, d_x, MSG_SITE, Color.TITLE)
 
 
 ########################## MAIN ###############################
@@ -661,7 +664,7 @@ def main(stdscr) -> None:
     daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
     journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
     help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
-    footer_view = FooterView(stdscr, screen.y_max - 1, 0, screen)
+    footer_view = FooterView(stdscr, 0, 0, screen)
     separator_view = SeparatorView(stdscr, 0, 0, screen)
 
     # Running different screens depending on the state:
@@ -676,8 +679,8 @@ def main(stdscr) -> None:
                 journal_screen_view.render()
             screen.active_pane = True
             monthly_screen_view.render()
-            footer_view.render()
             if screen.split: separator_view.render()
+            footer_view.render()
             control_monthly_screen(stdscr, user_events, screen, importer)
 
         # Daily (active) screen:
@@ -687,8 +690,8 @@ def main(stdscr) -> None:
                 journal_screen_view.render()
             screen.active_pane = True
             daily_screen_view.render()
-            footer_view.render()
             if screen.split: separator_view.render()
+            footer_view.render()
             control_daily_screen(stdscr, user_events, screen, importer)
 
         # Journal (active) screen:
@@ -698,8 +701,8 @@ def main(stdscr) -> None:
                 monthly_screen_view.render()
             screen.active_pane = True
             journal_screen_view.render()
-            footer_view.render()
             if screen.split: separator_view.render()
+            footer_view.render()
             control_journal_screen(stdscr, user_tasks, screen, importer)
 
         # Help screen:

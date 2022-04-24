@@ -29,6 +29,33 @@ class Frequency(enum.Enum):
     YEARLY = 5
 
 
+class Color(enum.Enum):
+    """Colors read from user config"""
+    DAY_NAMES = 1
+    WEEKENDS = 2
+    HINTS = 3
+    TODAY = 4
+    DAYS = 5
+    WEEKEND_NAMES = 6
+    BIRTHDAYS = 7
+    PROMPTS = 8
+    CONFIRMATIONS = 9
+    TITLE = 10
+    TODO = 11
+    DONE = 12
+    IMPORTANT = 13
+    TIMER = 14
+    TIMER_PAUSED = 15
+    HOLIDAYS = 16
+    EVENTS = 17
+    TIME = 18
+    WEATHER = 19
+    UNIMPORTANT = 20
+    CALENDAR_HEADER = 21
+    ACTIVE_PANE = 22
+    SEPARATOR = 23
+
+
 class Task:
     """Task crated by user"""
     def __init__(self, item_id, name, status, timer):
@@ -322,5 +349,3 @@ class RepeatedEvents(Events):
                 new_year = year + (month - 1)//12
                 new_month = month - 12*(new_year - year)
         return new_year, new_month, new_day
-
-

@@ -4,8 +4,9 @@ TITLE_KEYS_JOURNAL  = "JOURNAL KEYBINDINGS"
 
 KEYS_GENERAL = {
         ' Space ': 'Switch between calendar and journal',
-        '   ?   ': 'Toggle this help',
+        '   /   ': 'Toggle split screen',
         '   *   ': 'Toggle privacy mode',
+        '   ?   ': 'Toggle this help',
         '   q   ': 'Quit',
         }
 
