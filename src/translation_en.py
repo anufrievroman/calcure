@@ -8,6 +8,7 @@ KEYS_GENERAL = {
         '   *   ': 'Toggle privacy mode',
         '   q   ': 'Quit',
         }
+
 KEYS_CALENDAR = {
         '  a(A) ': 'Add a (recurring) event',
         '  n,🠒  ': 'Next month (day)',
@@ -70,6 +71,7 @@ MSG_TS_SUB        = 'Add subtask for task number: '
 MSG_TS_TITLE      = 'Enter subtask: '
 MSG_TS_IM         = "Import tasks from Calcurse? (y/n)"
 MSG_TS_TW         = "Import tasks from Taskwarrior? (y/n)"
+MSG_TS_NOTHING    = "Nothing planned..."
 
 CALENDAR_HINT = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 JOURNAL_HINT  = "Space · Switch to calendar   a · Add task   v · Done   i · Important   ? · All keybindings"

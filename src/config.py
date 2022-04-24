@@ -7,9 +7,9 @@ import getopt
 from translation_en import ERR_FILE1, ERR_FILE2
 from data import State
 
-class Config:
-    '''User configuration loaded from the config.ini file'''
 
+class Config:
+    """User configuration loaded from the config.ini file"""
     def __init__(self):
         self.taskwarrior_folder    = str(pathlib.Path.home()) + "/.task"
         self.calcurse_todo_file    = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
@@ -18,7 +18,7 @@ class Config:
         self.config_file           = self.config_folder + "/config.ini"
 
     def create_config_file(self):
-        '''Create config.ini file if it does not exist'''
+        """Create config.ini file if it does not exist"""
         if os.path.exists(self.config_file):
             return
 
@@ -134,7 +134,7 @@ class Config:
                 "concert":     "♪",
                 "dance":       "♪",
                 "music":       "♪",
-                "rehersal":    "♪",
+                "rehearsal":   "♪",
                 "call":        "🕻",
                 "phone":       "🕻",
                 "zoom":        "🕻",
@@ -162,7 +162,7 @@ class Config:
             conf.write(f)
 
     def read_config_file(self):
-        '''Read user config.ini file'''
+        """Read user config.ini file"""
         try:
             conf = configparser.ConfigParser()
             conf.read(self.config_file, 'utf-8')
@@ -277,11 +277,11 @@ class Config:
             exit()
 
     def read_config_file_from_user_arguments(self):
-        '''Read user config.ini location from user arguments'''
+        """Read user config.ini location from user arguments"""
         try:
             opts, args = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
             for opt, arg in opts:
-                if opt in ("--config"):
+                if opt in "--config":
                     self.config_file = arg
                     if not os.path.exists(self.config_file):
                         self.create_config_file()
@@ -289,11 +289,11 @@ class Config:
             pass
 
     def read_parameters_from_user_arguments(self):
-        '''Read user arguments that were provided at the run'''
+        """Read user arguments that were provided at the run"""
         try:
             opts, args = getopt.getopt(sys.argv[1:],"pjdchv",["folder=", "config="])
             for opt, arg in opts:
-                if opt in ('--folder'):
+                if opt in '--folder':
                     self.data_folder = arg
                     if not os.path.exists(self.data_folder):
                         os.makedirs(self.data_folder)
