@@ -70,7 +70,7 @@ class FileRepository:
                     frequency = Frequency.YEARLY
                 else:
                     try:
-                        frequency = Frequency(row[6].upper())
+                        frequency = Frequency[row[6].upper()]
                     except ValueError:
                         frequency = Frequency.ONCE
             else:

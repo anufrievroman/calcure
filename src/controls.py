@@ -138,8 +138,8 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
-    # except Exception:
-        # pass
+    except curses.error:
+        pass
 
 
 def control_daily_screen(stdscr, user_events, screen, importer):
@@ -257,7 +257,7 @@ def control_daily_screen(stdscr, user_events, screen, importer):
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
-    except Exception:
+    except curses.error:
         pass
 
 
@@ -389,7 +389,7 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
-    except Exception:
+    except curses.error:
         pass
 
 
@@ -418,5 +418,5 @@ def control_help_screen(stdscr, screen):
         if confirmed: screen.state = State.EXIT
 
     # Prevent crash if no input:
-    except Exception:
+    except curses.error:
         pass

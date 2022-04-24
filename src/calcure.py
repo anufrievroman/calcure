@@ -436,12 +436,13 @@ class DaysNameView(View):
         for i in range(7):
             shift = cf.START_WEEK_DAY - 1
             day_number = i + shift - 7 * ((i + shift) > 6)
-            name = calendar.day_name[day_number][:num].upper()
+            name = DAYS[day_number][:num]
             if day_number + 1 not in cf.WEEKEND_DAYS:
-                self.display_line(self.y, self.x + i * x_cell, name, 1, cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
+                self.display_line(self.y, self.x + i * x_cell, name, 1,
+                                cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
             else:
-                self.display_line(self.y, self.x + i * x_cell, name, 6, cf.BOLD_WEEKEND_NAMES,
-                                  cf.UNDERLINED_WEEKEND_NAMES)
+                self.display_line(self.y, self.x + i * x_cell, name, 6,
+                                cf.BOLD_WEEKEND_NAMES, cf.UNDERLINED_WEEKEND_NAMES)
 
 
 ##################### SCREENS ##########################
@@ -466,7 +467,7 @@ class DailyScreenView(View):
 
         # Form a string with month, year, and day with today icon:
         icon = cf.TODAY_ICON if self.screen.date == datetime.date.today() else ''
-        month_string = str(calendar.month_name[self.screen.month].upper())
+        month_string = str(MONTHS[self.screen.month])
         date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
 
         # Display header and footer:
@@ -498,7 +499,7 @@ class MonthlyScreenView(View):
         # self.fill_background()
 
         # Info about the month:
-        month_year_string = calendar.month_name[self.screen.month].upper() + " " + str(self.screen.year)
+        month_year_string = MONTHS[self.screen.month] + " " + str(self.screen.year)
         dates = calendar.Calendar(firstweekday=cf.START_WEEK_DAY - 1).monthdayscalendar(self.screen.year,
                                                                                         self.screen.month)
 

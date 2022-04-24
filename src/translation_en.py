@@ -78,3 +78,6 @@ JOURNAL_HINT  = "Space · Switch to calendar   a · Add task   v · Done   i · 
 
 ERR_FILE1 = "Looks like there is a problem in your config.ini file.Perhaps you edited it and entered a wrong line."
 ERR_FILE2 = "Try removing your config.ini file and run the program again, it will create a fresh working config file."
+
+DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+MONTHS = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]
