@@ -73,8 +73,8 @@ def ask_confirmation(stdscr, question, confirmations_enabled):
     curses.halfdelay(255)
     display_question(stdscr, y_max-2, 0, question, Color.CONFIRMATIONS)
     key = stdscr.getkey()
-    confirmed = 
-    return True if key == "y" else False
+    confirmed = True if key == "y" else False
+    return confirmed
 
 
 def vim_style_exit(stdscr, screen):

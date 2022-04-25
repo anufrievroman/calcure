@@ -71,7 +71,7 @@ class FileRepository:
                 else:
                     try:
                         frequency = Frequency[row[6].upper()]
-                    except ValueError:
+                    except (ValueError, KeyError):
                         frequency = Frequency.ONCE
             else:
                 repetition = '1'
@@ -199,7 +199,7 @@ class Importer:
             if not self.user_events.items:
                 event_id = 0
             else:
-                event_id = self.user_events.items[-1].id + 1
+                event_id = self.user_events.items[-1].item_id + 1
             imported_event = UserEvent(event_id, year, month, day, name, 1, Frequency.ONCE, Status.NORMAL)
             if not self.user_events.event_exists(imported_event):
                 self.user_events.add_item(imported_event)

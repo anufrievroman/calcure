@@ -32,7 +32,7 @@ class Screen:
         _, x_max = self.stdscr.getmaxyx()
         if x_max < 40:
             self.split = False
-        if self.split and self.state not in State.JOURNAL:
+        if self.split and self.state != State.JOURNAL:
             return x_max - self.journal_pane_width
         else:
             return x_max
