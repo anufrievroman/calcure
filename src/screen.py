@@ -1,3 +1,5 @@
+"""Module that controls the overal state of the program"""
+
 import datetime
 from data import Events, State
 
@@ -21,31 +23,31 @@ class Screen:
 
     @property
     def journal_pane_width(self):
+        """Calculate the widht of the right pane"""
         _, x_max = self.stdscr.getmaxyx()
         if 0 < self.right_pane_percentage < 99:
             return int(x_max//(100/self.right_pane_percentage))
-        else:
-            return x_max//4
+        return x_max//4
 
     @property
     def x_max(self):
+        """Calculate the right boundary of the screen"""
         _, x_max = self.stdscr.getmaxyx()
         if x_max < 40:
             self.split = False
         if self.split and self.state != State.JOURNAL:
             return x_max - self.journal_pane_width
-        else:
-            return x_max
+        return x_max
 
     @property
     def x_min(self):
+        """Calculate the left boundary of the screen"""
         _, x_max = self.stdscr.getmaxyx()
         if x_max < self.journal_pane_width:
             self.split = False
         if self.split and self.state == State.JOURNAL:
             return x_max - self.journal_pane_width + 2
-        else:
-            return 0
+        return 0
 
     @property
     def date(self) -> datetime:
@@ -104,4 +106,4 @@ class Screen:
         """Check if input corresponds to a date this month"""
         if number is None:
             return False
-        return True if (0 < number <= Events.monthrange_gregorian(self.year, self.month)) else False
+        return 0 < number <= Events.monthrange_gregorian(self.year, self.month)

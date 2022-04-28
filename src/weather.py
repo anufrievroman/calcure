@@ -1,8 +1,11 @@
+"""Module that controls the weather storing and loading"""
+
 import subprocess
 
 
 class Weather:
     """Information about the weather today"""
+
     def __init__(self, city):
         self.city = city
         self.forcast = None
@@ -13,7 +16,8 @@ class Weather:
         try:
             request_url = f"wttr.in/{self.city}?format=3"
             self.forcast = str(subprocess.check_output(["curl", "-s", request_url],
-                                                       timeout=self.max_load_time, encoding='utf-8'))[:-1]
+                                                        timeout=self.max_load_time,
+                                                        encoding='utf-8'))[:-1]
             self.forcast = self.forcast.split(':')[1]
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError, IndexError):
             self.forcast = None

@@ -1,3 +1,5 @@
+"""Module provides datatypes used in the program"""
+
 import time
 import datetime
 import enum
@@ -156,7 +158,7 @@ class Collection:
 
     def delete_item(self, selected_task_id):
         """Delete an item with provided id from the collection"""
-        for index, item in enumerate(self.items):
+        for item in self.items:
             if item.item_id == selected_task_id:
                 self.items.remove(item)
                 self.changed = True
@@ -200,13 +202,13 @@ class Collection:
 
     def is_empty(self):
         """Check if the collection is empty"""
-        return True if len(self.items) == 0 else False
+        return len(self.items) == 0
 
     def is_valid_number(self, number):
         """Check if input is valid and corresponds to an item"""
         if number is None:
             return False
-        return True if (0 <= number < len(self.items)) else False
+        return 0 <= number < len(self.items)
 
 
 class Tasks(Collection):
@@ -216,36 +218,32 @@ class Tasks(Collection):
         """Add a subtask for certain task in the journal"""
         level = '----'if (self.items[number].name[:2] == '--') else '--'
         task.name = level + task.name
-        if len(task.name) > 0:
+        if 100 > len(task.name) > 0:
             self.items.insert(number+1, task)
             self.changed = True
 
     def add_timestamp_for_task(self, number):
         """Add a timestamp to this task"""
-        if self.is_valid_number(number):
-            self.items[number].timer.stamps.append(int(time.time()))
-            self.changed = True
+        self.items[number].timer.stamps.append(int(time.time()))
+        self.changed = True
 
     def reset_timer_for_task(self, number):
         """Reset the timer for one of the tasks"""
-        if self.is_valid_number(number):
-            self.items[number].timer.stamps = []
-            self.changed = True
+        self.items[number].timer.stamps = []
+        self.changed = True
 
     def toggle_subtask_state(self, number):
         """Toggle the state of the task-subtask"""
-        if self.is_valid_number(number):
-            if self.items[number].name[:2] == '--':
-                self.items[number].name = self.items[number].name[2:]
-            else:
-                self.items[number].name = '--' + self.items[number].name
-            self.changed = True
+        if self.items[number].name[:2] == '--':
+            self.items[number].name = self.items[number].name[2:]
+        else:
+            self.items[number].name = '--' + self.items[number].name
+        self.changed = True
 
     def move_task(self, number_from, number_to):
         """Move task from certain place to another in the list"""
-        if self.is_valid_number(number_to):
-            self.items.insert(number_to, self.items.pop(number_from))
-            self.changed = True
+        self.items.insert(number_to, self.items.pop(number_from))
+        self.changed = True
 
 
 class Events(Collection):
@@ -313,10 +311,10 @@ class RepeatedEvents(Events):
         self.user_events = user_events
         for event in self.user_events.items:
             if event.repetition >= 1:
-                for r in range(1, event.repetition):
-                    temp_year = event.year + r*(event.frequency == Frequency.YEARLY)
-                    temp_month = event.month + r*(event.frequency == Frequency.MONTHLY)
-                    temp_day = event.day + r*(event.frequency == Frequency.DAILY) + 7*r*(event.frequency == Frequency.WEEKLY)
+                for rep in range(1, event.repetition):
+                    temp_year = event.year + rep*(event.frequency == Frequency.YEARLY)
+                    temp_month = event.month + rep*(event.frequency == Frequency.MONTHLY)
+                    temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + 7*rep*(event.frequency == Frequency.WEEKLY)
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
                     self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status))
 

@@ -1,6 +1,7 @@
+""" This module contains functions that react to user input """
 import curses
 
-from config import cf
+from configuration import cf
 from translation_en import *
 from data import *
 from dialogues import *
@@ -270,28 +271,34 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             # Timer operations:
             if screen.key == 't':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_ADD)
-                user_tasks.add_timestamp_for_task(number)
+                if user_tasks.is_valid_number(number):
+                    user_tasks.add_timestamp_for_task(number)
             if screen.key == 'T':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
-                user_tasks.reset_timer_for_task(number)
+                if user_tasks.is_valid_number(number):
+                    user_tasks.reset_timer_for_task(number)
 
             # Change the status:
             if screen.key in ['i', 'h']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_HIGH)
-                task_id = user_tasks.items[number].item_id
-                user_tasks.toggle_item_status(task_id, Status.IMPORTANT)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_item_status(task_id, Status.IMPORTANT)
             if screen.key == 'l':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                task_id = user_tasks.items[number].item_id
-                user_tasks.toggle_item_status(task_id, Status.UNIMPORTANT)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_item_status(task_id, Status.UNIMPORTANT)
             if screen.key == 'u':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_RES)
-                task_id = user_tasks.items[number].item_id
-                user_tasks.toggle_item_status(task_id, Status.NORMAL)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_item_status(task_id, Status.NORMAL)
             if screen.key == 'v':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
-                task_id = user_tasks.items[number].item_id
-                user_tasks.toggle_item_status(task_id, Status.DONE)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_item_status(task_id, Status.DONE)
 
             # Modify the task:
             if screen.key in ['d', 'x']:
@@ -315,7 +322,8 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             # Subtask operations:
             if screen.key == 's':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_TOG)
-                user_tasks.toggle_subtask_state(number)
+                if user_tasks.is_valid_number(number):
+                    user_tasks.toggle_subtask_state(number)
             if screen.key == 'A':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_SUB)
                 if user_tasks.is_valid_number(number):

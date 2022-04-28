@@ -1,3 +1,5 @@
+""" This module creates and loads user config file """
+
 import os
 import pathlib
 import configparser
@@ -279,7 +281,7 @@ class Config:
     def read_config_file_from_user_arguments(self):
         """Read user config.ini location from user arguments"""
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
+            opts, _ = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
             for opt, arg in opts:
                 if opt in "--config":
                     self.config_file = arg
@@ -291,7 +293,7 @@ class Config:
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run"""
         try:
-            opts, args = getopt.getopt(sys.argv[1:],"pjdchv",["folder=", "config="])
+            opts, _ = getopt.getopt(sys.argv[1:],"pjdchv",["folder=", "config="])
             for opt, arg in opts:
                 if opt in '--folder':
                     self.data_folder = arg

@@ -1,3 +1,5 @@
+"""Module that controls import and export of the user data"""
+
 import configparser
 import pathlib
 import csv
@@ -22,14 +24,14 @@ class FileRepository:
         """Try to read a csv file or create if it does not exist"""
         # Try to read the file line by line:
         try:
-            with open(file, "r") as f:
+            with open(file, "r", encoding="utf-8") as f:
                 read_lines = csv.reader(f, delimiter = ',')
                 return [line for line in read_lines]
 
         # Create file if it does not exist:
         except IOError:
             try:
-                with open(file, "w+") as f:
+                with open(file, "w+", encoding="utf-8") as f:
                     pass
                 return []
             # Pass if there was a problem with file system:
@@ -89,7 +91,7 @@ class FileRepository:
         """Rewrite the data file with changed tasks"""
         original_file = self.tasks_file
         dummy_file = self.tasks_file + '.bak'
-        with open(dummy_file, "w") as f:
+        with open(dummy_file, "w", encoding="utf-8") as f:
             for task in self.user_tasks.items:
                 f.write(f'"{task.name}",{task.status.name.lower()}')
                 for stamp in task.timer.stamps:
@@ -103,7 +105,7 @@ class FileRepository:
         """Rewrite the data file with changed events"""
         original_file = self.events_file
         dummy_file = self.events_file + '.bak'
-        with open(dummy_file, "w") as f:
+        with open(dummy_file, "w", encoding="utf-8") as f:
             for ev in self.user_events.items:
                 f.write(f'{ev.item_id},{ev.year},{ev.month},{ev.day},"{ev.name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
         os.remove(original_file)
@@ -149,7 +151,7 @@ class Importer:
     def read_file(self, file):
         """Try to read a file and return its lines"""
         try:
-            with open(file, "r") as f:
+            with open(file, "r", encoding="utf-8") as f:
                 lines = f.readlines()
             return lines
         except (IOError, FileNotFoundError, NameError):
@@ -200,6 +202,7 @@ class Importer:
                 event_id = 0
             else:
                 event_id = self.user_events.items[-1].item_id + 1
-            imported_event = UserEvent(event_id, year, month, day, name, 1, Frequency.ONCE, Status.NORMAL)
+            imported_event = UserEvent(event_id, year, month, day, name, 1,
+                                       Frequency.ONCE, Status.NORMAL)
             if not self.user_events.event_exists(imported_event):
                 self.user_events.add_item(imported_event)

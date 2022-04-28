@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+""" This is the main module that contains views and the main logic"""
+
 # Libraries
 import curses
 import datetime
@@ -6,7 +7,7 @@ import calendar
 import time
 
 # Modules
-from config import cf
+from configuration import cf
 from weather import Weather
 from repository import Importer, FileRepository
 from dialogues import clear_line
@@ -19,7 +20,7 @@ from controls import *
 __version__ = "2.0.0"
 
 
-def initialize_colors(stdscr):
+def initialize_colors():
     """Define all the color pairs"""
     curses.start_color()
     curses.use_default_colors()
@@ -56,7 +57,7 @@ def initialize_colors(stdscr):
 
 
 class View:
-    """Parent class of a view that displays information at certain coordinates"""
+    """Parent class of a view  displays things at certain coordinates"""
     def __init__(self, stdscr, y, x):
         self.stdscr = stdscr
         self.y = y
@@ -73,7 +74,8 @@ class View:
 
         # Make sure that we display inside the screen:
         y_max, x_max = self.stdscr.getmaxyx()
-        if y >= y_max or x >= x_max: return
+        if y >= y_max or x >= x_max:
+            return
 
         # Cut the text if it does not fit the screen:
         text = text[:(x_max - 1 - x)]
@@ -131,18 +133,16 @@ class TaskView(View):
         """Calculate the tab depending on the task level"""
         if self.task.name[:4] == '----':
             return 4
-        elif self.task.name[:2] == '--':
+        if self.task.name[:2] == '--':
             return 2
-        else:
-            return 0
+        return 0
 
     @property
     def title(self):
         """Obfuscate the name if privacy mode is on"""
         if self.screen.privacy:
             return cf.PRIVACY_ICON * len(self.task.name[self.tab:])
-        else:
-            return self.task.name[self.tab:]
+        return self.task.name[self.tab:]
 
     def render(self):
         """Display a line with an icon, task, and timer"""
@@ -224,8 +224,7 @@ class EventView(View):
         """Obfuscate the info if privacy mode is on"""
         if privacy:
             return cf.PRIVACY_ICON * len(self.event.name)
-        else:
-            return self.event.name
+        return self.event.name
 
     def cut_name(self, title):
         """Cut the name to fit into the cell of the calendar"""
@@ -257,8 +256,9 @@ class UserEventView(EventView):
 
 
 class BirthdayView(EventView):
+    """Display a line with birthday icon and name"""
     def render(self):
-        """Display a line with birthday icon and name"""
+        """Display a line with an birthday"""
         title = self.obfuscate_name(self.screen.privacy)
         title = self.cut_name(title)
         self.display_line(self.y, self.x, f'{cf.BIRTHDAY_ICON} {title}', Color.BIRTHDAYS)
@@ -287,28 +287,13 @@ class DailyView(View):
         """Display all events occuring on this days"""
         index = 0
 
-        # Show holidays:
-        if not cf.DISPLAY_HOLIDAYS: return
-        for event in self.holidays.items:
-            holiday_view = HolidayView(self.stdscr, self.y + index, self.x, event, self.screen)
-            holiday_view.render()
-            index += 1
-
-        # Show birthdays:
-        if not cf.BIRTHDAYS_FROM_ABOOK: return
-        for event in self.birthdays.items:
-            if event.day == self.screen.day and event.month == self.screen.month:
-                birthday_view = BirthdayView(self.stdscr, self.y + index, self.x, event, self.screen)
-                birthday_view.render()
-                index += 1
-
         # Show user events:
         for event in self.user_events.items:
             if index < self.y_cell - 2:
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
                 if self.screen.selection_mode:
-                    self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), 4)
+                    self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.TODAY)
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, Color.EVENTS)
             index += 1
@@ -321,6 +306,23 @@ class DailyView(View):
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, cf.HIDDEN_ICON, Color.EVENTS)
             index += 1
+
+        # Show holidays:
+        if not cf.DISPLAY_HOLIDAYS:
+            return
+        for event in self.holidays.items:
+            holiday_view = HolidayView(self.stdscr, self.y + index, self.x, event, self.screen)
+            holiday_view.render()
+            index += 1
+
+        # Show birthdays:
+        if not cf.BIRTHDAYS_FROM_ABOOK:
+            return
+        for event in self.birthdays.items:
+            if event.day == self.screen.day and event.month == self.screen.month:
+                birthday_view = BirthdayView(self.stdscr, self.y + index, self.x, event, self.screen)
+                birthday_view.render()
+                index += 1
 
 
 ##################### ADDITIONAL VIEWS ##############################
@@ -336,17 +338,15 @@ class DayNumberView(View):
 
     def render(self):
         """Display number of the day in month with proper styling"""
-        # Today:
         if datetime.date(self.screen.year, self.screen.month, self.day) == datetime.date.today():
-            self.display_line(self.y, self.x, str(self.day) + cf.TODAY_ICON + ' ' * self.x_cell, Color.TODAY, cf.BOLD_TODAY,
-                              cf.UNDERLINED_TODAY)
-        # Weekend days:
+            today = f"{self.day}{cf.TODAY_ICON}{' '* self.x_cell}"
+            self.display_line(self.y, self.x, today, Color.TODAY, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
         elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
-            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, Color.WEEKENDS, cf.BOLD_WEEKENDS,
-                              cf.UNDERLINED_WEEKENDS)
-        # Week days:
+            weekend = f"{self.day}{' '*self.x_cell}"
+            self.display_line(self.y, self.x, weekend, Color.WEEKENDS, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
         else:
-            self.display_line(self.y, self.x, str(self.day) + ' ' * self.x_cell, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
+            weekday = f"{self.day}{' '*self.x_cell}"
+            self.display_line(self.y, self.x, weekday, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 
 class TitleView(View):
@@ -432,20 +432,19 @@ class DaysNameView(View):
 
     def render(self):
         if not cf.SHOW_DAY_NAMES: return
-
         num = 2 if self.screen.x_max < 80 else 10
         x_cell = int(self.screen.x_max // 7)
+
         # Depending on which day we start the week, weekends are shifted:
         for i in range(7):
             shift = cf.START_WEEK_DAY - 1
-            day_number = i + shift - 7 * ((i + shift) > 6)
+            day_number = i + shift - 7*((i + shift) > 6)
             name = DAYS[day_number][:num]
+            x = self.x + i*x_cell
             if day_number + 1 not in cf.WEEKEND_DAYS:
-                self.display_line(self.y, self.x + i * x_cell, name, Color.DAY_NAMES,
-                                    cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
+                self.display_line(self.y, x, name, Color.DAY_NAMES, cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
             else:
-                self.display_line(self.y, self.x + i * x_cell, name, Color.WEEKEND_NAMES,
-                                    cf.BOLD_WEEKEND_NAMES, cf.UNDERLINED_WEEKEND_NAMES)
+                self.display_line(self.y, x, name, Color.WEEKEND_NAMES, cf.BOLD_WEEKEND_NAMES, cf.UNDERLINED_WEEKEND_NAMES)
 
 
 ##################### SCREENS ##########################
@@ -553,7 +552,8 @@ class JournalScreenView(View):
     def render(self):
         """Journal view showing all tasks"""
         self.screen.state = State.JOURNAL
-        if self.screen.x_max < 6 or self.screen.y_max < 3: return
+        if self.screen.x_max < 6 or self.screen.y_max < 3:
+            return
         # self.fill_background()
 
         # Check if any of the timers is counting, and increase the update time:
@@ -597,7 +597,8 @@ class HelpScreenView(View):
     def render(self):
         """Draw the help screen"""
         self.calibrate_position()
-        if self.x_max < 6 or self.y_max < 3: return
+        if self.x_max < 6 or self.y_max < 3:
+            return
         curses.halfdelay(255)
         self.stdscr.clear()
         self.fill_background()
@@ -651,13 +652,13 @@ def main(stdscr) -> None:
     holidays = file_repository.load_holidays()
     birthdays = file_repository.load_birthdays_from_abook()
     importer = Importer(user_tasks, user_events, cf.TASKS_FILE, cf.EVENTS_FILE,
-                        cf.CALCURSE_TODO_FILE, cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER)
+                cf.CALCURSE_TODO_FILE, cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER)
 
     # Initialise terminal screen:
     stdscr = curses.initscr()
     curses.noecho()
     curses.curs_set(False)
-    initialize_colors(stdscr)
+    initialize_colors()
 
     # Initialise screen views:
     monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
