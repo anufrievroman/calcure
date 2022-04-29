@@ -81,7 +81,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                 day = input_day(stdscr, screen.y_max-2, 0, question)
                 if screen.is_valid_day(day):
                     screen.day = day
-                    screen.state = State.DAILY
+                    screen.calendar_state = CalState.DAILY
 
             # Add single event:
             if screen.key == "a":
@@ -115,15 +115,16 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
             # Other actions:
             if vim_style_exit(stdscr, screen):
                 confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-                if confirmed: screen.state = State.EXIT
-            if screen.key == "*": screen.privacy = not screen.privacy
+                screen.state = AppState.EXIT if confirmed else screen.state
+            if screen.key == "*":
+                screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = State.JOURNAL
+                screen.state = AppState.JOURNAL
             if screen.key == "?":
-                screen.state = State.HELP
-            if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
+                screen.state = AppState.HELP
+            if screen.key in ["q", "\b", "\x7f"]:
                 confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-                if confirmed: screen.state = State.EXIT
+                screen.state = AppState.EXIT if confirmed else screen.state
             if screen.key in ["/"]:
                 screen.split = not screen.split
                 screen.refresh_now = True
@@ -136,7 +137,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
     # Handle keyboard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-        if confirmed: screen.state = State.EXIT
+        screen.state = AppState.EXIT if confirmed else screen.state
 
     # Prevent crash if no input:
     except curses.error:
@@ -235,14 +236,15 @@ def control_daily_screen(stdscr, user_events, screen, importer):
             # Other actions:
             if vim_style_exit(stdscr, screen):
                 confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-                if confirmed: screen.state = State.EXIT
-            if screen.key == "*": screen.privacy = not screen.privacy
+                screen.state = AppState.EXIT if confirmed else screen.state
+            if screen.key == "*":
+                screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = State.JOURNAL
+                screen.state = AppState.JOURNAL
             if screen.key == "?":
-                screen.state = State.HELP
+                screen.state = AppState.HELP
             if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
-                screen.state = State.MONTHLY
+                screen.calendar_state = CalState.MONTHLY
             if screen.key in ["/"]:
                 screen.split = not screen.split
                 screen.refresh_now = True
@@ -255,7 +257,7 @@ def control_daily_screen(stdscr, user_events, screen, importer):
     # Handle keyboard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-        if confirmed: screen.state = State.EXIT
+        screen.state = AppState.EXIT if confirmed else screen.state
 
     # Prevent crash if no input:
     except curses.error:
@@ -373,15 +375,16 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             # Other actions:
             if vim_style_exit(stdscr, screen):
                 confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-                if confirmed: screen.state = State.EXIT
-            if screen.key == "*": screen.privacy = not screen.privacy
+                screen.state = AppState.EXIT if confirmed else screen.state
+            if screen.key == "*":
+                screen.privacy = not screen.privacy
             if screen.key in [" ", "KEY_BTAB"]:
-                screen.state = State.MONTHLY
+                screen.state = AppState.CALENDAR
             if screen.key == "?":
-                screen.state = State.HELP
+                screen.state = AppState.HELP
             if screen.key == "q":
                 confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-                if confirmed: screen.state = State.EXIT
+                screen.state = AppState.EXIT if confirmed else screen.state
             if screen.key in ["/"]:
                 screen.split = not screen.split
                 screen.refresh_now = True
@@ -393,7 +396,7 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-        if confirmed: screen.state = State.EXIT
+        screen.state = AppState.EXIT if confirmed else screen.state
 
     # Prevent crash if no input:
     except curses.error:
@@ -409,11 +412,11 @@ def control_help_screen(stdscr, screen):
         # Handle vim-style exit on "ZZ" and "ZQ":
         if vim_style_exit(stdscr, screen):
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-            if confirmed: screen.state = State.EXIT
+            screen.state = AppState.EXIT if confirmed else screen.state
 
         # Handle keys to exit the help screen:
         if screen.key in [" ", "?", "q", "KEY_BACKSPACE", "^[", "\x7f"]:
-            screen.state = State.MONTHLY
+            screen.state = AppState.CALENDAR
 
         # Handle screen resize:
         if screen.key == "KEY_RESIZE":
@@ -421,7 +424,7 @@ def control_help_screen(stdscr, screen):
 
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
-        if confirmed: screen.state = State.EXIT
+        screen.state = AppState.EXIT if confirmed else screen.state
 
     # Prevent crash if no input:
     except curses.error:

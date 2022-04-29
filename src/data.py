@@ -5,13 +5,18 @@ import datetime
 import enum
 
 
-class State(enum.Enum):
-    """Possible states of the screen"""
-    EXIT = 1
-    MONTHLY = 2
-    DAILY = 3
-    JOURNAL = 4
-    HELP = 5
+class AppState(enum.Enum):
+    """Possible focus states of the application"""
+    CALENDAR = 1
+    JOURNAL = 2
+    HELP = 3
+    EXIT = 4
+
+
+class CalState(enum.Enum):
+    """Possible states of the calendar view"""
+    MONTHLY = 1
+    DAILY = 2
 
 
 class Status(enum.Enum):

@@ -7,7 +7,7 @@ import sys
 import getopt
 
 from translation_en import ERR_FILE1, ERR_FILE2
-from data import State
+from data import AppState
 
 
 class Config:
@@ -48,6 +48,7 @@ class Config:
                 "use_unicode_icons":         "Yes",
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
+                "show_nothing_planned":      "Yes",
                 "holiday_country":           "UnitedStates",
                 "start_week_day":            "1",
                 "weekend_days":              "6,7",
@@ -172,11 +173,9 @@ class Config:
             # Reading default view:
             default_view = conf.get("Parameters", "default_view", fallback="calendar")
             if default_view == 'calendar':
-                self.DEFAULT_VIEW = State.MONTHLY
-            elif default_view == 'journal':
-                self.DEFAULT_VIEW = State.JOURNAL
-            elif default_view == 'daily':
-                self.DEFAULT_VIEW = State.DAILY
+                self.DEFAULT_VIEW = AppState.CALENDAR
+            if default_view == 'journal':
+                self.DEFAULT_VIEW = AppState.JOURNAL
 
             # Calendar settings:
             self.SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
@@ -193,6 +192,7 @@ class Config:
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
+            self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
@@ -293,7 +293,7 @@ class Config:
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run"""
         try:
-            opts, _ = getopt.getopt(sys.argv[1:],"pjdchv",["folder=", "config="])
+            opts, _ = getopt.getopt(sys.argv[1:],"pjchv",["folder=", "config="])
             for opt, arg in opts:
                 if opt in '--folder':
                     self.data_folder = arg
@@ -304,15 +304,13 @@ class Config:
                 elif opt == '-p':
                     self.PRIVACY_MODE = True
                 elif opt == '-j':
-                    self.DEFAULT_VIEW = State.JOURNAL
-                elif opt == '-d':
-                    self.DEFAULT_VIEW = State.DAILY
+                    self.DEFAULT_VIEW = AppState.JOURNAL
                 elif opt == '-c':
-                    self.DEFAULT_VIEW = State.MONTHLY
+                    self.DEFAULT_VIEW = AppState.MONTHLY
                 elif opt in ('-h'):
-                    self.DEFAULT_VIEW = State.HELP
+                    self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
-                    self.DEFAULT_VIEW = State.EXIT
+                    self.DEFAULT_VIEW = AppState.EXIT
                     print ('Calcure - version 2.0')
         except getopt.GetoptError:
             pass

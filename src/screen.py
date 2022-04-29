@@ -1,7 +1,7 @@
 """Module that controls the overal state of the program"""
 
 import datetime
-from data import Events, State
+from data import Events, AppState, CalState
 
 
 class Screen:
@@ -14,6 +14,7 @@ class Screen:
         self.privacy = privacy
         self.state = state
         self.right_pane_percentage = right_pane_percentage
+        self.calendar_state = CalState.MONTHLY
         self.split = split
         self.active_pane = False
         self.selection_mode = False
@@ -35,7 +36,7 @@ class Screen:
         _, x_max = self.stdscr.getmaxyx()
         if x_max < 40:
             self.split = False
-        if self.split and self.state != State.JOURNAL:
+        if self.split and self.state != AppState.JOURNAL:
             return x_max - self.journal_pane_width
         return x_max
 
@@ -45,7 +46,7 @@ class Screen:
         _, x_max = self.stdscr.getmaxyx()
         if x_max < self.journal_pane_width:
             self.split = False
-        if self.split and self.state == State.JOURNAL:
+        if self.split and self.state == AppState.JOURNAL:
             return x_max - self.journal_pane_width + 2
         return 0
 

@@ -1,4 +1,4 @@
-""" This is the main module that contains views and the main logic"""
+"""This is the main module that contains views and the main logic"""
 
 # Libraries
 import curses
@@ -58,6 +58,7 @@ def initialize_colors():
 
 class View:
     """Parent class of a view  displays things at certain coordinates"""
+
     def __init__(self, stdscr, y, x):
         self.stdscr = stdscr
         self.y = y
@@ -95,6 +96,7 @@ class View:
 
 class TaskView(View):
     """Display a single task"""
+
     def __init__(self, stdscr, y, x, task, screen):
         super().__init__(stdscr, y, x)
         self.task = task
@@ -145,7 +147,7 @@ class TaskView(View):
         return self.task.name[self.tab:]
 
     def render(self):
-        """Display a line with an icon, task, and timer"""
+        """Render a line with an icon, task, and timer"""
         self.display_line(self.y, self.x + self.tab, f'{self.icon} {self.title}', self.color)
         timer_view = TimerView(self.stdscr, self.y, self.screen.x_min + 5 + len(self.task.name), self.task.timer)
         timer_view.render()
@@ -153,6 +155,7 @@ class TaskView(View):
 
 class TimerView(View):
     """Display a single task"""
+
     def __init__(self, stdscr, y, x, timer):
         super().__init__(stdscr, y, x)
         self.timer = timer
@@ -175,14 +178,15 @@ class TimerView(View):
         return icon
 
     def render(self):
-        """Display a line with a timer and icon"""
+        """Render a line with a timer and icon"""
         if self.timer.is_started:
             time_string = self.icon + self.timer.passed_time
             self.display_line(self.y, self.x, time_string, self.color)
 
 
 class JournalView(View):
-    """Displays a list of tasks"""
+    """Displays a list of all tasks"""
+
     def __init__(self, stdscr, y, x, user_tasks, screen):
         super().__init__(stdscr, y, x)
         self.user_tasks = user_tasks
@@ -190,7 +194,7 @@ class JournalView(View):
 
     def render(self):
         """Render the list of tasks"""
-        if not self.user_tasks.items:
+        if not self.user_tasks.items and cf.SHOW_NOTHING_PLANNED:
             self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
         for index, task in enumerate(self.user_tasks.items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
@@ -205,6 +209,7 @@ class JournalView(View):
 
 class EventView(View):
     """Parent class to display events"""
+
     def __init__(self, stdscr, y, x, event, screen):
         super().__init__(stdscr, y, x)
         self.event = event
@@ -229,7 +234,7 @@ class EventView(View):
     def cut_name(self, title):
         """Cut the name to fit into the cell of the calendar"""
         title = title[:self.screen.x_max - self.x - 2]
-        if cf.CUT_TITLES and self.screen.state == State.MONTHLY:
+        if cf.CUT_TITLES and self.screen.state == AppState.MONTHLY:
             x_cell = self.screen.x_max // 7
             title = title[:(x_cell - 2)]
         return title
@@ -237,6 +242,7 @@ class EventView(View):
 
 class UserEventView(EventView):
     """Display a single user event"""
+
     @property
     def icon(self):
         """Select the right icon for the event"""
@@ -249,7 +255,7 @@ class UserEventView(EventView):
         return icon
 
     def render(self):
-        """Display a line with an event"""
+        """Render this view on the scren"""
         title = self.obfuscate_name(self.screen.privacy)
         title = self.cut_name(title)
         self.display_line(self.y, self.x, f'{self.icon} {title}', self.color)
@@ -257,21 +263,26 @@ class UserEventView(EventView):
 
 class BirthdayView(EventView):
     """Display a line with birthday icon and name"""
+
     def render(self):
-        """Display a line with an birthday"""
+        """Render this view on the scren"""
         title = self.obfuscate_name(self.screen.privacy)
         title = self.cut_name(title)
         self.display_line(self.y, self.x, f'{cf.BIRTHDAY_ICON} {title}', Color.BIRTHDAYS)
 
 
 class HolidayView(EventView):
+    """Display a line with holiday icon and occasion"""
+
     def render(self):
-        """Display a line with holiday icon and occasion"""
+        """Render this view on the scren"""
         title = self.cut_name(self.event.name)
         self.display_line(self.y, self.x, f'{cf.HOLIDAY_ICON} {title}', Color.HOLIDAYS)
 
 
 class DailyView(View):
+    """Display all events occuring on this days"""
+
     def __init__(self, stdscr, y, x, repeated_user_events, user_events, holidays, birthdays, screen, index_offset):
         super().__init__(stdscr, y, x)
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
@@ -284,7 +295,7 @@ class DailyView(View):
         self.x_cell = self.screen.x_max // 7
 
     def render(self):
-        """Display all events occuring on this days"""
+        """Render this view on the scren"""
         index = 0
 
         # Show user events:
@@ -324,11 +335,16 @@ class DailyView(View):
                 birthday_view.render()
                 index += 1
 
+        if index == 0 and self.screen.calendar_state == CalState.DAILY and cf.SHOW_NOTHING_PLANNED:
+            self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
+
 
 ##################### ADDITIONAL VIEWS ##############################
 
 
 class DayNumberView(View):
+    """Display the date of the day in month with proper styling"""
+
     def __init__(self, stdscr, y, x, screen, day, day_in_week, x_cell):
         super().__init__(stdscr, y, x)
         self.screen = screen
@@ -337,7 +353,7 @@ class DayNumberView(View):
         self.x_cell = x_cell
 
     def render(self):
-        """Display number of the day in month with proper styling"""
+        """Render this view on the scren"""
         if datetime.date(self.screen.year, self.screen.month, self.day) == datetime.date.today():
             today = f"{self.day}{cf.TODAY_ICON}{' '* self.x_cell}"
             self.display_line(self.y, self.x, today, Color.TODAY, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
@@ -358,6 +374,7 @@ class TitleView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the scren"""
         if self.screen.active_pane and self.screen.split:
             self.display_line(0, self.screen.x_min, self.title, Color.ACTIVE_PANE, cf.BOLD_ACTIVE_PANE, cf.UNDERLINED_ACTIVE_PANE)
         else:
@@ -380,7 +397,7 @@ class HeaderView(View):
         title_view = TitleView(self.stdscr, 0, self.screen.x_min, self.title, self.screen)
         title_view.render()
 
-        if self.screen.state == State.JOURNAL and self.screen.split:
+        if self.screen.state == AppState.JOURNAL and self.screen.split:
             return
 
         # Show time:
@@ -403,10 +420,14 @@ class FooterView(View):
     def render(self):
         if not cf.SHOW_KEYBINDINGS: return
         clear_line(self.stdscr, self.screen.y_max - 1)
-        if self.screen.state in [State.MONTHLY, State.DAILY]:
-            self.display_line(self.screen.y_max - 1, 0, CALENDAR_HINT, Color.HINTS)
-        elif self.screen.state == State.JOURNAL:
-            self.display_line(self.screen.y_max - 1, 0, JOURNAL_HINT, Color.HINTS)
+        if self.screen.state == AppState.CALENDAR:
+            if self.screen.calendar_state == CalState.MONTHLY:
+                hint = CALENDAR_HINT
+            else:
+                hint = CALENDAR_HINT_D
+        elif self.screen.state == AppState.JOURNAL:
+            hint = JOURNAL_HINT
+        self.display_line(self.screen.y_max - 1, 0, hint, Color.HINTS)
 
 
 class SeparatorView(View):
@@ -462,7 +483,7 @@ class DailyScreenView(View):
         self.screen = screen
 
     def render(self):
-        self.screen.state = State.DAILY
+        self.screen.state = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
         # self.fill_background()
         curses.halfdelay(255)
@@ -495,7 +516,7 @@ class MonthlyScreenView(View):
         self.screen = screen
 
     def render(self):
-        self.screen.state = State.MONTHLY
+        self.screen.state = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
         curses.halfdelay(100)
         # self.fill_background()
@@ -551,7 +572,7 @@ class JournalScreenView(View):
 
     def render(self):
         """Journal view showing all tasks"""
-        self.screen.state = State.JOURNAL
+        self.screen.state = AppState.JOURNAL
         if self.screen.x_max < 6 or self.screen.y_max < 3:
             return
         # self.fill_background()
@@ -669,12 +690,12 @@ def main(stdscr) -> None:
     separator_view = SeparatorView(stdscr, 0, 0, screen)
 
     # Running different screens depending on the state:
-    while screen.state != State.EXIT:
+    while screen.state != AppState.EXIT:
         if not screen.split: stdscr.clear()
         screen.active_pane = False
 
         # Monthly (active) screen:
-        if screen.state == State.MONTHLY:
+        if screen.state == AppState.CALENDAR and screen.calendar_state == CalState.MONTHLY:
             if screen.split and not screen.selection_mode:
                 stdscr.clear()
                 journal_screen_view.render()
@@ -685,7 +706,7 @@ def main(stdscr) -> None:
             control_monthly_screen(stdscr, user_events, screen, importer)
 
         # Daily (active) screen:
-        elif screen.state == State.DAILY:
+        elif screen.state == AppState.CALENDAR and screen.calendar_state == CalState.DAILY:
             if screen.split and not screen.selection_mode:
                 stdscr.clear()
                 journal_screen_view.render()
@@ -696,10 +717,13 @@ def main(stdscr) -> None:
             control_daily_screen(stdscr, user_events, screen, importer)
 
         # Journal (active) screen:
-        elif screen.state == State.JOURNAL:
+        elif screen.state == AppState.JOURNAL:
             if screen.split and not screen.selection_mode:
                 if screen.refresh_now: stdscr.clear()
-                monthly_screen_view.render()
+                if screen.calendar_state == CalState.MONTHLY:
+                    monthly_screen_view.render()
+                else:
+                    daily_screen_view.render()
             screen.active_pane = True
             journal_screen_view.render()
             if screen.split: separator_view.render()
@@ -707,7 +731,7 @@ def main(stdscr) -> None:
             control_journal_screen(stdscr, user_tasks, screen, importer)
 
         # Help screen:
-        elif screen.state == State.HELP:
+        elif screen.state == AppState.HELP:
             help_screen_view.render()
             control_help_screen(stdscr, screen)
 
