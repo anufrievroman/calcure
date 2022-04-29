@@ -16,8 +16,7 @@ def display_question(stdscr, y, x, question, color):
 def clear_line(stdscr, y, x=0):
     """Clear a line from any text"""
     _, x_max = stdscr.getmaxyx()
-    stdscr.addstr(y, x, " " * (x_max - x - 2),
-                  curses.color_pair(Color.DAYS.value))
+    stdscr.addstr(y, x, " " * (x_max - x - 2), curses.color_pair(Color.EMPTY.value))
 
 
 def input_string(stdscr, y, x, question, answer_length):

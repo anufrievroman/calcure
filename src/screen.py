@@ -1,4 +1,4 @@
-"""Module that controls the overal state of the program"""
+"""Module that controls the overall state of the program"""
 
 import datetime
 from data import Events, AppState, CalState
@@ -13,9 +13,9 @@ class Screen:
         self.year = datetime.date.today().year
         self.privacy = privacy
         self.state = state
-        self.right_pane_percentage = right_pane_percentage
         self.calendar_state = CalState.MONTHLY
         self.split = split
+        self.right_pane_percentage = right_pane_percentage
         self.active_pane = False
         self.selection_mode = False
         self.refresh_now = False
@@ -24,9 +24,9 @@ class Screen:
 
     @property
     def journal_pane_width(self):
-        """Calculate the widht of the right pane"""
+        """Calculate the width of the right pane if the value is adequate"""
         _, x_max = self.stdscr.getmaxyx()
-        if 0 < self.right_pane_percentage < 99:
+        if 5 < self.right_pane_percentage < 95:
             return int(x_max//(100/self.right_pane_percentage))
         return x_max//4
 
@@ -104,7 +104,7 @@ class Screen:
         self.day = int(today.day)
 
     def is_valid_day(self, number) -> bool:
-        """Check if input corresponds to a date this month"""
+        """Check if input corresponds to a date in this month"""
         if number is None:
             return False
         return 0 < number <= Events.monthrange_gregorian(self.year, self.month)

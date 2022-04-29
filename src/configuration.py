@@ -1,4 +1,4 @@
-""" This module creates and loads user config file """
+"""This module creates and loads user config file"""
 
 import os
 import pathlib

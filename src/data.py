@@ -61,6 +61,7 @@ class Color(enum.Enum):
     CALENDAR_HEADER = 21
     ACTIVE_PANE = 22
     SEPARATOR = 23
+    EMPTY = 24
 
 
 class Task:
