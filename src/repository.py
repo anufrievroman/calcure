@@ -43,10 +43,15 @@ class FileRepository:
         lines = self.read_or_create_file(self.tasks_file)
         for index, row in enumerate(lines):
             task_id = index
-            name   = row[0]
+            if row[0][0] == '.':
+                name = row[0][1:]
+                privacy = True
+            else:
+                name = row[0]
+                privacy = False
             status = Status[row[1].upper()]
             stamps = row[2:] if len(row) > 2 else []
-            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps) ))
+            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), privacy))
         return self.user_tasks
 
     def load_events_from_csv(self):
@@ -57,7 +62,12 @@ class FileRepository:
             year = int(row[1])
             month = int(row[2])
             day = int(row[3])
-            name = row[4]
+            if row[4][0] == '.':
+                name = row[4][1:]
+                privacy = True
+            else:
+                name = row[4]
+                privacy = False
 
             # Account for old versions of the datafile:
             if len(row) > 5:
@@ -82,9 +92,8 @@ class FileRepository:
                 status = Status[row[7].upper()]
             else:
                 status = Status.NORMAL
-
             self.user_events.add_item(UserEvent(event_id, year, month, day,
-                        name, repetition, frequency, status))
+                                name, repetition, frequency, status, privacy))
         return self.user_events
 
     def save_tasks_to_csv(self):
@@ -93,7 +102,8 @@ class FileRepository:
         dummy_file = self.tasks_file + '.bak'
         with open(dummy_file, "w", encoding="utf-8") as f:
             for task in self.user_tasks.items:
-                f.write(f'"{task.name}",{task.status.name.lower()}')
+                dot = "."
+                f.write(f'"{dot*task.privacy}{task.name}",{task.status.name.lower()}')
                 for stamp in task.timer.stamps:
                     f.write(f',{str(stamp)}')
                 f.write("\n")
@@ -107,7 +117,8 @@ class FileRepository:
         dummy_file = self.events_file + '.bak'
         with open(dummy_file, "w", encoding="utf-8") as f:
             for ev in self.user_events.items:
-                f.write(f'{ev.item_id},{ev.year},{ev.month},{ev.day},"{ev.name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
+                name = f'{"."*ev.privacy}{ev.name}'
+                f.write(f'{ev.item_id},{ev.year},{ev.month},{ev.day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
         os.remove(original_file)
         os.rename(dummy_file, original_file)
         self.user_events.changed = False
@@ -171,7 +182,8 @@ class Importer:
                 else:
                     status = Status.NORMAL
                 task_id = len(self.user_tasks.items)
-                self.user_tasks.add_item(Task(task_id, name, status, Timer([])))
+                privacy = False
+                self.user_tasks.add_item(Task(task_id, name, status, Timer([]), privacy))
 
     def import_tasks_from_taskwarrior(self):
         """Import tasks from taskwarrior database"""
@@ -182,7 +194,8 @@ class Importer:
                 name = name.split('"', 1)[0]
                 if not self.user_tasks.item_exists(name):
                     task_id = len(self.user_tasks.items)
-                    self.user_tasks.add_item(Task(task_id, name, Status.NORMAL, Timer([])))
+                    privacy = False
+                    self.user_tasks.add_item(Task(task_id, name, Status.NORMAL, Timer([]), privacy))
 
     def import_events_from_calcurse(self):
         """Importing events from calcurse apt file into our events file"""

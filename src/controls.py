@@ -1,4 +1,4 @@
-""" This module contains functions that react to user input """
+"""This module contains functions that react to user input"""
 import curses
 
 from configuration import cf
@@ -14,7 +14,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
         if screen.selection_mode:
             screen.selection_mode = False
 
-            # Chance event status:
+            # Change event status:
             if screen.key in ['i', 'h']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
@@ -30,6 +30,13 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                 if user_events.filter_events_that_month(screen).is_valid_number(number):
                     event_id = user_events.filter_events_that_month(screen).items[number].item_id
                     user_events.toggle_item_status(event_id, Status.NORMAL)
+
+            # Toggle event privacy:
+            if screen.key == '.':
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
+                if user_events.filter_events_that_month(screen).is_valid_number(number):
+                    event_id = user_events.filter_events_that_month(screen).items[number].item_id
+                    user_events.toggle_item_privacy(event_id)
 
             # Delete event:
             if screen.key in ['d', 'x']:
@@ -64,7 +71,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
             screen.key = stdscr.getkey()
 
             # If we need to select an event, change to selection mode:
-            if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm']:
+            if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm', '.']:
                 screen.selection_mode = True
 
             # Navigation:
@@ -91,7 +98,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                     clear_line(stdscr, screen.y_max-2)
                     name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                     event_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
-                    user_events.add_item(UserEvent(event_id, screen.year, screen.month, day, name, 1, Frequency.ONCE, Status.NORMAL))
+                    user_events.add_item(UserEvent(event_id, screen.year, screen.month, day, name, 1, Frequency.ONCE, Status.NORMAL, False))
 
             # Add a recurring event:
             if screen.key == "A":
@@ -104,7 +111,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                     reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                     freq = input_frequency(stdscr, screen.y_max-2, 0, MSG_EVENT_FR)
                     if reps > 0 and freq is not None:
-                        user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps + 1, freq, Status.NORMAL))
+                        user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps + 1, freq, Status.NORMAL, False))
 
             # Imports:
             if screen.key == "C":
@@ -168,6 +175,13 @@ def control_daily_screen(stdscr, user_events, screen, importer):
                     item_id = user_events.filter_events_that_day(screen).items[number].item_id
                     user_events.toggle_item_status(item_id, Status.NORMAL)
 
+            # Toggle event privacy:
+            if screen.key == '.':
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
+                if user_events.filter_events_that_day(screen).is_valid_number(number):
+                    event_id = user_events.filter_events_that_day(screen).items[number].item_id
+                    user_events.toggle_item_privacy(event_id)
+
             # Delete event:
             if screen.key in ['d', 'x']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
@@ -201,7 +215,7 @@ def control_daily_screen(stdscr, user_events, screen, importer):
             screen.key = stdscr.getkey()
 
             # If we need to select an event, change to selection mode:
-            if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm']:
+            if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm', '.']:
                 screen.selection_mode = True
 
             # Navigation:
@@ -216,7 +230,7 @@ def control_daily_screen(stdscr, user_events, screen, importer):
             if screen.key == "a":
                 name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
-                user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, 1, Frequency.ONCE, Status.NORMAL))
+                user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, 1, Frequency.ONCE, Status.NORMAL, False))
 
             # Add a recurring event:
             if screen.key == "A":
@@ -225,7 +239,7 @@ def control_daily_screen(stdscr, user_events, screen, importer):
                 reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                 freq = input_frequency(stdscr, screen.y_max-2, 0, MSG_EVENT_FR)
                 if reps > 0 and freq is not None:
-                    user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps + 1, freq, Status.NORMAL))
+                    user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps + 1, freq, Status.NORMAL, False))
 
             # Import from calcurse:
             if screen.key == "C":
@@ -302,6 +316,13 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                     task_id = user_tasks.items[number].item_id
                     user_tasks.toggle_item_status(task_id, Status.DONE)
 
+            # Toggle task privacy:
+            if screen.key == '.':
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_PRIVACY)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_item_privacy(task_id)
+
             # Modify the task:
             if screen.key in ['d', 'x']:
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEL)
@@ -331,7 +352,7 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 if user_tasks.is_valid_number(number):
                     clear_line(stdscr, screen.y_max-2, 0)
                     task_name = input_string(stdscr, screen.y_max-2, 0, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
-                    user_tasks.add_subtask(Task(None, task_name, Status.NORMAL, Timer([])), number)
+                    user_tasks.add_subtask(Task(None, task_name, Status.NORMAL, Timer([]), False), number)
             screen.selection_mode = False
 
         # Otherwise, we check for user input:
@@ -340,14 +361,14 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             screen.key = stdscr.getkey()
 
             # If we need to select a task, change to selection mode:
-            if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'c', 'A', 'm']:
+            if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'c', 'A', 'm', '.']:
                 screen.selection_mode = True
 
             # Add single task:
             if screen.key == 'a':
                 clear_line(stdscr, len(user_tasks.items) + 2, screen.x_min)
                 task_name = input_string(stdscr, len(user_tasks.items) + 2, screen.x_min, cf.TODO_ICON+' ', screen.x_max - 4)
-                user_tasks.add_item(Task(len(user_tasks.items), task_name, Status.NORMAL, Timer([])))
+                user_tasks.add_item(Task(len(user_tasks.items), task_name, Status.NORMAL, Timer([]), False))
 
             # Bulk operations:
             if screen.key == "V":

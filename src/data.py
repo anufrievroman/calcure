@@ -66,15 +66,18 @@ class Color(enum.Enum):
 
 class Task:
     """Task crated by user"""
-    def __init__(self, item_id, name, status, timer):
+
+    def __init__(self, item_id, name, status, timer, privacy):
         self.item_id = item_id
         self.name = name
         self.status = status
         self.timer = timer
+        self.privacy = privacy
 
 
 class Event:
     """Parent class of events"""
+
     def __init__(self, year, month, day, name):
         self.year = year
         self.month = month
@@ -89,24 +92,29 @@ class Event:
 
 class UserEvent(Event):
     """Events crated by user"""
-    def __init__(self, item_id, year, month, day, name, repetition, frequency, status):
+
+    def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.repetition = repetition
         self.frequency = frequency
         self.status = status
+        self.privacy = privacy
 
 
 class UserRepeatedEvent(Event):
     """Events that are repetitions of the original user events"""
-    def __init__(self, item_id, year, month, day, name, status):
+
+    def __init__(self, item_id, year, month, day, name, status, privacy):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.status = status
+        self.privacy = privacy
 
 
 class Timer:
     """Timer for a task"""
+
     def __init__(self, stamps):
         self.stamps = stamps
 
@@ -152,6 +160,7 @@ class Timer:
 
 class Collection:
     """Parent class for collections of items like tasks or events"""
+
     def __init__(self):
         self.items = []
         self.changed = False
@@ -185,6 +194,14 @@ class Collection:
                     item.status = Status.NORMAL
                 else:
                     item.status = new_status
+                self.changed = True
+                break
+
+    def toggle_item_privacy(self, selected_task_id):
+        """Toggle the privacy for the item with provided id"""
+        for item in self.items:
+            if item.item_id == selected_task_id:
+                item.privacy = not item.privacy
                 self.changed = True
                 break
 
@@ -322,7 +339,7 @@ class RepeatedEvents(Events):
                     temp_month = event.month + rep*(event.frequency == Frequency.MONTHLY)
                     temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + 7*rep*(event.frequency == Frequency.WEEKLY)
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
-                    self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status))
+                    self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status, event.privacy))
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""

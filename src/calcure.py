@@ -127,7 +127,7 @@ class TaskView(View):
             icon = cf.DONE_ICON
         if self.task.status == Status.IMPORTANT:
             icon = cf.IMPORTANT_ICON
-        if self.screen.privacy:
+        if self.screen.privacy or self.task.privacy:
             icon = cf.PRIVACY_ICON
         return icon
 
@@ -143,7 +143,7 @@ class TaskView(View):
     @property
     def title(self):
         """Obfuscate the name if privacy mode is on"""
-        if self.screen.privacy:
+        if self.screen.privacy or self.task.privacy:
             return cf.PRIVACY_ICON * len(self.task.name[self.tab:])
         return self.task.name[self.tab:]
 
@@ -226,16 +226,14 @@ class EventView(View):
             color = Color.UNIMPORTANT
         return color
 
-    def obfuscate_name(self, privacy):
+    def obfuscate_name(self):
         """Obfuscate the info if privacy mode is on"""
-        if privacy:
-            return cf.PRIVACY_ICON * len(self.event.name)
-        return self.event.name
+        return cf.PRIVACY_ICON * len(self.event.name)
 
     def cut_name(self, title):
         """Cut the name to fit into the cell of the calendar"""
         title = title[:self.screen.x_max - self.x - 2]
-        if cf.CUT_TITLES and self.screen.state == AppState.MONTHLY:
+        if cf.CUT_TITLES and self.screen.state == CalState.MONTHLY:
             x_cell = self.screen.x_max // 7
             title = title[:(x_cell - 2)]
         return title
@@ -252,12 +250,16 @@ class UserEventView(EventView):
             for keyword in cf.ICONS:
                 if keyword in self.event.name.lower():
                     icon = cf.ICONS[keyword]
-        if self.screen.privacy: icon = cf.PRIVACY_ICON
+        if self.screen.privacy or self.event.privacy:
+            icon = cf.PRIVACY_ICON
         return icon
 
     def render(self):
         """Render this view on the scren"""
-        title = self.obfuscate_name(self.screen.privacy)
+        if self.screen.privacy or self.event.privacy:
+            title = self.obfuscate_name()
+        else:
+            title = self.event.name
         title = self.cut_name(title)
         self.display_line(self.y, self.x, f'{self.icon} {title}', self.color)
 
@@ -267,7 +269,10 @@ class BirthdayView(EventView):
 
     def render(self):
         """Render this view on the scren"""
-        title = self.obfuscate_name(self.screen.privacy)
+        if self.screen.privacy:
+            title = self.obfuscate_name(self.event.name)
+        else:
+            title = self.event.name
         title = self.cut_name(title)
         self.display_line(self.y, self.x, f'{cf.BIRTHDAY_ICON} {title}', Color.BIRTHDAYS)
 
