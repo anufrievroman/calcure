@@ -20,7 +20,12 @@ class Screen:
         self.selection_mode = False
         self.refresh_now = False
         self.key = None
-        self.y_max, _ = self.stdscr.getmaxyx()
+
+    @property
+    def y_max(self):
+        """Get maximum size of the screen"""
+        y_max, _ = self.stdscr.getmaxyx()
+        return y_max
 
     @property
     def journal_pane_width(self):

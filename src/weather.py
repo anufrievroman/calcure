@@ -8,7 +8,7 @@ class Weather:
 
     def __init__(self, city):
         self.city = city
-        self.forcast = None
+        self.forcast = ""
         self.max_load_time = 2  # seconds
 
     def load_from_wttr(self):
@@ -20,4 +20,4 @@ class Weather:
                                                         encoding='utf-8'))[:-1]
             self.forcast = self.forcast.split(':')[1]
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError, IndexError):
-            self.forcast = None
+            self.forcast = ""

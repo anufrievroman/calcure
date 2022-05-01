@@ -136,11 +136,6 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                 screen.split = not screen.split
                 screen.refresh_now = True
 
-            # Handle screen resize:
-            if screen.key == "KEY_RESIZE":
-                # screen.y_max, screen.x_max = stdscr.getmaxyx()
-                screen.y_max, _ = stdscr.getmaxyx()
-
     # Handle keyboard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
@@ -262,11 +257,6 @@ def control_daily_screen(stdscr, user_events, screen, importer):
             if screen.key in ["/"]:
                 screen.split = not screen.split
                 screen.refresh_now = True
-
-            # Handle screen resize:
-            if screen.key == "KEY_RESIZE":
-                # screen.y_max, screen.x_max = stdscr.getmaxyx()
-                screen.y_max, _ = stdscr.getmaxyx()
 
     # Handle keyboard interruption with ctr+c:
     except KeyboardInterrupt:
@@ -410,10 +400,6 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 screen.split = not screen.split
                 screen.refresh_now = True
 
-            # Handle screen resize:
-            if screen.key == "KEY_RESIZE":
-                screen.y_max, _ = stdscr.getmaxyx()
-
     # Handle keybard interruption with ctr+c:
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
@@ -438,10 +424,6 @@ def control_help_screen(stdscr, screen):
         # Handle keys to exit the help screen:
         if screen.key in [" ", "?", "q", "KEY_BACKSPACE", "^[", "\x7f"]:
             screen.state = AppState.CALENDAR
-
-        # Handle screen resize:
-        if screen.key == "KEY_RESIZE":
-            screen.y_max, _ = stdscr.getmaxyx()
 
     except KeyboardInterrupt:
         confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)

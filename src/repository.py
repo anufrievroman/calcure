@@ -13,7 +13,7 @@ class FileRepository:
         self.user_tasks = Tasks()
         self.user_events = Events()
         self.holidays = Events()
-        self.birthdays = Events()
+        self.birthdays = Birthdays()
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = tasks_file
         self.events_file = events_file

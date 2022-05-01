@@ -43,6 +43,7 @@ class Config:
                 "minimal_today_indicator":   "Yes",
                 "minimal_days_indicator":    "Yes",
                 "minimal_weekend_indicator": "Yes",
+                "show_calendar_boarders":    "Yes",
                 "cut_titles_by_cell_length": "No",
                 "ask_confirmations":         "Yes",
                 "use_unicode_icons":         "Yes",
@@ -71,8 +72,8 @@ class Config:
 
         conf["Colors"] = {
                 "color_today":           "2",
-                "color_events":          "4",
-                "color_days":            "7",
+                "color_events":          "7",
+                "color_days":            "4",
                 "color_day_names":       "4",
                 "color_weekends":        "1",
                 "color_weekend_names":   "1",
@@ -93,6 +94,7 @@ class Config:
                 "color_weather":         "2",
                 "color_active_pane":     "2",
                 "color_separator":       "7",
+                "color_calendar_border": "7",
                 "color_background":      "-1",
                 }
 
@@ -193,6 +195,7 @@ class Config:
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
+            self.SHOW_CALENDAR_BOARDERS    = conf.getboolean("Parameters", "show_calendar_boarders", fallback=True)
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
@@ -240,6 +243,7 @@ class Config:
             self.COLOR_CALENDAR_HEADER = int(conf.get("Colors", "color_calendar_header", fallback=4))
             self.COLOR_ACTIVE_PANE     = int(conf.get("Colors", "color_active_pane", fallback=2))
             self.COLOR_SEPARATOR       = int(conf.get("Colors", "color_separator", fallback=7))
+            self.COLOR_CALENDAR_BOARDER= int(conf.get("Colors", "color_calendar_border", fallback=7))
 
             # Journal colors:
             self.COLOR_TODO           = int(conf.get("Colors", "color_todo", fallback=7))

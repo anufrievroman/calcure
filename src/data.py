@@ -62,6 +62,7 @@ class Color(enum.Enum):
     ACTIVE_PANE = 22
     SEPARATOR = 23
     EMPTY = 24
+    CALENDAR_BOARDER = 24
 
 
 class Task:
@@ -325,6 +326,17 @@ class Events(Collection):
     #
     #     mdays = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]
     #     return mdays[month] + (month == 12 and isleap(year))
+
+class Birthdays(Events):
+    """List of birthdays"""
+
+    def filter_events_that_day(self, screen):
+        """Filter only birthdays that happen on the particular day"""
+        events_of_the_day = Events()
+        for event in self.items:
+            if event.month == screen.month and event.day == screen.day:
+                events_of_the_day.add_item(event)
+        return events_of_the_day
 
 
 class RepeatedEvents(Events):

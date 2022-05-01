@@ -25,8 +25,7 @@ def input_string(stdscr, y, x, question, answer_length):
     curses.curs_set(True)
     display_question(stdscr, y, x, question, Color.PROMPTS)
     stdscr.refresh()
-    answer = stdscr.getstr(y, len(question) + x,
-                           answer_length).decode(encoding="utf-8")
+    answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
     curses.noecho()
     curses.curs_set(False)
     return answer
