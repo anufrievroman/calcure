@@ -1,7 +1,6 @@
 """Module provides datatypes used in the program"""
 
 import time
-import datetime
 import enum
 
 
@@ -28,7 +27,7 @@ class Status(enum.Enum):
 
 
 class Frequency(enum.Enum):
-    """Frequency of repetion of recurring events"""
+    """Frequency of repetitions of recurring events"""
     ONCE = 1
     DAILY = 2
     WEEKLY = 3
@@ -85,11 +84,6 @@ class Event:
         self.day = day
         self.name = name
 
-    @property
-    def date(self):
-        """Return date in datetime format"""
-        return datetime.date(self.year, self.month, self.day)
-
 
 class UserEvent(Event):
     """Events crated by user"""
@@ -131,7 +125,7 @@ class Timer:
 
     @property
     def passed_time(self):
-        """Calculate how much time passed in the unpaused intervals"""
+        """Calculate how much time passed in the un-paused intervals"""
         time_passed = 0
 
         # Calculate passed time, assuming that even timestamps are pauses:
@@ -276,7 +270,10 @@ class Events(Collection):
     def event_exists(self, new_event):
         """Check if such event already exists in collection"""
         for event in self.items:
-            if event.name == new_event.name and event.date == new_event.date:
+            if (event.name == new_event.name
+                and event.year == new_event.year
+                and event.month == new_event.month
+                and event.day == new_event.day):
                 return True
         return False
 
@@ -284,7 +281,9 @@ class Events(Collection):
         """Filter only events that happen on the particular day"""
         events_of_the_day = Events()
         for event in self.items:
-            if event.date == screen.date:
+            if (event.year == screen.year
+                and event.month == screen.month
+                and event.day == screen.day):
                 events_of_the_day.add_item(event)
         return events_of_the_day
 
@@ -305,27 +304,6 @@ class Events(Collection):
                 self.changed = True
                 break
 
-    @staticmethod
-    def monthrange_gregorian(year, month):
-        """Return number of days (28-31) in this gregorian month and year"""
-
-        def isleap(year):
-            """Return True for leap years, False for non-leap years"""
-            return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
-
-        mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-        return mdays[month] + (month == 2 and isleap(year))
-
-    # @staticmethod
-    # def monthrange_persian(year, month):
-    #     """Return number of days (28-31) in this Jalali month and year"""
-    #
-    #     def isleap(year):
-    #         """Return True for leap years, False for non-leap years"""
-    #         return jdatetime.date(year, 1, 1).isleap()
-    #
-    #     mdays = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]
-    #     return mdays[month] + (month == 12 and isleap(year))
 
 class Birthdays(Events):
     """List of birthdays"""
@@ -366,8 +344,13 @@ class RepeatedEvents(Events):
                 if month + i > 12:
                     year = year + 1
                     month = month - 12
-                if day > skip_days + self.monthrange_gregorian(year, month + i):
-                    skip_days += self.monthrange_gregorian(year, month + i)
+
+                is_leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+                mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                last_day = mdays[month + 1] + (month + 1 == 2 and is_leap)
+
+                if day > skip_days + last_day:
+                    skip_days += last_day
                     skip_months = i + 1
                 else:
                     skip_months = i

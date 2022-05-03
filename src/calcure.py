@@ -2,11 +2,11 @@
 
 # Libraries
 import curses
-import datetime
 import calendar
 import time
 
 # Modules
+from calendars import Calendar, CalType
 from configuration import cf
 from weather import Weather
 from repository import Importer, FileRepository
@@ -383,17 +383,18 @@ class DayNumberView(View):
         self.day = day
         self.day_in_week = day_in_week
         self.x_cell = x_cell
+        self.screen.day = self.day
 
     def render(self):
-        """Render this view on the scren"""
-        if datetime.date(self.screen.year, self.screen.month, self.day) == datetime.date.today():
-            today = f"{self.day}{cf.TODAY_ICON}{' '*(self.x_cell - len(str(self.day)) - 1)}"
+        """Render this view on the screen"""
+        if self.screen.date == self.screen.today:
+            today = f"{self.day}{cf.TODAY_ICON}{' '*(self.x_cell - len(str(self.day)) - 2)}"
             self.display_line(self.y, self.x, today, Color.TODAY, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
         elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
             weekend = f"{self.day}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekend, Color.WEEKENDS, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
         else:
-            weekday = f"{self.day}{' '*(self.x_cell - len(str(self.day))-1)}"
+            weekday = f"{self.day}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekday, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 
@@ -479,10 +480,10 @@ class SeparatorView(View):
         for row in range(height):
             self.display_line(row, x_separator, cf.SEPARATOR_ICON, Color.SEPARATOR)
 
-        if cf.SHOW_CALENDAR_BOARDERS:
+        if cf.SHOW_CALENDAR_BOARDERS and self.screen.calendar_state == CalState.MONTHLY:
             for row in range(1, 7):
-                self.display_line(row*y_cell + 1, self.screen.x_max, "┤", Color.CALENDAR_BOARDER)
-            self.display_line(6*y_cell + 1, self.screen.x_max, "┘", Color.CALENDAR_BOARDER)
+                self.display_line(row*y_cell + 1, x_separator, "┤", Color.CALENDAR_BOARDER)
+            self.display_line(6*y_cell + 1, x_separator, "┘", Color.CALENDAR_BOARDER)
 
 
 class CalenarBoarderView(View):
@@ -522,7 +523,6 @@ class DaysNameView(View):
         self.screen = screen
 
     def render(self):
-        if not cf.SHOW_DAY_NAMES: return
         num = 2 if self.screen.x_max < 80 else 10
         x_cell = int(self.screen.x_max // 7)
 
@@ -530,7 +530,8 @@ class DaysNameView(View):
         for i in range(7):
             shift = cf.START_WEEK_DAY - 1
             day_number = i + shift - 7*((i + shift) > 6)
-            name = DAYS[day_number][:num]
+            day_names = DAYS if self.screen.calendar_type == CalType.GREGORIAN else DAYS_PERSIAN
+            name = day_names[day_number][:num]
             x = self.x + i*x_cell
             if day_number + 1 not in cf.WEEKEND_DAYS:
                 self.display_line(self.y, x, name, Color.DAY_NAMES, cf.BOLD_DAY_NAMES, cf.UNDERLINED_DAY_NAMES)
@@ -559,8 +560,9 @@ class DailyScreenView(View):
         curses.halfdelay(255)
 
         # Form a string with month, year, and day with today icon:
-        icon = cf.TODAY_ICON if self.screen.date == datetime.date.today() else ''
-        month_string = str(MONTHS[self.screen.month-1])
+        month_names = MONTHS if self.screen.calendar_type == CalType.GREGORIAN else MONTHS_PERSIAN
+        icon = cf.TODAY_ICON if self.screen.date == self.screen.today else ''
+        month_string = str(month_names[self.screen.month-1])
         date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
 
         # Display header and footer:
@@ -592,8 +594,9 @@ class MonthlyScreenView(View):
         # self.fill_background()
 
         # Info about the month:
-        month_year_string = MONTHS[self.screen.month-1] + " " + str(self.screen.year)
-        dates = calendar.Calendar(firstweekday=cf.START_WEEK_DAY - 1).monthdayscalendar(self.screen.year, self.screen.month)
+        month_names = MONTHS if self.screen.calendar_type == CalType.GREGORIAN else MONTHS_PERSIAN
+        month_year_string = month_names[self.screen.month-1] + " " + str(self.screen.year)
+        dates = Calendar(cf.START_WEEK_DAY - 1, self.screen.calendar_type).monthdayscalendar(self.screen.year, self.screen.month)
 
         y_cell = (self.screen.y_max - 3) // 6
         x_cell = self.screen.x_max // 7
@@ -602,10 +605,6 @@ class MonthlyScreenView(View):
         days_name_view = DaysNameView(self.stdscr, 1, 0, self.screen)
         header_view.render()
         days_name_view.render()
-
-        if cf.SHOW_CALENDAR_BOARDERS:
-            calendar_boarder_view = CalenarBoarderView(self.stdscr, 0, 0, self.screen)
-            calendar_boarder_view.render()
 
         # Displaying the dates and events:
         repeated_user_events = RepeatedEvents(self.user_events)
@@ -625,6 +624,10 @@ class MonthlyScreenView(View):
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
+        if cf.SHOW_CALENDAR_BOARDERS:
+            calendar_boarder_view = CalenarBoarderView(self.stdscr, 0, 0, self.screen)
+            calendar_boarder_view.render()
+
 
 class JournalScreenView(View):
     def __init__(self, stdscr, y, x, weather, user_tasks, screen):
@@ -633,7 +636,6 @@ class JournalScreenView(View):
         self.user_tasks = user_tasks
         self.screen = screen
         self.refresh_time = 100
-        # self.refresh_now = True
 
     def calculate_refresh_rate(self):
         """Check if a timer is running and change the refresh rate"""
@@ -648,7 +650,6 @@ class JournalScreenView(View):
         self.screen.state = AppState.JOURNAL
         if self.screen.x_max < 6 or self.screen.y_max < 3:
             return
-        # self.fill_background()
 
         # Check if any of the timers is counting, and increase the update time:
         self.calculate_refresh_rate()
@@ -736,8 +737,8 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         print("Weather is loading...")
         weather.load_from_wttr()
-    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE)
-    file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, screen.year)
+    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR)
+    file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, cf.USE_PERSIAN_CALENDAR)
     user_events = file_repository.load_events_from_csv()
     user_tasks = file_repository.load_tasks_from_csv()
     holidays = file_repository.load_holidays()

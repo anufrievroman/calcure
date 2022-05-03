@@ -6,10 +6,32 @@ import csv
 import os
 from data import *
 
+import datetime
+import jdatetime
+
+
+
+def convert_to_persian_date(year, month, day):
+    """Convert date from Gregorian to Persian calendar"""
+    persian_date =  jdatetime.date.fromgregorian(day=day, month=month, year=year)
+    day = persian_date.day
+    month = persian_date.month
+    year = persian_date.year
+    return year, month, day
+
+
+def convert_to_gregorian_date(year, month, day):
+    """Convert date from Persian to Gregorian calendar"""
+    gregorian_date = jdatetime.date(year, month, day).togregorian()
+    day = gregorian_date.day
+    month = gregorian_date.month
+    year = gregorian_date.year
+    return year, month, day
+
 
 class FileRepository:
     """Load and save events and tasks to files"""
-    def __init__(self, tasks_file, events_file, country, year):
+    def __init__(self, tasks_file, events_file, country, persian_calendar):
         self.user_tasks = Tasks()
         self.user_events = Events()
         self.holidays = Events()
@@ -18,7 +40,7 @@ class FileRepository:
         self.tasks_file = tasks_file
         self.events_file = events_file
         self.country = country
-        self.year = year
+        self.persian_calendar = persian_calendar
 
     def read_or_create_file(self, file):
         """Try to read a csv file or create if it does not exist"""
@@ -92,6 +114,11 @@ class FileRepository:
                 status = Status[row[7].upper()]
             else:
                 status = Status.NORMAL
+
+            # Convert to persian date if needed:
+            if self.persian_calendar:
+                year, month, day = convert_to_persian_date(year, month, day)
+
             self.user_events.add_item(UserEvent(event_id, year, month, day,
                                 name, repetition, frequency, status, privacy))
         return self.user_events
@@ -117,8 +144,15 @@ class FileRepository:
         dummy_file = self.events_file + '.bak'
         with open(dummy_file, "w", encoding="utf-8") as f:
             for ev in self.user_events.items:
+
+                # If persian calendar was user, we convert event back to Gregorian for storage:
+                if self.persian_calendar:
+                    year, month, day = convert_to_gregorian_date(ev.year, ev.month, ev.day)
+                else:
+                    year, month, day = ev.year, ev. month, ev.day
+
                 name = f'{"."*ev.privacy}{ev.name}'
-                f.write(f'{ev.item_id},{ev.year},{ev.month},{ev.day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
+                f.write(f'{ev.item_id},{year},{month},{day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
         os.remove(original_file)
         os.rename(dummy_file, original_file)
         self.user_events.changed = False
@@ -127,9 +161,17 @@ class FileRepository:
         """Load list of holidays in this country around this year"""
         try:
             import holidays as hl
-            holiday_events = eval("hl."+self.country+"(years=[self.year-1, self.year, self.year+3])")
+            year = datetime.date.today().year
+            holiday_events = eval("hl."+self.country+"(years=[year-1, year, year+3])")
             for date, name in holiday_events.items():
-                self.holidays.add_item(Event(date.year, date.month, date.day, name))
+
+                # Convert to persian date if needed:
+                if self.persian_calendar:
+                    year, month, day = convert_to_persian_date(date.year, date.month, date.day)
+                else:
+                    year, month, day = date.year, date.month, date.day
+
+                self.holidays.add_item(Event(year, month, day, name))
         except (ModuleNotFoundError, SyntaxError, AttributeError):
             pass
         return self.holidays
@@ -139,11 +181,16 @@ class FileRepository:
         abook = configparser.ConfigParser()
         abook.read(self.abook_file)
         for each_contact in abook.sections():
-            for (key, value) in abook.items(each_contact):
+            for key, _ in abook.items(each_contact):
                 if key == "birthday":
                     month = int(abook[each_contact]["birthday"][-5:-3])
                     day = int(abook[each_contact]["birthday"][-2:])
                     name = abook[each_contact]["name"]
+
+                    # Convert to persian date if needed:
+                    if self.persian_calendar:
+                        _, month, day = convert_to_persian_date(1000, month, day)
+
                     self.birthdays.add_item(Event(1, month, day, name))
         return self.birthdays
 
@@ -215,6 +262,11 @@ class Importer:
                 event_id = 0
             else:
                 event_id = self.user_events.items[-1].item_id + 1
+
+            # Convert to persian date if needed:
+            if self.persian_calendar:
+                year, month, day = convert_to_persian_date(year, month, day)
+
             imported_event = UserEvent(event_id, year, month, day, name, 1,
                                        Frequency.ONCE, Status.NORMAL)
             if not self.user_events.event_exists(imported_event):

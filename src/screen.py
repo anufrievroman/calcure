@@ -1,25 +1,29 @@
-"""Module that controls the overall state of the program"""
+"""Module that controls the overall state of the program screen"""
 
 import datetime
+import jdatetime
+
 from data import Events, AppState, CalState
+from calendars import Calendar, CalType
 
 
 class Screen:
     """Main state of the program that describes what is displayed and how"""
-    def __init__(self, stdscr, privacy, state, split, right_pane_percentage):
+    def __init__(self, stdscr, privacy, state, split, right_pane_percentage, use_persian_calendar):
         self.stdscr = stdscr
-        self.day = datetime.date.today().day
-        self.month = datetime.date.today().month
-        self.year = datetime.date.today().year
         self.privacy = privacy
         self.state = state
         self.calendar_state = CalState.MONTHLY
+        self.calendar_type = CalType.PERSIAN if use_persian_calendar else CalType.GREGORIAN
         self.split = split
         self.right_pane_percentage = right_pane_percentage
         self.active_pane = False
         self.selection_mode = False
         self.refresh_now = False
         self.key = None
+        self.day = self.today.day
+        self.month = self.today.month
+        self.year = self.today.year
 
     @property
     def y_max(self):
@@ -58,7 +62,18 @@ class Screen:
     @property
     def date(self) -> datetime:
         """Return displayed date in datetime format"""
-        return datetime.date(self.year, self.month, self.day)
+        if self.calendar_type == CalType.PERSIAN:
+            return jdatetime.date(self.year, self.month, self.day)
+        else:
+            return datetime.date(self.year, self.month, self.day)
+
+    @property
+    def today(self) -> datetime:
+        """Return todays's date in datetime format"""
+        if self.calendar_type == CalType.PERSIAN:
+            return jdatetime.date.today()
+        else:
+            return datetime.date.today()
 
     def next_month(self):
         """Switches to the next month"""
@@ -78,7 +93,7 @@ class Screen:
 
     def next_day(self):
         """Switch to the next day"""
-        days_in_this_month = Events.monthrange_gregorian(self.year, self.month)
+        days_in_this_month = Calendar(0, self.calendar_type).last_day(self.year, self.month)
         if self.day < days_in_this_month:
             self.day += 1
         else:
@@ -99,17 +114,16 @@ class Screen:
             else:
                 self.month = 12
                 self.year -= 1
-            self.day = Events.monthrange_gregorian(self.year, self.month)
+            self.day = Calendar(0, self.calendar_type).last_day(self.year, self.month)
 
     def reset_to_today(self):
         """Reset the day, month, and year to the current date"""
-        today = datetime.date.today()
-        self.month = today.month
-        self.year = today.year
-        self.day = int(today.day)
+        self.month = self.today.month
+        self.year = self.today.year
+        self.day = self.today.day
 
     def is_valid_day(self, number) -> bool:
         """Check if input corresponds to a date in this month"""
         if number is None:
             return False
-        return 0 < number <= Events.monthrange_gregorian(self.year, self.month)
+        return 0 < number <= Calendar(0, self.calendar_type).last_day(self.year, self.month)

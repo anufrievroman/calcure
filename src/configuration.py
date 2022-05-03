@@ -39,11 +39,10 @@ class Config:
                 "privacy_mode":              "No",
                 "show_weather":              "No",
                 "weather_city":              "",
-                "show_day_names":            "Yes",
                 "minimal_today_indicator":   "Yes",
                 "minimal_days_indicator":    "Yes",
                 "minimal_weekend_indicator": "Yes",
-                "show_calendar_boarders":    "Yes",
+                "show_calendar_boarders":    "No",
                 "cut_titles_by_cell_length": "No",
                 "ask_confirmations":         "Yes",
                 "use_unicode_icons":         "Yes",
@@ -51,6 +50,7 @@ class Config:
                 "show_holidays":             "Yes",
                 "show_nothing_planned":      "Yes",
                 "holiday_country":           "UnitedStates",
+                "use_persian_calendar":      "No",
                 "start_week_day":            "1",
                 "weekend_days":              "6,7",
                 "refresh_interval":          "1",
@@ -174,14 +174,13 @@ class Config:
 
             # Reading default view:
             default_view = conf.get("Parameters", "default_view", fallback="calendar")
-            if default_view == 'calendar':
-                self.DEFAULT_VIEW = AppState.CALENDAR
             if default_view == 'journal':
                 self.DEFAULT_VIEW = AppState.JOURNAL
+            else:
+                self.DEFAULT_VIEW = AppState.CALENDAR
 
             # Calendar settings:
             self.SHOW_KEYBINDINGS          = conf.getboolean("Parameters", "show_keybindings", fallback=True)
-            self.SHOW_DAY_NAMES            = conf.getboolean("Parameters", "show_day_names", fallback=True)
             self.MINIMAL_TODAY_INDICATOR   = conf.getboolean("Parameters", "minimal_today_indicator", fallback=True)
             self.MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator", fallback=True)
             self.MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator", fallback=True)
@@ -195,7 +194,8 @@ class Config:
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
-            self.SHOW_CALENDAR_BOARDERS    = conf.getboolean("Parameters", "show_calendar_boarders", fallback=True)
+            self.SHOW_CALENDAR_BOARDERS    = conf.getboolean("Parameters", "show_calendar_boarders", fallback=False)
+            self.USE_PERSIAN_CALENDAR      = conf.getboolean("Parameters", "use_persian_calendar", fallback=False)
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
@@ -297,7 +297,7 @@ class Config:
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run"""
         try:
-            opts, _ = getopt.getopt(sys.argv[1:],"pjchv",["folder=", "config="])
+            opts, _ = getopt.getopt(sys.argv[1:],"pjhvi",["folder=", "config="])
             for opt, arg in opts:
                 if opt in '--folder':
                     self.data_folder = arg
@@ -309,13 +309,13 @@ class Config:
                     self.PRIVACY_MODE = True
                 elif opt == '-j':
                     self.DEFAULT_VIEW = AppState.JOURNAL
-                elif opt == '-c':
-                    self.DEFAULT_VIEW = AppState.MONTHLY
                 elif opt in ('-h'):
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
                     print ('Calcure - version 2.0')
+                elif opt in ('-i'):
+                    self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError:
             pass
 
