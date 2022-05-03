@@ -742,8 +742,8 @@ def main(stdscr) -> None:
     user_tasks = file_repository.load_tasks_from_csv()
     holidays = file_repository.load_holidays()
     birthdays = file_repository.load_birthdays_from_abook()
-    importer = Importer(user_tasks, user_events, cf.TASKS_FILE, cf.EVENTS_FILE,
-                cf.CALCURSE_TODO_FILE, cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER)
+    importer = Importer(user_tasks, user_events, cf.TASKS_FILE, cf.EVENTS_FILE, cf.CALCURSE_TODO_FILE,
+                                cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER, cf.USE_PERSIAN_CALENDAR)
 
     # Initialise terminal screen:
     stdscr = curses.initscr()

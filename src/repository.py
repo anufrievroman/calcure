@@ -31,7 +31,7 @@ def convert_to_gregorian_date(year, month, day):
 
 class FileRepository:
     """Load and save events and tasks to files"""
-    def __init__(self, tasks_file, events_file, country, persian_calendar):
+    def __init__(self, tasks_file, events_file, country, use_persian_calendar):
         self.user_tasks = Tasks()
         self.user_events = Events()
         self.holidays = Events()
@@ -40,7 +40,7 @@ class FileRepository:
         self.tasks_file = tasks_file
         self.events_file = events_file
         self.country = country
-        self.persian_calendar = persian_calendar
+        self.use_persian_calendar = use_persian_calendar
 
     def read_or_create_file(self, file):
         """Try to read a csv file or create if it does not exist"""
@@ -116,7 +116,7 @@ class FileRepository:
                 status = Status.NORMAL
 
             # Convert to persian date if needed:
-            if self.persian_calendar:
+            if self.use_persian_calendar:
                 year, month, day = convert_to_persian_date(year, month, day)
 
             self.user_events.add_item(UserEvent(event_id, year, month, day,
@@ -146,7 +146,7 @@ class FileRepository:
             for ev in self.user_events.items:
 
                 # If persian calendar was user, we convert event back to Gregorian for storage:
-                if self.persian_calendar:
+                if self.use_persian_calendar:
                     year, month, day = convert_to_gregorian_date(ev.year, ev.month, ev.day)
                 else:
                     year, month, day = ev.year, ev. month, ev.day
@@ -166,7 +166,7 @@ class FileRepository:
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
-                if self.persian_calendar:
+                if self.use_persian_calendar:
                     year, month, day = convert_to_persian_date(date.year, date.month, date.day)
                 else:
                     year, month, day = date.year, date.month, date.day
@@ -188,7 +188,7 @@ class FileRepository:
                     name = abook[each_contact]["name"]
 
                     # Convert to persian date if needed:
-                    if self.persian_calendar:
+                    if self.use_persian_calendar:
                         _, month, day = convert_to_persian_date(1000, month, day)
 
                     self.birthdays.add_item(Event(1, month, day, name))
@@ -197,7 +197,7 @@ class FileRepository:
 
 class Importer:
     """Import tasks and events from files of other programs"""
-    def __init__(self, user_tasks, user_events, tasks_file, events_file, calcurse_todo_file, calcurse_events_file, taskwarrior_folder):
+    def __init__(self, user_tasks, user_events, tasks_file, events_file, calcurse_todo_file, calcurse_events_file, taskwarrior_folder, use_persian_calendar):
         self.user_tasks = user_tasks
         self.user_events = user_events
         self.tasks_file = tasks_file
@@ -205,6 +205,7 @@ class Importer:
         self.calcurse_todo_file = calcurse_todo_file
         self.calcurse_events_file = calcurse_events_file
         self.taskwarrior_folder = taskwarrior_folder
+        self.use_persian_calendar = use_persian_calendar
 
     def read_file(self, file):
         """Try to read a file and return its lines"""
@@ -262,12 +263,13 @@ class Importer:
                 event_id = 0
             else:
                 event_id = self.user_events.items[-1].item_id + 1
+            privacy = False
 
             # Convert to persian date if needed:
-            if self.persian_calendar:
+            if self.use_persian_calendar:
                 year, month, day = convert_to_persian_date(year, month, day)
 
             imported_event = UserEvent(event_id, year, month, day, name, 1,
-                                       Frequency.ONCE, Status.NORMAL)
+                                       Frequency.ONCE, Status.NORMAL, privacy)
             if not self.user_events.event_exists(imported_event):
                 self.user_events.add_item(imported_event)
