@@ -3,6 +3,8 @@
 import time
 import enum
 
+from calendars import Calendar
+
 
 class AppState(enum.Enum):
     """Possible focus states of the application"""
@@ -319,9 +321,12 @@ class Birthdays(Events):
 
 class RepeatedEvents(Events):
     """List of events that are repetitions of the main events"""
-    def __init__(self, user_events):
+
+    def __init__(self, user_events, use_persian_calendar):
         super().__init__()
         self.user_events = user_events
+        self.use_persian_calendar = use_persian_calendar
+
         for event in self.user_events.items:
             if event.repetition >= 1:
                 for rep in range(1, event.repetition):
@@ -330,6 +335,7 @@ class RepeatedEvents(Events):
                     temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + 7*rep*(event.frequency == Frequency.WEEKLY)
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
                     self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status, event.privacy))
+
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""
@@ -340,15 +346,14 @@ class RepeatedEvents(Events):
 
         # Weekly and daily recurrence:
         if frequency in [Frequency.WEEKLY, Frequency.DAILY]:
+
+            # Calculate how many days and month to skip to next event:
             for i in range(1000):
                 if month + i > 12:
                     year = year + 1
                     month = month - 12
 
-                is_leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
-                mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-                last_day = mdays[month + 1] + (month + 1 == 2 and is_leap)
-
+                last_day = Calendar(0, self.use_persian_calendar).last_day(year, month+i)
                 if day > skip_days + last_day:
                     skip_days += last_day
                     skip_months = i + 1

@@ -4,7 +4,7 @@ import datetime
 import jdatetime
 
 from data import Events, AppState, CalState
-from calendars import Calendar, CalType
+from calendars import Calendar
 
 
 class Screen:
@@ -14,7 +14,7 @@ class Screen:
         self.privacy = privacy
         self.state = state
         self.calendar_state = CalState.MONTHLY
-        self.calendar_type = CalType.PERSIAN if use_persian_calendar else CalType.GREGORIAN
+        self.use_persian_calendar = use_persian_calendar
         self.split = split
         self.right_pane_percentage = right_pane_percentage
         self.active_pane = False
@@ -62,7 +62,7 @@ class Screen:
     @property
     def date(self) -> datetime:
         """Return displayed date in datetime format"""
-        if self.calendar_type == CalType.PERSIAN:
+        if self.use_persian_calendar:
             return jdatetime.date(self.year, self.month, self.day)
         else:
             return datetime.date(self.year, self.month, self.day)
@@ -70,7 +70,7 @@ class Screen:
     @property
     def today(self) -> datetime:
         """Return todays's date in datetime format"""
-        if self.calendar_type == CalType.PERSIAN:
+        if self.use_persian_calendar:
             return jdatetime.date.today()
         else:
             return datetime.date.today()
@@ -93,7 +93,7 @@ class Screen:
 
     def next_day(self):
         """Switch to the next day"""
-        days_in_this_month = Calendar(0, self.calendar_type).last_day(self.year, self.month)
+        days_in_this_month = Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
         if self.day < days_in_this_month:
             self.day += 1
         else:
@@ -114,7 +114,7 @@ class Screen:
             else:
                 self.month = 12
                 self.year -= 1
-            self.day = Calendar(0, self.calendar_type).last_day(self.year, self.month)
+            self.day = Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
 
     def reset_to_today(self):
         """Reset the day, month, and year to the current date"""
@@ -126,4 +126,4 @@ class Screen:
         """Check if input corresponds to a date in this month"""
         if number is None:
             return False
-        return 0 < number <= Calendar(0, self.calendar_type).last_day(self.year, self.month)
+        return 0 < number <= Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)

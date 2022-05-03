@@ -6,7 +6,7 @@ import calendar
 import time
 
 # Modules
-from calendars import Calendar, CalType
+from calendars import Calendar
 from configuration import cf
 from weather import Weather
 from repository import Importer, FileRepository
@@ -530,7 +530,7 @@ class DaysNameView(View):
         for i in range(7):
             shift = cf.START_WEEK_DAY - 1
             day_number = i + shift - 7*((i + shift) > 6)
-            day_names = DAYS if self.screen.calendar_type == CalType.GREGORIAN else DAYS_PERSIAN
+            day_names = DAYS_PERSIAN if cf.USE_PERSIAN_CALENDAR else DAYS
             name = day_names[day_number][:num]
             x = self.x + i*x_cell
             if day_number + 1 not in cf.WEEKEND_DAYS:
@@ -560,7 +560,7 @@ class DailyScreenView(View):
         curses.halfdelay(255)
 
         # Form a string with month, year, and day with today icon:
-        month_names = MONTHS if self.screen.calendar_type == CalType.GREGORIAN else MONTHS_PERSIAN
+        month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
         icon = cf.TODAY_ICON if self.screen.date == self.screen.today else ''
         month_string = str(month_names[self.screen.month-1])
         date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
@@ -570,7 +570,7 @@ class DailyScreenView(View):
         header_view.render()
 
         # Display the events:
-        repeated_user_events = RepeatedEvents(self.user_events)
+        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
         daily_view = DailyView(self.stdscr, self.y + 2, self.x, repeated_user_events,
                                self.user_events, self.holidays, self.birthdays, self.screen, 0)
         daily_view.render()
@@ -591,12 +591,11 @@ class MonthlyScreenView(View):
         self.screen.state = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
         curses.halfdelay(100)
-        # self.fill_background()
 
         # Info about the month:
-        month_names = MONTHS if self.screen.calendar_type == CalType.GREGORIAN else MONTHS_PERSIAN
+        month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
         month_year_string = month_names[self.screen.month-1] + " " + str(self.screen.year)
-        dates = Calendar(cf.START_WEEK_DAY - 1, self.screen.calendar_type).monthdayscalendar(self.screen.year, self.screen.month)
+        dates = Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR).monthdayscalendar(self.screen.year, self.screen.month)
 
         y_cell = (self.screen.y_max - 3) // 6
         x_cell = self.screen.x_max // 7
@@ -607,7 +606,7 @@ class MonthlyScreenView(View):
         days_name_view.render()
 
         # Displaying the dates and events:
-        repeated_user_events = RepeatedEvents(self.user_events)
+        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
         num_events_this_month = 0
         for row, week in enumerate(dates):
             for col, day in enumerate(week):
