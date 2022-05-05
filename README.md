@@ -58,123 +58,18 @@ Run `calcure` in your terminal. You may need to restart your terminal after inst
 
 ### User arguments
 
-Calcure can be started in special mods using the following user arguments:
-
-`-j` · Start on the journal page
-
-`-i` · Start using Persian calendar
-
-`-h` · Start on the help page
-
-`-p` · Start in the privacy mode (text is obfuscated as •••••)
-
-`-v` · Print the version and exit
-
-`--folder=FOLDERNAME` - Use datafiles (events and tasks) stored in a specific folder. For example, if you want to have separate databases for work and for personal things, you can start as:
-`calcure --folder=$HOME/.calcure/work` or `calcure --folder=$HOME/.calcure/personal`
-The same effect can also be achieved with the `--config` argument, as explained below.
-
-`--config=CONFIGFILE.ini` - Use specific config file instead of the default one. For example, if you want to separate not only datafiles, like in the previous example, but other settings too, you can run the program with alternative config as:
-
-`calcure --config=$HOME/.config/calcure/config2.ini`
-
-If the specified config file does not exist, it will be created with default settings.
+Calcure can be started in special mods using various user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
 
 ## Key bindings
 
-Besides key bindings listed below, various vim-style key binding (`ZZ`, `ZQ` etc) and dedicated buttons (`home` etc) are supported as well.
+List of all key bindings can be accessed [in the wiki](https://github.com/anufrievroman/calcure/wiki/Key-bindings) and via `?` key in the program.
 
-### General
+## Settings
 
-`space` · Switch between calendar and tasks
-
-`/` · Toggle split screen
-
-`*` · Toggle privacy mode
-
-`?` · Show keybindings
-
-`q` · quit
-
-
-### Calendar view
-
-`n`,`l`,`↓`  · Next month
-
-`p`,`k`,`↑` · Previous month
-
-`a` · Add an event
-
-`A` · Add a recurring event
-
-`h` · Mark/unmark an event as high priority
-
-`l` · Mark/unmark an event as low priority
-
-`d` · Delete an event
-
-`e` · Edit an event
-
-`m` · Move an event
-
-`.` · Toggle privacy of an event
-
-`g` · Go to selected day
-
-`C` · Import events from Calcurse
-
-`G` - return to current month
-
-
-### Tasks view
-
-`a` · Add a task
-
-`A` · Add a subtask
-
-`v` · Mark a task as done
-
-`V` · Mark all tasks as done
-
-`u` · Unmark a task
-
-`U` · Unmark all tasks
-
-`h` · Mark/unmark a task as important
-
-`H` · Mark/unmark all tasks as important
-
-`l` · Mark/unmark a task as low priority
-
-`L` · Mark/unmark all tasks as low priority
-
-`.` · Toggle privacy of a task
-
-`d` · Delete a task and all its subtasks
-
-`D` · Delete all tasks
-
-`t` · Start / pause timer for a task
-
-`T` · Remove a timer
-
-`m` · Move a task
-
-`s` · Toggle between task and subtask
-
-`e` · Edit a task
-
-`C` · Import tasks from Calcurse
-
-`W` · Import tasks from Taskwarrior
-
-
-## Configuration
-
-On the first run, program will create a configuration file at `.config/calcure/config.ini`
-
-You can edit parameters and colors in the `config.ini` file. Example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini). Explanations of all options are [available in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
-
+On the first run, program will create a configuration file at `.config/calcure/config.ini`.
+You can edit parameters and colors in the `config.ini` file.
+An example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini).
+Explanations of all settings are [in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
 
 ## Troubleshooting
 
