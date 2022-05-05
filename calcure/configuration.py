@@ -133,9 +133,9 @@ class Config:
                 "match":       "♟",
                 "play":        "♟",
                 "interview":   "🎙️",
-                "conference":  "🎙️",
-                "hearing":     "🎙️",
-                "date":        "♥",
+                "conference":  "🎙️"
+                "hearing":     "🎙️"
+                "dating":      "♥",
                 "concert":     "♪",
                 "dance":       "♪",
                 "music":       "♪",
