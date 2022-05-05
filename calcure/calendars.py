@@ -22,13 +22,11 @@ class Calendar:
         """Return the number of the last day of the month"""
         if self.use_persian_calendar:
             isleap = jdatetime.date(year, 1, 1).isleap()
-            day1 = jdatetime.date(year, month, 1).weekday()
             mdays = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]
             ndays = mdays[month] + (month == 2 and isleap)
             return ndays
         else:
             isleap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
-            day1 = datetime.date(year, month, 1).weekday()
             mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
             ndays = mdays[month] + (month == 2 and isleap)
             return ndays

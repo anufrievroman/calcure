@@ -3,8 +3,8 @@
 import datetime
 import jdatetime
 
-from data import Events, AppState, CalState
-from calendars import Calendar
+from calcure.data import Events, AppState, CalState
+from calcure.calendars import Calendar
 
 
 class Screen:

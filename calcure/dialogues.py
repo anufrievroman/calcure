@@ -1,7 +1,7 @@
 """ Module that controls interactions with the user, like questions and confirmations"""
 
 import curses
-from data import Frequency, Color
+from calcure.data import Frequency, Color
 
 
 def display_question(stdscr, y, x, question, color):

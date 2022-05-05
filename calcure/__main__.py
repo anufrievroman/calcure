@@ -6,15 +6,15 @@ import calendar
 import time
 
 # Modules
-from calendars import Calendar
-from configuration import cf
-from weather import Weather
-from repository import Importer, FileRepository
-from dialogues import clear_line
-from screen import Screen
-from data import *
-from translation_en import *
-from controls import *
+from calcure.calendars import Calendar
+from calcure.configuration import cf
+from calcure.weather import Weather
+from calcure.repository import Importer, FileRepository
+from calcure.dialogues import clear_line
+from calcure.screen import Screen
+from calcure.data import *
+from calcure.translation_en import *
+from calcure.controls import *
 
 
 __version__ = "2.0.0"
@@ -407,7 +407,7 @@ class TitleView(View):
         self.screen = screen
 
     def render(self):
-        """Render this view on the scren"""
+        """Render this view on the screen"""
         if self.screen.active_pane and self.screen.split:
             self.display_line(0, self.screen.x_min, self.title, Color.ACTIVE_PANE, cf.BOLD_ACTIVE_PANE, cf.UNDERLINED_ACTIVE_PANE)
         else:
@@ -767,6 +767,8 @@ def main(stdscr) -> None:
             app_view.fill_background()
         screen.active_pane = False
 
+        # CALENDARS
+
         # Monthly (active) screen:
         if screen.state == AppState.CALENDAR and screen.calendar_state == CalState.MONTHLY:
             if screen.split and not screen.selection_mode:
@@ -790,6 +792,8 @@ def main(stdscr) -> None:
             if screen.split: separator_view.render()
             footer_view.render()
             control_daily_screen(stdscr, user_events, screen, importer)
+
+        # JOURNAL
 
         # Journal (active) screen:
         elif screen.state == AppState.JOURNAL:

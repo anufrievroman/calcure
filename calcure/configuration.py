@@ -6,8 +6,8 @@ import configparser
 import sys
 import getopt
 
-from translation_en import ERR_FILE1, ERR_FILE2
-from data import AppState
+from calcure.translation_en import ERR_FILE1, ERR_FILE2
+from calcure.data import AppState
 
 
 class Config:

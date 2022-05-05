@@ -1,10 +1,10 @@
 """This module contains functions that react to user input"""
 import curses
 
-from configuration import cf
-from translation_en import *
-from data import *
-from dialogues import *
+from calcure.configuration import cf
+from calcure.translation_en import *
+from calcure.data import *
+from calcure.dialogues import *
 
 
 def control_monthly_screen(stdscr, user_events, screen, importer):

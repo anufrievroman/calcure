@@ -4,7 +4,8 @@ import configparser
 import pathlib
 import csv
 import os
-from data import *
+
+from calcure.data import *
 
 import datetime
 import jdatetime
@@ -39,6 +40,7 @@ class FileRepository:
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = tasks_file
         self.events_file = events_file
+
         self.country = country
         self.use_persian_calendar = use_persian_calendar
 
