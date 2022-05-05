@@ -1,12 +1,10 @@
 from pathlib import Path
 import re
-from setuptools import setup
+import setuptools
 
 setup_dir = Path(__file__).resolve().parent
-version = re.search(
-    r'__version__ = "(.*)"',
-    Path(setup_dir, 'calcure.py').open().read()
-)
+
+version = re.search( r'__version__ = "(.*)"', Path(setup_dir, 'calcure/__main__.py').open().read())
 if version is None:
     raise SystemExit("Could not determine version to use")
 version = version.group(1)
@@ -14,7 +12,7 @@ version = version.group(1)
 # with open('requirements.txt') as f:
     # required = f.read().splitlines()
 
-setup(
+setuptools.setup(
     name='calcure',
     author='Roman Anufriev',
     author_email='anufriev.roman@protonmail.com',
@@ -23,28 +21,39 @@ setup(
     long_description=Path(setup_dir, 'README.md').open().read(),
     long_description_content_type='text/markdown',
     license='MIT',
-    py_modules=['calcure'],
+    # py_modules=['calcure',
+                # 'data',
+                # 'screen',
+                # 'calendars',
+                # 'translation_en',
+                # 'controls',
+                # 'dialogues',
+                # 'repository',
+                # 'configuration',
+                # 'weather',
+                # ],
     entry_points={
         "console_scripts": [
-            "calcure = calcure:cli"
+            "calcure = calcure.__main__:cli"
         ]
     },
-    install_requires=['holidays'],
+    install_requires=['holidays', 'jdatetime'],
     version=version,
-    python_requires='~=3.6',
+    python_requires='~=3.7',
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Environment :: Console",
         "Natural Language :: English",
-        "Operating System :: POSIX :: Linux",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: POSIX :: SunOS/Solaris",
-        "Programming Language :: Python :: 3.6",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Topic :: Utilities",
-    ]
+    ],
+    packages=["calcure"],
+    include_package_data=True,
+    # package_dir={"": "src"},
+    # packages=setuptools.find_packages(),
 )
