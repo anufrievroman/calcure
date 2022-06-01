@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """This is the main module that contains views and the main logic"""
 
 # Libraries
@@ -590,7 +592,7 @@ class MonthlyScreenView(View):
     def render(self):
         self.screen.state = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
-        curses.halfdelay(100)
+        curses.halfdelay(255)
 
         # Info about the month:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
@@ -634,10 +636,11 @@ class JournalScreenView(View):
         self.weather = weather
         self.user_tasks = user_tasks
         self.screen = screen
-        self.refresh_time = 100
+        self.refresh_time = 255
 
     def calculate_refresh_rate(self):
         """Check if a timer is running and change the refresh rate"""
+        self.refresh_time = 255
         for task in self.user_tasks.items:
             if task.timer.is_counting:
                 self.refresh_time = cf.REFRESH_INTERVAL * 10

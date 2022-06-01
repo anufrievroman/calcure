@@ -12,7 +12,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Birthdays of your abook contacts
 - Import of events and tasks from calcurse and taskwarrior
 - Icons according to the name ✈ ⛷ ⛱
-- Privat events and tasks •••••
+- Private events and tasks •••••
 - Plain text database in your folder for cloud sync
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
@@ -30,7 +30,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ### Arch Linux, Manjaro etc
 
-The package `calcure` is available in AUR. 
+The package `calcure` is available in AUR (older version at the moment). 
 
 `yay -S calcure`
 
@@ -60,18 +60,18 @@ Run `calcure` in your terminal. You may need to restart your terminal after inst
 
 Calcure can be started in special mods using various user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
 
-## Key bindings
+### Key bindings
 
 List of all key bindings can be accessed [in the wiki](https://github.com/anufrievroman/calcure/wiki/Key-bindings) and via `?` key in the program.
 
-## Settings
+### Settings
 
 On the first run, program will create a configuration file at `.config/calcure/config.ini`.
 You can edit parameters and colors in the `config.ini` file.
 An example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini).
 Explanations of all settings are [in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
 
-## Troubleshooting
+### Troubleshooting
 
 - If your terminal shows empty squares instead of icons, probably it does not support unicode. In this case, in config set: `use_unicode_icons = No`.
 - Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
