@@ -12,7 +12,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Birthdays of your abook contacts
 - Import of events and tasks from calcurse and taskwarrior
 - Icons according to the name ✈ ⛷ ⛱
-- Privat events and tasks •••••
+- Private events and tasks •••••
 - Plain text database in your folder for cloud sync
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
