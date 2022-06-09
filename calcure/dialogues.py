@@ -5,7 +5,7 @@ from calcure.data import Frequency, Color
 
 
 def display_question(stdscr, y, x, question, color):
-    """Display the line of text respecting the slyling and available space"""
+    """Display the line of text respecting the styling and available space"""
     y_max, x_max = stdscr.getmaxyx()
     if y >= y_max or x >= x_max:
         return
@@ -51,6 +51,18 @@ def input_day(stdscr, y, x, prompt_string):
     return number
 
 
+def input_date(stdscr, y, x, prompt_string):
+    """Ask user to input date in YYYY/MM/DD format and check if it was valid entry"""
+    date_unformated = input_string(stdscr, y, x, prompt_string, 10)
+    try:
+        year = int(date_unformated.split("/")[0])
+        month = int(date_unformated.split("/")[1])
+        day = int(date_unformated.split("/")[2])
+        return year, month, day
+    except ValueError:
+        return None, None, None
+
+
 def input_frequency(stdscr, y, x, question):
     """Ask user for the frequency of event repetitions"""
     freq = input_string(stdscr, y, x, question, 2)
@@ -80,7 +92,7 @@ def ask_confirmation(stdscr, question, confirmations_enabled):
 
 
 def vim_style_exit(stdscr, screen):
-    """Handle vim style key combinations like "ZZ" and "ZQ" for exit"""
+    """Handle vim style key combinations like ZZ and ZQ for exit"""
     if screen.key == "Z":
         try:
             screen.key = stdscr.getkey()

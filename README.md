@@ -8,7 +8,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 - Vim keys
 - Operation with fewest key presses possible
-- Todo list with subtasks and timers ⌚
+- Todo list with subtasks, deadlines, and timers
 - Birthdays of your abook contacts
 - Import of events and tasks from calcurse and taskwarrior
 - Icons according to the name ✈ ⛷ ⛱

@@ -39,6 +39,7 @@ KEYS_TODO = {
         '  e,c  ': 'Edit a task',
         '   s   ': 'Toggle between task and subtask',
         '   .   ': 'Toggle task privacy',
+        '  f(F) ': 'Change (remove) task deadline',
         '   m   ': 'Move a task',
         '  C(W) ': 'Import tasks from calcurse (taskwarrior)',
         }
@@ -81,13 +82,13 @@ MSG_TS_IM         = "Import tasks from Calcurse? (y/n)"
 MSG_TS_TW         = "Import tasks from Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Nothing planned..."
 MSG_TS_PRIVACY    = "Toggle privacy of task number: "
+MSG_TS_DEAD_ADD   = "Add deadline for task number: "
+MSG_TS_DEAD_DEL   = "Remove deadline of the task number: "
+MSG_TS_DEAD_DATE  = "Add deadline on YYYY/MM/DD: "
 
 CALENDAR_HINT     = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 CALENDAR_HINT_D   = "Space · Switch to journal   a · Add event  n/p · Change day   ? · All keybindings"
 JOURNAL_HINT      = "Space · Switch to calendar   a · Add task   v · Done   i · Important   ? · All keybindings"
-
-ERR_FILE1 = "Looks like there is a problem in your config.ini file.Perhaps you edited it and entered a wrong line."
-ERR_FILE2 = "Try removing your config.ini file and run the program again, it will create a fresh working config file."
 
 DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

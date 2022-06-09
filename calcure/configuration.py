@@ -6,7 +6,6 @@ import configparser
 import sys
 import getopt
 
-from calcure.translation_en import ERR_FILE1, ERR_FILE2
 from calcure.data import AppState
 
 
@@ -66,14 +65,14 @@ class Config:
                 "done_icon":                 "✔",
                 "todo_icon":                 "•",
                 "important_icon":            "‣",
-                "timer_icon":                "⌚",
                 "separator_icon":            "│",
+                "deadline_icon":             "⚑",
                 }
 
         conf["Colors"] = {
                 "color_today":           "2",
-                "color_events":          "7",
-                "color_days":            "4",
+                "color_events":          "4",
+                "color_days":            "7",
                 "color_day_names":       "4",
                 "color_weekends":        "1",
                 "color_weekend_names":   "1",
@@ -91,6 +90,7 @@ class Config:
                 "color_timer":           "2",
                 "color_timer_paused":    "7",
                 "color_time":            "7",
+                "color_deadlines":       "3",
                 "color_weather":         "2",
                 "color_active_pane":     "2",
                 "color_separator":       "7",
@@ -133,8 +133,7 @@ class Config:
                 "match":       "♟",
                 "play":        "♟",
                 "interview":   "🎙️",
-                "conference":  "🎙️"
-                "hearing":     "🎙️"
+                "conference":  "🎙️",
                 "dating":      "♥",
                 "concert":     "♪",
                 "dance":       "♪",
@@ -167,7 +166,7 @@ class Config:
             conf.write(f)
 
     def read_config_file(self):
-        """Read user config.ini file"""
+        """Read user config.ini file and assign values to all the global variables"""
         try:
             conf = configparser.ConfigParser()
             conf.read(self.config_file, 'utf-8')
@@ -199,16 +198,8 @@ class Config:
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
-
             self.HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
             self.WEATHER_CITY     = conf.get("Parameters", "weather_city", fallback="")
-            self.TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if self.DISPLAY_ICONS else "·"
-            self.PRIVACY_ICON     = conf.get("Parameters", "privacy_icon", fallback="•") if self.DISPLAY_ICONS else "·"
-            self.HIDDEN_ICON      = conf.get("Parameters", "hidden_icon", fallback="...")
-            self.EVENT_ICON       = conf.get("Parameters", "event_icon", fallback="•") if self.DISPLAY_ICONS else ""
-            self.BIRTHDAY_ICON    = conf.get("Parameters", "birthday_icon", fallback="★")
-            self.HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="☘️")
-            self.SEPARATOR_ICON   = conf.get("Parameters", "separator_icon", fallback="│")
 
             # Journal settings:
             self.CALCURSE_TODO_FILE    = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
@@ -219,7 +210,6 @@ class Config:
             self.DONE_ICON             = conf.get("Parameters", "done_icon", fallback="✔") if self.DISPLAY_ICONS else "×"
             self.TODO_ICON             = conf.get("Parameters", "todo_icon", fallback="•") if self.DISPLAY_ICONS else "·"
             self.IMPORTANT_ICON        = conf.get("Parameters", "important_icon", fallback="‣") if self.DISPLAY_ICONS else "!"
-            self.TIMER_ICON            = conf.get("Parameters", "timer_icon", fallback="⌚") if self.DISPLAY_ICONS else "!"
             self.REFRESH_INTERVAL      = int(conf.get("Parameters", "refresh_interval", fallback=1))
             self.RIGHT_PANE_PERCENTAGE = int(conf.get("Parameters", "right_pane_percentage", fallback=25))
 
@@ -234,6 +224,7 @@ class Config:
             self.COLOR_PROMPTS         = int(conf.get("Colors", "color_prompts", fallback=7))
             self.COLOR_BIRTHDAYS       = int(conf.get("Colors", "color_birthdays", fallback=1))
             self.COLOR_HOLIDAYS        = int(conf.get("Colors", "color_holidays", fallback=2))
+            self.COLOR_DEADLINES       = int(conf.get("Colors", "color_deadlines", fallback=3))
             self.COLOR_CONFIRMATIONS   = int(conf.get("Colors", "color_confirmations", fallback=1))
             self.COLOR_TIMER           = int(conf.get("Colors", "color_timer", fallback=2))
             self.COLOR_TIMER_PAUSED    = int(conf.get("Colors", "color_timer_paused", fallback=7))
@@ -268,6 +259,15 @@ class Config:
             self.UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
             self.UNDERLINED_ACTIVE_PANE   = conf.getboolean("Styles", "underlined_active_pane", fallback=False)
 
+            # Icons:
+            self.TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if self.DISPLAY_ICONS else "·"
+            self.PRIVACY_ICON     = conf.get("Parameters", "privacy_icon", fallback="•") if self.DISPLAY_ICONS else "·"
+            self.HIDDEN_ICON      = conf.get("Parameters", "hidden_icon", fallback="...")
+            self.EVENT_ICON       = conf.get("Parameters", "event_icon", fallback="•") if self.DISPLAY_ICONS else "·"
+            self.BIRTHDAY_ICON    = conf.get("Parameters", "birthday_icon", fallback="★") if self.DISPLAY_ICONS else "·"
+            self.HOLIDAY_ICON     = conf.get("Parameters", "holiday_icon", fallback="☘️") if self.DISPLAY_ICONS else "·"
+            self.SEPARATOR_ICON   = conf.get("Parameters", "separator_icon", fallback="│")
+            self.DEADLINE_ICON    = conf.get("Parameters", "deadline_icon", fallback="⚑") if self.DISPLAY_ICONS else "·"
             try:
                 self.ICONS = {word: icon for (word, icon) in conf.items("Event icons")}
             except configparser.NoSectionError:
@@ -278,6 +278,8 @@ class Config:
             self.TASKS_FILE = self.data_folder + "/tasks.csv"
 
         except Exception:
+            ERR_FILE1 = "Looks like there is a problem in your config.ini file. Perhaps you edited it and entered a wrong line."
+            ERR_FILE2 = "Try removing your config.ini file and run the program again, it will create a fresh working config file."
             print(ERR_FILE1)
             print(ERR_FILE2)
             exit()
@@ -295,7 +297,7 @@ class Config:
             pass
 
     def read_parameters_from_user_arguments(self):
-        """Read user arguments that were provided at the run"""
+        """Read user arguments that were provided at the run. This values take priority over config.ini"""
         try:
             opts, _ = getopt.getopt(sys.argv[1:],"pjhvi",["folder=", "config="])
             for opt, arg in opts:

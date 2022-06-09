@@ -19,7 +19,7 @@ from calcure.translation_en import *
 from calcure.controls import *
 
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 
 def initialize_colors():
@@ -51,6 +51,7 @@ def initialize_colors():
     curses.init_pair(Color.SEPARATOR.value, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.EMPTY.value, cf.COLOR_BACKGROUND, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.CALENDAR_BOARDER.value, cf.COLOR_CALENDAR_BOARDER, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.DEADLINES.value, cf.COLOR_DEADLINES, cf.COLOR_BACKGROUND)
 
     if not cf.MINIMAL_WEEKEND_INDICATOR:
         curses.init_pair(Color.WEEKENDS.value, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)
@@ -107,14 +108,13 @@ class TaskView(View):
     @property
     def color(self):
         """Select the color depending on the status"""
-        color = Color.TODO
         if self.task.status == Status.DONE:
-            color = Color.DONE
+            return Color.DONE
         if self.task.status == Status.IMPORTANT:
-            color = Color.IMPORTANT
+            return Color.IMPORTANT
         if self.task.status == Status.UNIMPORTANT:
-            color = Color.UNIMPORTANT
-        return color
+            return Color.UNIMPORTANT
+        return Color.TODO
 
     @property
     def icon(self):
@@ -144,44 +144,57 @@ class TaskView(View):
         self.info = f'{cf.TODO_ICON} {cf.PRIVACY_ICON * len(self.task.name[self.indent:])}'
 
     def render(self):
-        """Render a line with an icon, task, and timer"""
+        """Render a line with an icon, task, deadline, and timer"""
         if self.screen.privacy or self.task.privacy:
             self.obfuscate_info()
         self.display_line(self.y, self.x + self.indent, self.info, self.color)
-        timer_indentation = self.screen.x_min + 2 + len(self.info) + self.indent
+
+        deadline_indentation = self.screen.x_min + 2 + len(self.info) + self.indent
+        deadline_view = TaskDeadlineView(self.stdscr, self.y, deadline_indentation, self.task)
+        deadline_view.render()
+
+        addition_indentation = (deadline_view.has_deadline)*(4 + len(deadline_view.info))
+        timer_indentation = deadline_indentation + addition_indentation
         timer_view = TimerView(self.stdscr, self.y, timer_indentation, self.task.timer)
         timer_view.render()
 
 
+class TaskDeadlineView(View):
+    """Display deadline for a task"""
+
+    def __init__(self, stdscr, y, x, task):
+        super().__init__(stdscr, y, x)
+        self.task = task
+        self.color = Color.DEADLINES
+        self.icon = cf.DEADLINE_ICON
+        self.info = f"{self.task.year}/{self.task.month}/{self.task.day}"
+        self.has_deadline = (self.task.year > 0)
+
+    def render(self):
+        """Render a line with the deadline date and icon"""
+        if self.has_deadline:
+            self.display_line(self.y, self.x, f"{self.icon} {self.info}", self.color)
+
+
 class TimerView(View):
-    """Display a single task"""
+    """Display timer for a task"""
 
     def __init__(self, stdscr, y, x, timer):
         super().__init__(stdscr, y, x)
         self.timer = timer
-
-    @property
-    def color(self):
-        """Select the color depending on the timer status"""
-        color = Color.TIMER if self.timer.is_counting else Color.TIMER_PAUSED
-        return color
+        self.color = Color.TIMER if self.timer.is_counting else Color.TIMER_PAUSED
 
     @property
     def icon(self):
         """Return icon corresponding to timer state"""
-        if not self.timer.is_counting and cf.DISPLAY_ICONS:
-            icon = "⏯︎ "
-        elif self.timer.is_counting and cf.DISPLAY_ICONS:
-            icon = "⏵ "
-        else:
-            icon = ''
-        return icon
+        TIMER_RUNS_ICON = "⏵" if cf.DISPLAY_ICONS else "·"
+        TIMER_PAUSED_ICON = "⏯︎" if cf.DISPLAY_ICONS else "·"
+        return TIMER_RUNS_ICON if self.timer.is_counting else TIMER_PAUSED_ICON
 
     def render(self):
         """Render a line with a timer and icon"""
         if self.timer.is_started:
-            time_string = self.icon + self.timer.passed_time
-            self.display_line(self.y, self.x, time_string, self.color)
+            self.display_line(self.y, self.x, f"{self.icon} {self.timer.passed_time}", self.color)
 
 
 class JournalView(View):
@@ -311,15 +324,34 @@ class HolidayView(EventView):
         self.display_line(self.y, self.x, self.info, Color.HOLIDAYS)
 
 
+class DeadlineView(EventView):
+    """Display a line with deadline icon and task name"""
+
+    @property
+    def icon(self):
+        """Set the icon for task deadline"""
+        return cf.DEADLINE_ICON
+
+    def render(self):
+        """Render this view on the screen"""
+        if self.screen.privacy or self.event.privacy:
+            self.obfuscate_info()
+        self.fill_remaining_space()
+        self.cut_info()
+        self.minimize_info()
+        self.display_line(self.y, self.x, self.info, Color.DEADLINES)
+
+
 class DailyView(View):
     """Display all events occurring on this days"""
 
-    def __init__(self, stdscr, y, x, repeated_user_events, user_events, holidays, birthdays, screen, index_offset):
+    def __init__(self, stdscr, y, x, repeated_user_events, user_events, holidays, birthdays, user_tasks, screen, index_offset):
         super().__init__(stdscr, y, x)
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
         self.holidays = holidays.filter_events_that_day(screen)
         self.birthdays = birthdays.filter_events_that_day(screen)
+        self.deadlines = user_tasks.filter_events_that_day(screen)
         self.screen = screen
         self.index_offset = index_offset
         self.y_cell = (self.screen.y_max - 3) // 6
@@ -348,6 +380,15 @@ class DailyView(View):
                 user_event_view.render()
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
+            index += 1
+
+        # Show deadlines for tasks:
+        for event in self.deadlines.items:
+            if index < self.y_cell - 1:
+                deadline_view = DeadlineView(self.stdscr, self.y + index, self.x, event, self.screen)
+                deadline_view.render()
+            else:
+                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.DEADLINES)
             index += 1
 
         # Show holidays:
@@ -525,7 +566,7 @@ class DaysNameView(View):
         self.screen = screen
 
     def render(self):
-        num = 2 if self.screen.x_max < 80 else 10
+        num = 2 if self.screen.x_max < 74 else 12
         x_cell = int(self.screen.x_max // 7)
 
         # Depending on which day we start the week, weekends are shifted:
@@ -547,12 +588,13 @@ class DaysNameView(View):
 class DailyScreenView(View):
     """Daily view showing events of the day"""
 
-    def __init__(self, stdscr, y, x, weather, user_events, holidays, birthdays, screen):
+    def __init__(self, stdscr, y, x, weather, user_events, holidays, birthdays, user_tasks, screen):
         super().__init__(stdscr, y, x)
         self.weather = weather
         self.user_events = user_events
         self.holidays = holidays
         self.birthdays = birthdays
+        self.user_tasks = user_tasks
         self.screen = screen
 
     def render(self):
@@ -573,20 +615,21 @@ class DailyScreenView(View):
 
         # Display the events:
         repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
-        daily_view = DailyView(self.stdscr, self.y + 2, self.x, repeated_user_events,
-                               self.user_events, self.holidays, self.birthdays, self.screen, 0)
+        daily_view = DailyView(self.stdscr, self.y + 2, self.x, repeated_user_events, self.user_events,
+                                        self.holidays, self.birthdays, self.user_tasks, self.screen, 0)
         daily_view.render()
 
 
 class MonthlyScreenView(View):
     """Monthly view showing events of the month"""
 
-    def __init__(self, stdscr, y, x, weather, user_events, holidays, birthdays, screen):
+    def __init__(self, stdscr, y, x, weather, user_events, holidays, birthdays, user_tasks, screen):
         super().__init__(stdscr, y, x)
         self.weather = weather
         self.user_events = user_events
         self.holidays = holidays
         self.birthdays = birthdays
+        self.user_tasks = user_tasks
         self.screen = screen
 
     def render(self):
@@ -620,8 +663,8 @@ class MonthlyScreenView(View):
 
                     # Display the events:
                     self.screen.day = day
-                    daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events,
-                                           self.user_events, self.holidays, self.birthdays, self.screen, num_events_this_month)
+                    daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events, self.user_events,
+                                            self.holidays, self.birthdays, self.user_tasks, self.screen, num_events_this_month)
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
@@ -706,22 +749,23 @@ class HelpScreenView(View):
         self.display_line(self.global_shift_y + 2, self.global_shift_x + 8,
                           TITLE_KEYS_GENERAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_GENERAL):
-            line = f"{key} {KEYS_GENERAL[key]}"
-            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, line, Color.TODO)
+            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, key, Color.TODAY)
+            self.display_line(self.global_shift_y + index + 3, self.global_shift_x + 8, KEYS_GENERAL[key], Color.TODO)
 
         self.display_line(self.global_shift_y + 4 + len(KEYS_GENERAL), self.global_shift_x + 8,
                           TITLE_KEYS_CALENDAR, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_CALENDAR):
-            line = f"{key} {KEYS_CALENDAR[key]}"
-            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, line, Color.TODO)
+            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, key, Color.TODAY)
+            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x + 8,
+                                                                            KEYS_CALENDAR[key], Color.TODO)
 
         # Right column:
         d_x = self.global_shift_x + self.shift_x
         d_y = self.global_shift_y + self.shift_y
         self.display_line(d_y, d_x + 8, TITLE_KEYS_JOURNAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_TODO):
-            line = f"{key} {KEYS_TODO[key]}"
-            self.display_line(d_y + index + 1, d_x, line, Color.TODO)
+            self.display_line(d_y + index + 1, d_x, key, Color.TODAY)
+            self.display_line(d_y + index + 1, d_x + 8, KEYS_TODO[key], Color.TODO)
 
         # Additional info:
         d_x = self.global_shift_x + self.shift_x + 8
@@ -756,12 +800,14 @@ def main(stdscr) -> None:
 
     # Initialise screen views:
     app_view = View(stdscr, 0, 0)
-    monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
-    daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, screen)
+    monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, user_tasks, screen)
+    daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, user_tasks, screen)
     journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
     help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
     footer_view = FooterView(stdscr, 0, 0, screen)
     separator_view = SeparatorView(stdscr, 0, 0, screen)
+
+    print(holidays.items)
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
@@ -822,7 +868,7 @@ def main(stdscr) -> None:
         else:
             break
 
-        # If something changed, save the data:
+        # If something has been changed, save the data:
         if user_events.changed:
             file_repository.save_events_to_csv()
             screen.refresh_now = True

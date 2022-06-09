@@ -64,17 +64,21 @@ class Color(enum.Enum):
     SEPARATOR = 23
     EMPTY = 24
     CALENDAR_BOARDER = 24
+    DEADLINES = 25
 
 
 class Task:
-    """Task crated by user"""
+    """Tasks crated by user"""
 
-    def __init__(self, item_id, name, status, timer, privacy):
+    def __init__(self, item_id, name, status, timer, privacy, year=0, month=0, day=0):
         self.item_id = item_id
         self.name = name
         self.status = status
         self.timer = timer
         self.privacy = privacy
+        self.year = year
+        self.month = month
+        self.day = day
 
 
 class Event:
@@ -110,14 +114,14 @@ class UserRepeatedEvent(Event):
 
 
 class Timer:
-    """Timer for a task"""
+    """Timer for tasks"""
 
     def __init__(self, stamps):
         self.stamps = stamps
 
     @property
     def is_counting(self):
-        """Evaluate if the time is currently counting"""
+        """Evaluate if the timer is currently running"""
         return False if not self.stamps else (len(self.stamps)%2 == 1)
 
     @property
@@ -127,7 +131,7 @@ class Timer:
 
     @property
     def passed_time(self):
-        """Calculate how much time passed in the un-paused intervals"""
+        """Calculate how much time has passed in the un-paused intervals"""
         time_passed = 0
 
         # Calculate passed time, assuming that even timestamps are pauses:
@@ -230,6 +234,25 @@ class Collection:
             return False
         return 0 <= number < len(self.items)
 
+    def filter_events_that_day(self, screen):
+        """Filter only events that happen on the particular day"""
+        events_of_the_day = Events()
+        for event in self.items:
+            if (event.year == screen.year
+                and event.month == screen.month
+                and event.day == screen.day):
+                events_of_the_day.add_item(event)
+        return events_of_the_day
+
+    def filter_events_that_month(self, screen):
+        """Filter only events that happen on the particular month and sort them by day"""
+        events_of_the_month = Events()
+        for event in self.items:
+            if event.month == screen.month and event.year == screen.year:
+                events_of_the_month.add_item(event)
+        events_of_the_month.items = sorted(events_of_the_month.items, key=lambda item: item.day)
+        return events_of_the_month
+
 
 class Tasks(Collection):
     """List of tasks created by the user"""
@@ -250,6 +273,13 @@ class Tasks(Collection):
     def reset_timer_for_task(self, number):
         """Reset the timer for one of the tasks"""
         self.items[number].timer.stamps = []
+        self.changed = True
+
+    def change_deadline(self, number, new_year, new_month, new_day):
+        """Reset the timer for one of the tasks"""
+        self.items[number].year = new_year
+        self.items[number].month = new_month
+        self.items[number].day = new_day
         self.changed = True
 
     def toggle_subtask_state(self, number):
@@ -279,27 +309,8 @@ class Events(Collection):
                 return True
         return False
 
-    def filter_events_that_day(self, screen):
-        """Filter only events that happen on the particular day"""
-        events_of_the_day = Events()
-        for event in self.items:
-            if (event.year == screen.year
-                and event.month == screen.month
-                and event.day == screen.day):
-                events_of_the_day.add_item(event)
-        return events_of_the_day
-
-    def filter_events_that_month(self, screen):
-        """Filter only events that happen on the particular month and sort them by day"""
-        events_of_the_month = Events()
-        for event in self.items:
-            if event.month == screen.month and event.year == screen.year:
-                events_of_the_month.add_item(event)
-        events_of_the_month.items = sorted(events_of_the_month.items, key=lambda item: item.day)
-        return events_of_the_month
-
     def change_day(self, selected_item_id, new_day):
-        """Move task from certain place to another in the list"""
+        """Move an event to another day"""
         for item in self.items:
             if item.item_id == selected_item_id:
                 item.day = new_day
@@ -308,7 +319,7 @@ class Events(Collection):
 
 
 class Birthdays(Events):
-    """List of birthdays"""
+    """List of birthdays imported from abook"""
 
     def filter_events_that_day(self, screen):
         """Filter only birthdays that happen on the particular day"""
@@ -320,7 +331,7 @@ class Birthdays(Events):
 
 
 class RepeatedEvents(Events):
-    """List of events that are repetitions of the main events"""
+    """List of events that are repetitions of main events"""
 
     def __init__(self, user_events, use_persian_calendar):
         super().__init__()

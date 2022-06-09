@@ -127,3 +127,13 @@ class Screen:
         if number is None:
             return False
         return 0 < number <= Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
+
+
+    def is_valid_date(self, year, month, day) -> bool:
+        """Check if a date corresponds to any actually existing date"""
+        if None in [year, month, day]:
+            return False
+        if 0 < month < 12:
+            return 0 < day <= Calendar(0, self.use_persian_calendar).last_day(year, month)
+        else:
+            return False

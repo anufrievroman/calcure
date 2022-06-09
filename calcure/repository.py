@@ -11,7 +11,6 @@ import datetime
 import jdatetime
 
 
-
 def convert_to_persian_date(year, month, day):
     """Convert date from Gregorian to Persian calendar"""
     persian_date =  jdatetime.date.fromgregorian(day=day, month=month, year=year)
@@ -32,6 +31,7 @@ def convert_to_gregorian_date(year, month, day):
 
 class FileRepository:
     """Load and save events and tasks to files"""
+
     def __init__(self, tasks_file, events_file, country, use_persian_calendar):
         self.user_tasks = Tasks()
         self.user_events = Events()
@@ -40,17 +40,23 @@ class FileRepository:
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = tasks_file
         self.events_file = events_file
-
         self.country = country
         self.use_persian_calendar = use_persian_calendar
 
+    @property
+    def is_task_format_old(self):
+        """Check if the database format is old"""
+        with open(self.tasks_file, "r", encoding="utf-8") as f:
+            text = f.read()
+        return text[0] == '"'
+
     def read_or_create_file(self, file):
-        """Try to read a csv file or create if it does not exist"""
+        """Read user's csv file or create new one if it does not exist"""
         # Try to read the file line by line:
         try:
             with open(file, "r", encoding="utf-8") as f:
                 read_lines = csv.reader(f, delimiter = ',')
-                return [line for line in read_lines]
+                return list(read_lines)
 
         # Create file if it does not exist:
         except IOError:
@@ -63,19 +69,38 @@ class FileRepository:
                 return []
 
     def load_tasks_from_csv(self):
-        """Reads from user's file or create it if it does not exist"""
+        """Reads from user's file or create new one if it does not exist"""
         lines = self.read_or_create_file(self.tasks_file)
+
         for index, row in enumerate(lines):
             task_id = index
-            if row[0][0] == '.':
-                name = row[0][1:]
+
+            # Read task dates:
+            if self.is_task_format_old:
+                shift = 0
+                year = 0
+                month = 0
+                day = 0
+            else:
+                shift = 3
+                year = int(row[0])
+                month = int(row[1])
+                day = int(row[2])
+
+            # Convert to persian date if needed and if it is not zero date:
+            if self.use_persian_calendar and year != 0:
+                year, month, day = convert_to_persian_date(year, month, day)
+
+            # Read task name and statuses:
+            if row[0 + shift][0] == '.':
+                name = row[0 + shift][1:]
                 privacy = True
             else:
-                name = row[0]
+                name = row[0 + shift]
                 privacy = False
-            status = Status[row[1].upper()]
-            stamps = row[2:] if len(row) > 2 else []
-            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), privacy))
+            status = Status[row[1 + shift].upper()]
+            stamps = row[(2 + shift):] if len(row) > 2 else []
+            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), privacy, year, month, day))
         return self.user_tasks
 
     def load_events_from_csv(self):
@@ -132,7 +157,14 @@ class FileRepository:
         with open(dummy_file, "w", encoding="utf-8") as f:
             for task in self.user_tasks.items:
                 dot = "."
-                f.write(f'"{dot*task.privacy}{task.name}",{task.status.name.lower()}')
+
+                # If persian calendar was used, we convert event back to Gregorian for storage:
+                if self.use_persian_calendar and task.year != 0:
+                    year, month, day = convert_to_gregorian_date(task.year, task.month, task.day)
+                else:
+                    year, month, day = task.year, task.month, task.day
+
+                f.write(f'{year},{month},{day},"{dot*task.privacy}{task.name}",{task.status.name.lower()}')
                 for stamp in task.timer.stamps:
                     f.write(f',{str(stamp)}')
                 f.write("\n")
@@ -147,7 +179,7 @@ class FileRepository:
         with open(dummy_file, "w", encoding="utf-8") as f:
             for ev in self.user_events.items:
 
-                # If persian calendar was user, we convert event back to Gregorian for storage:
+                # If persian calendar was used, we convert event back to Gregorian for storage:
                 if self.use_persian_calendar:
                     year, month, day = convert_to_gregorian_date(ev.year, ev.month, ev.day)
                 else:
@@ -158,6 +190,12 @@ class FileRepository:
         os.remove(original_file)
         os.rename(dummy_file, original_file)
         self.user_events.changed = False
+
+    def load_deadlines(self):
+        """Create collection of events that are deadlines for tasks"""
+        for task in self.user_tasks.items:
+            self.deadlines.add_item(DeadlineEvent(task.item_id, task.year, task.month, task.day, task.name, task.status, task.privacy))
+        return self.deadlines
 
     def load_holidays(self):
         """Load list of holidays in this country around this year"""
@@ -199,7 +237,8 @@ class FileRepository:
 
 class Importer:
     """Import tasks and events from files of other programs"""
-    def __init__(self, user_tasks, user_events, tasks_file, events_file, calcurse_todo_file, calcurse_events_file, taskwarrior_folder, use_persian_calendar):
+    def __init__(self, user_tasks, user_events, tasks_file, events_file, calcurse_todo_file,
+                            calcurse_events_file, taskwarrior_folder, use_persian_calendar):
         self.user_tasks = user_tasks
         self.user_events = user_events
         self.tasks_file = tasks_file

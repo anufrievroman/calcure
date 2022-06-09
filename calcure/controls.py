@@ -1,4 +1,5 @@
-"""This module contains functions that react to user input"""
+"""This module contains functions that react to user input on each screen"""
+
 import curses
 
 from calcure.configuration import cf
@@ -110,8 +111,9 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                     item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
                     reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                     freq = input_frequency(stdscr, screen.y_max-2, 0, MSG_EVENT_FR)
-                    if reps > 0 and freq is not None:
-                        user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps + 1, freq, Status.NORMAL, False))
+                    if reps is not None and freq is not None:
+                        reps = 1 if reps == 0 else reps
+                        user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps+1, freq, Status.NORMAL, False))
 
             # Imports:
             if screen.key == "C":
@@ -233,8 +235,9 @@ def control_daily_screen(stdscr, user_events, screen, importer):
                 item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
                 reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
                 freq = input_frequency(stdscr, screen.y_max-2, 0, MSG_EVENT_FR)
-                if reps > 0 and freq is not None:
-                    user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps + 1, freq, Status.NORMAL, False))
+                if reps is not None and freq is not None:
+                    reps = 1 if reps == 0 else reps
+                    user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps+1, freq, Status.NORMAL, False))
 
             # Import from calcurse:
             if screen.key == "C":
@@ -283,6 +286,23 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
                 if user_tasks.is_valid_number(number):
                     user_tasks.reset_timer_for_task(number)
+
+            # Add deadline:
+            if screen.key == "f":
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEAD_ADD)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    clear_line(stdscr, screen.y_max-2, 0)
+                    year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_TS_DEAD_DATE)
+                    if screen.is_valid_date(year, month, day):
+                        user_tasks.change_deadline(task_id, year, month, day)
+
+            # Remove deadline:
+            if screen.key == "F":
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEAD_DEL)
+                if user_tasks.is_valid_number(number):
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.change_deadline(task_id, 0, 0, 0)
 
             # Change the status:
             if screen.key in ['i', 'h']:
@@ -351,11 +371,11 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             screen.key = stdscr.getkey()
 
             # If we need to select a task, change to selection mode:
-            if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'c', 'A', 'm', '.']:
+            if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'c', 'A', 'm', '.', 'f', 'F']:
                 screen.selection_mode = True
 
             # Add single task:
-            if screen.key == 'a':
+            if screen.key == "a":
                 clear_line(stdscr, len(user_tasks.items) + 2, screen.x_min)
                 task_name = input_string(stdscr, len(user_tasks.items) + 2, screen.x_min, cf.TODO_ICON+' ', screen.x_max - 4)
                 user_tasks.add_item(Task(len(user_tasks.items), task_name, Status.NORMAL, Timer([]), False))
@@ -367,9 +387,9 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 user_tasks.change_all_statuses(Status.NORMAL)
             if screen.key == "L":
                 user_tasks.change_all_statuses(Status.UNIMPORTANT)
-            if screen.key in ['I', 'H']:
+            if screen.key in ["I", "H"]:
                 user_tasks.change_all_statuses(Status.IMPORTANT)
-            if screen.key in ['D', 'X']:
+            if screen.key in ["D", "X"]:
                 confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
                 if confirmed: user_tasks.delete_all_items()
 
