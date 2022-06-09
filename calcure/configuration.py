@@ -299,7 +299,7 @@ class Config:
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run. This values take priority over config.ini"""
         try:
-            opts, _ = getopt.getopt(sys.argv[1:],"pjhvi",["folder=", "config="])
+            opts, _ = getopt.getopt(sys.argv[1:],"pjhvi",["folder=", "config=", "task=", "event="])
             for opt, arg in opts:
                 if opt in '--folder':
                     self.data_folder = arg

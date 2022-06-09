@@ -4,8 +4,9 @@
 
 # Libraries
 import curses
-import calendar
 import time
+import getopt
+import sys
 
 # Modules
 from calcure.calendars import Calendar
@@ -59,6 +60,31 @@ def initialize_colors():
         curses.init_pair(Color.TODAY.value, curses.COLOR_BLACK, cf.COLOR_TODAY)
     if not cf.MINIMAL_DAYS_INDICATOR:
         curses.init_pair(Color.DAYS.value, curses.COLOR_BLACK, cf.COLOR_DAYS)
+
+
+def read_items_from_user_arguments(screen, user_tasks, user_events, file_repository):
+    """Read --task and --event flags from user arguments to create new tasks or events"""
+    try:
+        opts, _ = getopt.getopt(sys.argv[1:], "pjhvi", ["folder=", "config=", "task=", "event="])
+        for opt, arg in opts:
+            if opt in '--task':
+                name = arg
+                user_tasks.add_item(Task(len(user_tasks.items), name, Status.NORMAL, Timer([]), False))
+                screen.state = AppState.EXIT
+                file_repository.save_tasks_to_csv()
+            if opt in '--event':
+                year = int(arg.split("-")[0])
+                month = int(arg.split("-")[1])
+                day = int(arg.split("-")[2])
+                name = arg.split("-")[3]
+                event_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
+                user_events.add_item(UserEvent(event_id, year, month, day, name,
+                                        1, Frequency.ONCE, Status.NORMAL, False))
+                screen.state = AppState.EXIT
+                file_repository.save_events_to_csv()
+
+    except (getopt.GetoptError, ValueError):
+        pass
 
 
 class View:
@@ -792,6 +818,8 @@ def main(stdscr) -> None:
     importer = Importer(user_tasks, user_events, cf.TASKS_FILE, cf.EVENTS_FILE, cf.CALCURSE_TODO_FILE,
                                 cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER, cf.USE_PERSIAN_CALENDAR)
 
+    read_items_from_user_arguments(screen, user_tasks, user_events, file_repository)
+
     # Initialise terminal screen:
     stdscr = curses.initscr()
     curses.noecho()
@@ -807,7 +835,6 @@ def main(stdscr) -> None:
     footer_view = FooterView(stdscr, 0, 0, screen)
     separator_view = SeparatorView(stdscr, 0, 0, screen)
 
-    print(holidays.items)
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
