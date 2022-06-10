@@ -16,7 +16,6 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Plain text database in your folder for cloud sync
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
-- Week can start on any day
 - Current weather ⛅
 - Support for Persian calendar
 
@@ -26,18 +25,6 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 ### Linux and Mac OS
 
 `pip install calcure`
-
-
-### Arch Linux, Manjaro etc
-
-The package `calcure` is available in AUR (older version at the moment). 
-
-`yay -S calcure`
-
-Also, you need to install `holidays` and `jdatetime` libraries:
-
-`pip install holidays jdatetime`
-
 
 ### Windows
 
@@ -58,7 +45,7 @@ Run `calcure` in your terminal. You may need to restart your terminal after inst
 
 ### User arguments
 
-Calcure can be started in special mods using various user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
+Calcure support automations and can be started in special mods using user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
 
 ### Key bindings
 
@@ -66,8 +53,8 @@ List of all key bindings can be accessed [in the wiki](https://github.com/anufri
 
 ### Settings
 
-On the first run, program will create a configuration file at `.config/calcure/config.ini`.
-You can edit parameters and colors in the `config.ini` file.
+On the first run, program will create a configuration file at `~/.config/calcure/config.ini`.
+You can edit parameters, colors, and icons in the `config.ini` file.
 An example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini).
 Explanations of all settings are [in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
 
@@ -77,10 +64,11 @@ Explanations of all settings are [in the wiki](https://github.com/anufrievroman/
 - Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
 - If weather is incorrect, set your city in config `weather_city = Tokyo`. By default, this setting is empty and program tries to detect your city automatically from your ip.
 - If after install the program does not run by just running `calcure`, try to restart your terminal, it may need to recheck the binaries.
+- AUR package is autdated, please use `pip install calcure` for installation.
 
 ## Contribution, translations, donations
 
-If you wish to contribute to the code base or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute on the topics of file encryption and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
+If you wish to contribute to the code base or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations, packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
 
 If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
 For more information about contribution, see [wiki pages](https://github.com/anufrievroman/calcure/wiki/Contribution).
