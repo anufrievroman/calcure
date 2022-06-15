@@ -295,6 +295,10 @@ class Tasks(Collection):
         self.items.insert(number_to, self.items.pop(number_from))
         self.changed = True
 
+    def generate_id(self):
+        """Generate a id for a new item. The id is generated as maximum of existing ids plus one"""
+        return max([item.item_id for item in self.items]) + 1
+
 
 class Events(Collection):
     """List of events created by the user or imported"""

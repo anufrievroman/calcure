@@ -1,5 +1,6 @@
 # Calcure
 
+
 Modern TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse) and [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior). See [wiki](https://github.com/anufrievroman/calcure/wiki) for more information.
 
 ![screenshot](screen.jpg)

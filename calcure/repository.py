@@ -5,10 +5,10 @@ import pathlib
 import csv
 import os
 
-from calcure.data import *
-
 import datetime
 import jdatetime
+
+from calcure.data import *
 
 
 def convert_to_persian_date(year, month, day):
@@ -270,7 +270,7 @@ class Importer:
                     status = Status.UNIMPORTANT
                 else:
                     status = Status.NORMAL
-                task_id = len(self.user_tasks.items)
+                task_id = self.user_tasks.generate_id()
                 privacy = False
                 self.user_tasks.add_item(Task(task_id, name, status, Timer([]), privacy))
 
@@ -282,7 +282,7 @@ class Importer:
                 name = line.split('description:"', 1)[1]
                 name = name.split('"', 1)[0]
                 if not self.user_tasks.item_exists(name):
-                    task_id = len(self.user_tasks.items)
+                    task_id = self.user_tasks.generate_id()
                     privacy = False
                     self.user_tasks.add_item(Task(task_id, name, Status.NORMAL, Timer([]), privacy))
 

@@ -342,6 +342,7 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             if screen.key == 'm':
                 number_from = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE)
                 if user_tasks.is_valid_number(number_from):
+                    clear_line(stdscr, screen.y_max-2)
                     number_to = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE_TO)
                     user_tasks.move_task(number_from, number_to)
             if screen.key in ['e', 'c']:
@@ -362,7 +363,8 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 if user_tasks.is_valid_number(number):
                     clear_line(stdscr, screen.y_max-2, 0)
                     task_name = input_string(stdscr, screen.y_max-2, 0, MSG_TS_TITLE, screen.x_max-len(MSG_TS_TITLE)-2)
-                    user_tasks.add_subtask(Task(None, task_name, Status.NORMAL, Timer([]), False), number)
+                    task_id = user_tasks.generate_id()
+                    user_tasks.add_subtask(Task(task_id, task_name, Status.NORMAL, Timer([]), False), number)
             screen.selection_mode = False
 
         # Otherwise, we check for user input:
@@ -378,7 +380,8 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             if screen.key == "a":
                 clear_line(stdscr, len(user_tasks.items) + 2, screen.x_min)
                 task_name = input_string(stdscr, len(user_tasks.items) + 2, screen.x_min, cf.TODO_ICON+' ', screen.x_max - 4)
-                user_tasks.add_item(Task(len(user_tasks.items), task_name, Status.NORMAL, Timer([]), False))
+                task_id = user_tasks.generate_id()
+                user_tasks.add_item(Task(task_id, task_name, Status.NORMAL, Timer([]), False))
 
             # Bulk operations:
             if screen.key == "V":
@@ -391,7 +394,8 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 user_tasks.change_all_statuses(Status.IMPORTANT)
             if screen.key in ["D", "X"]:
                 confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
-                if confirmed: user_tasks.delete_all_items()
+                if confirmed:
+                    user_tasks.delete_all_items()
 
             # Imports:
             if screen.key == "C":
