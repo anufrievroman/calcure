@@ -353,10 +353,23 @@ class HolidayView(EventView):
 class DeadlineView(EventView):
     """Display a line with deadline icon and task name"""
 
+    def __init__(self, stdscr, y, x, event, screen):
+        super().__init__(stdscr, y, x, event, screen)
+        self.info = f"{self.icon} {self.event.name[self.indent:]}"
+
     @property
     def icon(self):
         """Set the icon for task deadline"""
         return cf.DEADLINE_ICON
+
+    @property
+    def indent(self):
+        """Calculate the left indentation depending on the task level"""
+        if self.event.name[:4] == '----':
+            return 4
+        if self.event.name[:2] == '--':
+            return 2
+        return 0
 
     def render(self):
         """Render this view on the screen"""

@@ -134,13 +134,13 @@ class Config:
                 "play":        "♟",
                 "interview":   "🎙️",
                 "conference":  "🎙️",
+                "talk":        "🎙️",
                 "dating":      "♥",
                 "concert":     "♪",
                 "dance":       "♪",
                 "music":       "♪",
                 "rehearsal":   "♪",
                 "call":        "🕻",
-                "phone":       "🕻",
                 "zoom":        "🕻",
                 "deadline":    "⚑",
                 "over":        "⚑",
@@ -154,7 +154,6 @@ class Config:
                 "bar":         "☘",
                 "museum":      "⛬",
                 "meet":        "⛬",
-                "talk":        "⛬",
                 "sport":       "⛷",
                 "gym":         "🏋",
                 "training":    "⛷",
@@ -315,7 +314,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.0')
+                    print ('Calcure - version 2.3')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError:
