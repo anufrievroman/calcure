@@ -297,6 +297,8 @@ class Tasks(Collection):
 
     def generate_id(self):
         """Generate a id for a new item. The id is generated as maximum of existing ids plus one"""
+        if self.is_empty():
+            return 0
         return max([item.item_id for item in self.items]) + 1
 
 
