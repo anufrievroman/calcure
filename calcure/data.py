@@ -265,30 +265,41 @@ class Tasks(Collection):
             self.items.insert(number+1, task)
             self.changed = True
 
-    def add_timestamp_for_task(self, number):
+    def add_timestamp_for_task(self, selected_task_id):
         """Add a timestamp to this task"""
-        self.items[number].timer.stamps.append(int(time.time()))
-        self.changed = True
+        for item in self.items:
+            if item.item_id == selected_task_id:
+                item.timer.stamps.append(int(time.time()))
+                self.changed = True
+                break
 
-    def reset_timer_for_task(self, number):
+    def reset_timer_for_task(self, selected_task_id):
         """Reset the timer for one of the tasks"""
-        self.items[number].timer.stamps = []
-        self.changed = True
+        for item in self.items:
+            if item.item_id == selected_task_id:
+                item.timer.stamps = []
+                self.changed = True
+                break
 
-    def change_deadline(self, number, new_year, new_month, new_day):
+    def change_deadline(self, selected_task_id, new_year, new_month, new_day):
         """Reset the timer for one of the tasks"""
-        self.items[number].year = new_year
-        self.items[number].month = new_month
-        self.items[number].day = new_day
-        self.changed = True
+        for item in self.items:
+            if item.item_id == selected_task_id:
+                item.year = new_year
+                item.month = new_month
+                item.day = new_day
+                self.changed = True
+                break
 
-    def toggle_subtask_state(self, number):
+    def toggle_subtask_state(self, selected_task_id):
         """Toggle the state of the task-subtask"""
-        if self.items[number].name[:2] == '--':
-            self.items[number].name = self.items[number].name[2:]
-        else:
-            self.items[number].name = '--' + self.items[number].name
-        self.changed = True
+        for item in self.items:
+            if item.item_id == selected_task_id:
+                if item.name[:2] == '--':
+                    item.name = item.name[2:]
+                else:
+                    item.name = '--' + item.name
+                self.changed = True
 
     def move_task(self, number_from, number_to):
         """Move task from certain place to another in the list"""

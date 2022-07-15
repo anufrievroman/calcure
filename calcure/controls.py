@@ -281,11 +281,13 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             if screen.key == 't':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_ADD)
                 if user_tasks.is_valid_number(number):
-                    user_tasks.add_timestamp_for_task(number)
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.add_timestamp_for_task(task_id)
             if screen.key == 'T':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
                 if user_tasks.is_valid_number(number):
-                    user_tasks.reset_timer_for_task(number)
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.reset_timer_for_task(task_id)
 
             # Add deadline:
             if screen.key == "f":
@@ -357,7 +359,8 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
             if screen.key == 's':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_TOG)
                 if user_tasks.is_valid_number(number):
-                    user_tasks.toggle_subtask_state(number)
+                    task_id = user_tasks.items[number].item_id
+                    user_tasks.toggle_subtask_state(task_id)
             if screen.key == 'A':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_SUB)
                 if user_tasks.is_valid_number(number):
