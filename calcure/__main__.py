@@ -20,7 +20,7 @@ from calcure.translation_en import *
 from calcure.controls import *
 
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 
 
 def initialize_colors():
