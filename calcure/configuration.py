@@ -12,15 +12,17 @@ from calcure.data import AppState
 class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
-        self.taskwarrior_folder    = str(pathlib.Path.home()) + "/.task"
-        self.calcurse_todo_file    = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
-        self.calcurse_events_file  = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
-        self.config_folder         = str(pathlib.Path.home()) + "/.config/calcure"
-        self.config_file           = self.config_folder + "/config.ini"
+        self.taskwarrior_folder   = str(pathlib.Path.home()) + "/.task"
+        self.calcurse_todo_file   = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
+        self.calcurse_events_file = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
+        self.config_folder        = str(pathlib.Path.home()) + "/.config/calcure"
+        self.config_file          = self.config_folder + "/config.ini"
+        self.is_first_run         = True
 
     def create_config_file(self):
         """Create config.ini file if it does not exist"""
         if os.path.exists(self.config_file):
+            self.is_first_run = False
             return
 
         if not os.path.exists(self.config_folder):

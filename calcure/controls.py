@@ -459,3 +459,24 @@ def control_help_screen(stdscr, screen):
     # Prevent crash if no input:
     except curses.error:
         pass
+
+
+def control_welcome_screen(stdscr, screen):
+    """Process user input on the welcome screen"""
+    try:
+        # Getting user's input:
+        screen.key = stdscr.getkey()
+
+        # Handle key to call help screen:
+        if screen.key in ["?"]:
+            screen.state = AppState.HELP
+        else:
+            screen.state = AppState.CALENDAR
+
+    except KeyboardInterrupt:
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+        screen.state = AppState.EXIT if confirmed else screen.state
+
+    # Prevent crash if no input:
+    except curses.error:
+        pass

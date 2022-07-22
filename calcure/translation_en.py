@@ -1,5 +1,10 @@
 """Translations of the program interface in English"""
 
+MSG_WELCOME_1 = "Welcome to Calcure"
+MSG_WELCOME_2 = "Your terminal calendar and task manager!"
+MSG_WELCOME_3 = "Config and data files were created at:"
+MSG_WELCOME_4 = "For support, contribution, and additional information, visit:"
+MSG_WELCOME_5 = "Press ? to see all keybindings or any other key to continue."
 
 TITLE_KEYS_GENERAL = "GENERAL KEYBINDINGS"
 TITLE_KEYS_CALENDAR = "CALENDAR KEYBINDINGS"

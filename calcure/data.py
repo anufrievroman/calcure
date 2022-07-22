@@ -12,6 +12,7 @@ class AppState(enum.Enum):
     JOURNAL = 2
     HELP = 3
     EXIT = 4
+    WELCOME = 5
 
 
 class CalState(enum.Enum):
