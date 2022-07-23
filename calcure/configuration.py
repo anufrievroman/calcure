@@ -34,6 +34,7 @@ class Config:
                 "calcurse_todo_file":        str(self.calcurse_todo_file),
                 "calcurse_events_file":      str(self.calcurse_events_file),
                 "taskwarrior_folder":        str(self.taskwarrior_folder),
+                "language":                  "en",
                 "default_view":              "calendar",
                 "birthdays_from_abook":      "Yes",
                 "show_keybindings":          "Yes",
@@ -196,6 +197,7 @@ class Config:
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
             self.SHOW_CALENDAR_BOARDERS    = conf.getboolean("Parameters", "show_calendar_boarders", fallback=False)
             self.USE_PERSIAN_CALENDAR      = conf.getboolean("Parameters", "use_persian_calendar", fallback=False)
+            self.LANG                      = conf.get("Parameters", "language", fallback="en")
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]

@@ -2,13 +2,13 @@
 
 """This is the main module that contains views and the main logic"""
 
-# Libraries
+# Libraries:
 import curses
 import time
 import getopt
 import sys
 
-# Modules
+# Modules:
 from calcure.calendars import Calendar
 from calcure.configuration import cf
 from calcure.weather import Weather
@@ -16,11 +16,19 @@ from calcure.repository import Importer, FileRepository
 from calcure.dialogues import clear_line
 from calcure.screen import Screen
 from calcure.data import *
-from calcure.translation_en import *
 from calcure.controls import *
 
 
-__version__ = "2.3.1"
+# Language:
+if cf.LANG == "fr":
+    from calcure.translation_fr import *
+elif cf.LANG == "ru":
+    from calcure.translation_ru import *
+else:
+    from calcure.translation_en import *
+
+
+__version__ = "2.4.0"
 
 
 def initialize_colors():
@@ -854,7 +862,7 @@ def main(stdscr) -> None:
     # Load the data:
     weather = Weather(cf.WEATHER_CITY)
     if cf.SHOW_WEATHER:
-        print("Weather is loading...")
+        print(cf.MSG_WEATHER)
         weather.load_from_wttr()
     screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR)
     file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, cf.USE_PERSIAN_CALENDAR)

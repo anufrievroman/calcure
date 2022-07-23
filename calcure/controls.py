@@ -2,10 +2,18 @@
 
 import curses
 
+# Modules:
 from calcure.configuration import cf
-from calcure.translation_en import *
 from calcure.data import *
 from calcure.dialogues import *
+
+# Language:
+if cf.LANG == "fr":
+    from calcure.translation_fr import *
+elif cf.LANG == "ru":
+    from calcure.translation_ru import *
+else:
+    from calcure.translation_en import *
 
 
 def control_monthly_screen(stdscr, user_events, screen, importer):
