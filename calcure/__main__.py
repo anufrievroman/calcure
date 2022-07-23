@@ -28,7 +28,7 @@ else:
     from calcure.translation_en import *
 
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 
 
 def initialize_colors():
@@ -887,6 +887,7 @@ def main(stdscr) -> None:
     daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, user_tasks, screen)
     journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
     help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
+    welcome_screen_view = WelcomeScreenView(stdscr, 0, 0, screen)
     footer_view = FooterView(stdscr, 0, 0, screen)
     separator_view = SeparatorView(stdscr, 0, 0, screen)
 

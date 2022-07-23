@@ -25,7 +25,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ### Linux and Mac OS
 
-`pip install calcure`
+`pip install --upgrade calcure`
 
 ### Windows
 
@@ -34,6 +34,9 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 3. Install the program and libraries libraries by typing in the Windows Terminal `pip install windows-curses calcure`
 4. Now you can finally run it by typing in the Windows Terminal `python -m calcure`
 
+## Upgrade to the most recent version
+
+`pip install --upgrade calcure`
 
 ## Dependencies
 
@@ -42,15 +45,15 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ## Usage
 
-Run `calcure` in your terminal. You may need to restart your terminal after install.
+Run `calcure` in your terminal. You may need to restart your terminal after the install.
 
 ### User arguments
 
-Calcure support automations and can be started in special mods using user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
+Calcure supports automations and can be started in special mods using various user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
 
 ### Key bindings
 
-List of all key bindings can be accessed [in the wiki](https://github.com/anufrievroman/calcure/wiki/Key-bindings) and via `?` key in the program.
+[List of all key bindings](https://github.com/anufrievroman/calcure/wiki/Key-bindings) can be accessed in the wiki and via `?` key in the program.
 
 ### Settings
 
@@ -67,9 +70,17 @@ Explanations of all settings are [in the wiki](https://github.com/anufrievroman/
 - If after install the program does not run by just running `calcure`, try to restart your terminal, it may need to recheck the binaries.
 - AUR package is autdated, please use `pip install calcure` for installation.
 
+## Roadmap
+
+- Translations (currently done: English, French, and Russian)
+- Support for .ics files in read only mode
+- Support for .ics files in read and write mode
+- Migrate current .csv data format to .ics for full syncing with clouds
+
 ## Contribution, translations, donations
 
-If you wish to contribute to the code base or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations, packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
+If you wish to contribute to the development or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations (create a copy of `translation_en.py` in your language), packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
 
 If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
+
 For more information about contribution, see [wiki pages](https://github.com/anufrievroman/calcure/wiki/Contribution).
