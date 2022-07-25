@@ -93,7 +93,7 @@ MSG_TS_DEAD_DATE  = "Aggiungi una scandeza per il (AAAA/MM/GG): "
 MSG_WEATHER       = "Caricamento del meteo..."
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
-CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
+CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"
 JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Add task   v · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
 
 DAYS = ["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDì", "SABATO", "DOMENICA"]

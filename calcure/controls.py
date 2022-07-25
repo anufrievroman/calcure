@@ -12,6 +12,8 @@ if cf.LANG == "fr":
     from calcure.translation_fr import *
 elif cf.LANG == "ru":
     from calcure.translation_ru import *
+elif cf.LANG == "it":
+    from calcure.translation_it import *
 else:
     from calcure.translation_en import *
 
