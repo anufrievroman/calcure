@@ -34,7 +34,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 3. Install the program and libraries libraries by typing in the Windows Terminal `pip install windows-curses calcure`
 4. Now you can finally run it by typing in the Windows Terminal `python -m calcure`
 
-## Upgrade to the most recent version
+### Upgrade to the most recent version
 
 `pip install --upgrade calcure`
 
@@ -62,7 +62,7 @@ You can edit parameters, colors, and icons in the `config.ini` file.
 An example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini).
 Explanations of all settings are [in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
 
-### Troubleshooting
+## Troubleshooting
 
 - If your terminal shows empty squares instead of icons, probably it does not support unicode. In this case, in config set: `use_unicode_icons = No`.
 - Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
@@ -72,14 +72,13 @@ Explanations of all settings are [in the wiki](https://github.com/anufrievroman/
 
 ## Roadmap
 
-- Translations (currently done: English, French, and Russian)
+- Translations (currently done: English, French, Russian, Italian, and Brazilian Portuguese)
 - Support for .ics files in read only mode
 - Support for .ics files in read and write mode
-- Migrate current .csv data format to .ics for full syncing with clouds
 
 ## Contribution, translations, donations
 
-If you wish to contribute to the development or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations (create a copy of `translation_en.py` in your language), packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
+If you wish to contribute to the development or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations (create a copy of `en.py` in translations folder in your language), packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
 
 If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
 

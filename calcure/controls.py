@@ -9,13 +9,15 @@ from calcure.dialogues import *
 
 # Language:
 if cf.LANG == "fr":
-    from calcure.translation_fr import *
+    from calcure.translations.fr import *
 elif cf.LANG == "ru":
-    from calcure.translation_ru import *
+    from calcure.translations.ru import *
 elif cf.LANG == "it":
-    from calcure.translation_it import *
+    from calcure.translations.it import *
+elif cf.LANG == "br":
+    from calcure.translations.br import *
 else:
-    from calcure.translation_en import *
+    from calcure.translations.en import *
 
 
 def control_monthly_screen(stdscr, user_events, screen, importer):
