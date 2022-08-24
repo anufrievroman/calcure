@@ -9,9 +9,6 @@ if version is None:
     raise SystemExit("Could not determine version to use")
 version = version.group(1)
 
-# with open('requirements.txt') as f:
-    # required = f.read().splitlines()
-
 setuptools.setup(
     name='calcure',
     author='Roman Anufriev',
@@ -21,17 +18,6 @@ setuptools.setup(
     long_description=Path(setup_dir, 'README.md').open().read(),
     long_description_content_type='text/markdown',
     license='MIT',
-    # py_modules=['calcure',
-                # 'data',
-                # 'screen',
-                # 'calendars',
-                # 'translation_en',
-                # 'controls',
-                # 'dialogues',
-                # 'repository',
-                # 'configuration',
-                # 'weather',
-                # ],
     entry_points={
         "console_scripts": [
             "calcure = calcure.__main__:cli"
@@ -52,8 +38,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
         "Topic :: Utilities",
     ],
-    packages=["calcure"],
+    packages=["calcure", "calcure.translations"],
     include_package_data=True,
-    # package_dir={"": "src"},
-    # packages=setuptools.find_packages(),
 )

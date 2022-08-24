@@ -32,7 +32,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.4.1"
+__version__ = "2.4.3"
 
 
 def initialize_colors():
