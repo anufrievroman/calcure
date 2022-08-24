@@ -222,9 +222,9 @@ class FileRepository:
         abook.read(self.abook_file)
         for each_contact in abook.sections():
             for key, _ in abook.items(each_contact):
-                if key == "birthday":
-                    month = int(abook[each_contact]["birthday"][-5:-3])
-                    day = int(abook[each_contact]["birthday"][-2:])
+                if key in ["birthday", "anniversary"]:
+                    month = int(abook[each_contact][key][-5:-3])
+                    day = int(abook[each_contact][key][-2:])
                     name = abook[each_contact]["name"]
 
                     # Convert to persian date if needed:
