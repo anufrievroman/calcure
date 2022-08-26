@@ -103,6 +103,10 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                     screen.day = day
                     screen.calendar_state = CalState.DAILY
 
+            # Change the view to daily:
+            if screen.key == "v":
+                screen.calendar_state = CalState.DAILY
+
             # Add single event:
             if screen.key == "a":
                 question = f'{MSG_EVENT_DATE} {screen.year}/{screen.month}/'
@@ -256,6 +260,10 @@ def control_daily_screen(stdscr, user_events, screen, importer):
                 confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     importer.import_events_from_calcurse()
+
+            # Change the view to monthly:
+            if screen.key == "v":
+                screen.calendar_state = CalState.MONTHLY
 
             # Other actions:
             if vim_style_exit(stdscr, screen):

@@ -9,14 +9,14 @@ import getopt
 import sys
 
 # Modules:
-from calcure.calendars import Calendar
-from calcure.configuration import cf
-from calcure.weather import Weather
-from calcure.repository import Importer, FileRepository
-from calcure.dialogues import clear_line
-from calcure.screen import Screen
-from calcure.data import *
-from calcure.controls import *
+from .calendars import Calendar
+from .configuration import cf
+from .weather import Weather
+from .repository import Importer, FileRepository
+from .dialogues import clear_line
+from .screen import Screen
+from .data import *
+from .controls import *
 
 
 # Language:
@@ -396,7 +396,7 @@ class DeadlineView(EventView):
 class DailyView(View):
     """Display all events occurring on this days"""
 
-    def __init__(self, stdscr, y, x, repeated_user_events, user_events, holidays, birthdays, user_tasks, screen, index_offset):
+    def __init__(self, stdscr, y, x, repeated_user_events, user_events, holidays, birthdays, user_tasks, screen, index_offset, is_selection_day=True):
         super().__init__(stdscr, y, x)
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
@@ -408,6 +408,8 @@ class DailyView(View):
         self.y_cell = (self.screen.y_max - 3) // 6
         self.x_cell = self.screen.x_max // 7
         self.hidden_events_sign = cf.HIDDEN_ICON + " "*(self.x_cell-len(cf.HIDDEN_ICON))
+        self.num_events_this_day = 0
+        self.is_selection_day = is_selection_day
 
     def render(self):
         """Render this view on the screen"""
@@ -418,7 +420,7 @@ class DailyView(View):
             if index < self.y_cell - 1:
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
-                if self.screen.selection_mode:
+                if self.screen.selection_mode and self.is_selection_day:
                     self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.TODAY)
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
@@ -464,8 +466,11 @@ class DailyView(View):
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
             index += 1
 
-        if index == 0 and self.screen.calendar_state == CalState.DAILY and cf.SHOW_NOTHING_PLANNED:
-            self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
+        # if index == 0 and self.screen.calendar_state == CalState.DAILY and cf.SHOW_NOTHING_PLANNED:
+            # self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
+            # index += 1
+
+        self.num_events_this_day = index
 
 
 class DayNumberView(View):
@@ -647,6 +652,31 @@ class DailyScreenView(View):
         self.birthdays = birthdays
         self.user_tasks = user_tasks
         self.screen = screen
+        self.dates = Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR).monthdayscalendar(self.screen.year, self.screen.month)
+
+    @property
+    def week_day(self):
+        """Number of the day in week"""
+        for week in self.dates:
+            try:
+                weekday = week.index(self.screen.day)
+            except ValueError:
+                pass
+        return weekday
+
+    @property
+    def color(self):
+        """Color of the date and dayname"""
+        if self.screen.date == self.screen.today:
+            return Color.TODAY
+        if self.week_day + 1 in cf.WEEKEND_DAYS:
+            return Color.WEEKENDS
+        return Color.DAYS
+
+    @property
+    def icon(self):
+        """Icon of today"""
+        return cf.TODAY_ICON if self.screen.date == self.screen.today else ''
 
     def render(self):
         self.screen.state = AppState.CALENDAR
@@ -656,19 +686,34 @@ class DailyScreenView(View):
 
         # Form a string with month, year, and day with today icon:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
-        icon = cf.TODAY_ICON if self.screen.date == self.screen.today else ''
         month_string = str(month_names[self.screen.month-1])
-        date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
+        # date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
+        date_string = f'{month_string} {self.screen.year}'
 
         # Display header and footer:
         header_view = HeaderView(self.stdscr, 0, 0, date_string, self.weather, self.screen)
         header_view.render()
 
-        # Display the events:
+        # Display the events from current day to as many as possible days:
         repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
-        daily_view = DailyView(self.stdscr, self.y + 2, self.x, repeated_user_events, self.user_events,
-                                        self.holidays, self.birthdays, self.user_tasks, self.screen, 0)
-        daily_view.render()
+        max_num_days = (self.screen.y_max - 5)//2
+        vertical_shift = 0
+
+        is_selection_day = True
+        for _ in range(max_num_days):
+            day_string = f'{self.screen.day} {DAYS[self.week_day]} {self.icon}'
+            self.display_line(self.y + 2 + vertical_shift, self.x, day_string, self.color)
+
+            daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
+                        self.user_events, self.holidays, self.birthdays, self.user_tasks, self.screen, 0, is_selection_day)
+            daily_view.render()
+            vertical_shift += daily_view.num_events_this_day + 3
+            self.screen.next_day()
+            is_selection_day = False
+
+        # Return screen day back to the original day:
+        for _ in range(max_num_days):
+            self.screen.previous_day()
 
 
 class MonthlyScreenView(View):

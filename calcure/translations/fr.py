@@ -25,6 +25,7 @@ KEYS_CALENDAR = {
         "  d,x  ": "Supprimer un événement",
         "  e,c  ": "Modifier un événement",
         "   m   ": "Déplacer l'événement",
+        "   v   ": "Basculer la vue quotidienne/mensuelle",
         "   g   ": "Aller à un certain jour",
         "   h   ": "Désactiver l'événement en haute priorité",
         "   l   ": "Basculer l'événement en priorité basse",

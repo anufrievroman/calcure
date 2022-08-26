@@ -26,6 +26,7 @@ KEYS_CALENDAR = {
         "  e,c  ": "Edit an event",
         "   m   ": "Move event",
         "   g   ": "Go to a certain day",
+        "   v   ": "Toggle daily/monthly view",
         "   h   ": "Toggle event as high priority",
         "   l   ": "Toggle event as low priority",
         "   .   ": "Toggle event privacy",

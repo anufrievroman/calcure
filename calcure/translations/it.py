@@ -25,6 +25,7 @@ KEYS_CALENDAR = {
         "  d,x  ": "Cancella un evento",
         "  e,c  ": "Modifica un evento",
         "   m   ": "Sposta un evento",
+        "   v   ": "Alterna la visualizzazione giornaliera/mensile",
         "   g   ": "Vai ad un determinato giorno",
         "   h   ": "Imposta un evento come ad alta priorità",
         "   l   ": "Imposta un evento come a bassa priorità",

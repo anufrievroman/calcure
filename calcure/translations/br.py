@@ -8,7 +8,7 @@ MSG_WELCOME_5 = "Aperte ? para ver todas as combinações de teclas ou qualquer 
 
 TITLE_KEYS_GENERAL = "COMBINAÇÃO DE TECLAS GERAIS"
 TITLE_KEYS_CALENDAR = "COMBINAÇÃO DE TECLAS DO CALENDÁRIO"
-TITLE_KEYS_JOURNAL  = "COMBINAÇÃO DE TECLAS DO DIÁRIO" 
+TITLE_KEYS_JOURNAL  = "COMBINAÇÃO DE TECLAS DO DIÁRIO"
 
 KEYS_GENERAL = {
         " Espaço ": "Muda entre calendário e diário",
@@ -25,6 +25,7 @@ KEYS_CALENDAR = {
         "  d,x  ": "Deletar um evento",
         "  e,c  ": "Editar um evento",
         "   m   ": "Mover evento",
+        "   v   ": "Alternar visualização diária/mensal",
         "   g   ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
         "   l   ": "Alternar evento como baixa prioridade",
@@ -101,4 +102,3 @@ DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBE
 
 MONTHS = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"]
 MONTHS_PERSIAN = ["FARVARDIN", "ORDIBEHESHT", "KHORDAD", "TIR", "MORDAD", "SHAHRIVAR", "MEHR", "ABAN", "AZAR", "DEY", "BAHMAN", "ESFAND"]
-
