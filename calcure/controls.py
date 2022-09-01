@@ -105,6 +105,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
 
             # Change the view to daily:
             if screen.key == "v":
+                screen.day = 1
                 screen.calendar_state = CalState.DAILY
 
             # Add single event:

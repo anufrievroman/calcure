@@ -32,7 +32,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.4.3"
+__version__ = "2.5.2"
 
 
 def initialize_colors():
@@ -652,7 +652,11 @@ class DailyScreenView(View):
         self.birthdays = birthdays
         self.user_tasks = user_tasks
         self.screen = screen
-        self.dates = Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR).monthdayscalendar(self.screen.year, self.screen.month)
+
+    @property
+    def dates(self):
+        """Return dates that exist in this month"""
+        return Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR).monthdayscalendar(self.screen.year, self.screen.month)
 
     @property
     def week_day(self):
