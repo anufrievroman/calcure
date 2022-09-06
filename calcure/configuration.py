@@ -36,6 +36,7 @@ class Config:
                 "taskwarrior_folder":        str(self.taskwarrior_folder),
                 "language":                  "en",
                 "default_view":              "calendar",
+                "default_calendar_view":     "monthly",
                 "birthdays_from_abook":      "Yes",
                 "show_keybindings":          "Yes",
                 "privacy_mode":              "No",
@@ -51,6 +52,7 @@ class Config:
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
                 "show_nothing_planned":      "Yes",
+                "one_timer_at_a_time":       "No",
                 "holiday_country":           "UnitedStates",
                 "use_persian_calendar":      "No",
                 "start_week_day":            "1",
@@ -201,8 +203,9 @@ class Config:
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
             self.WEEKEND_DAYS              = conf.get("Parameters", "weekend_days", fallback="6,7")
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
-            self.HOLIDAY_COUNTRY  = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
-            self.WEATHER_CITY     = conf.get("Parameters", "weather_city", fallback="")
+            self.HOLIDAY_COUNTRY           = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
+            self.WEATHER_CITY              = conf.get("Parameters", "weather_city", fallback="")
+            self.DEFAULT_CALENDAR_VIEW     = conf.get("Parameters", "default_calendar_view", fallback="monthly")
 
             # Journal settings:
             self.CALCURSE_TODO_FILE    = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
@@ -215,6 +218,7 @@ class Config:
             self.IMPORTANT_ICON        = conf.get("Parameters", "important_icon", fallback="‣") if self.DISPLAY_ICONS else "!"
             self.REFRESH_INTERVAL      = int(conf.get("Parameters", "refresh_interval", fallback=1))
             self.RIGHT_PANE_PERCENTAGE = int(conf.get("Parameters", "right_pane_percentage", fallback=25))
+            self.ONE_TIMER_AT_A_TIME   = conf.getboolean("Parameters", "one_timer_at_a_time", fallback=False)
 
             # Calendar colors:
             self.COLOR_TODAY           = int(conf.get("Colors", "color_today", fallback=2))
@@ -302,7 +306,7 @@ class Config:
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run. This values take priority over config.ini"""
         try:
-            opts, _ = getopt.getopt(sys.argv[1:],"pjhvi",["folder=", "config=", "task=", "event="])
+            opts, _ = getopt.getopt(sys.argv[1:],"pjhvid",["folder=", "config=", "task=", "event="])
             for opt, arg in opts:
                 if opt in '--folder':
                     self.data_folder = arg
@@ -313,6 +317,8 @@ class Config:
                 elif opt == '-p':
                     self.PRIVACY_MODE = True
                 elif opt == '-j':
+                    self.DEFAULT_VIEW = AppState.JOURNAL
+                elif opt == '-d':
                     self.DEFAULT_VIEW = AppState.JOURNAL
                 elif opt in ('-h'):
                     self.DEFAULT_VIEW = AppState.HELP

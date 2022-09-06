@@ -9,14 +9,14 @@ import getopt
 import sys
 
 # Modules:
-from .calendars import Calendar
-from .configuration import cf
-from .weather import Weather
-from .repository import Importer, FileRepository
-from .dialogues import clear_line
-from .screen import Screen
-from .data import *
-from .controls import *
+from calcure.calendars import Calendar
+from calcure.configuration import cf
+from calcure.weather import Weather
+from calcure.repository import Importer, FileRepository
+from calcure.dialogues import clear_line
+from calcure.screen import Screen
+from calcure.data import *
+from calcure.controls import *
 
 
 # Language:
@@ -917,7 +917,7 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         print(cf.MSG_WEATHER)
         weather.load_from_wttr()
-    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR)
+    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR, cf.DEFAULT_CALENDAR_VIEW)
     file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, cf.USE_PERSIAN_CALENDAR)
     user_events = file_repository.load_events_from_csv()
     user_tasks = file_repository.load_tasks_from_csv()

@@ -303,7 +303,10 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_ADD)
                 if user_tasks.is_valid_number(number):
                     task_id = user_tasks.items[number].item_id
+                    if cf.ONE_TIMER_AT_A_TIME:
+                        user_tasks.pause_all_other_timers(task_id)
                     user_tasks.add_timestamp_for_task(task_id)
+
             if screen.key == 'T':
                 number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
                 if user_tasks.is_valid_number(number):

@@ -274,6 +274,13 @@ class Tasks(Collection):
                 self.changed = True
                 break
 
+    def pause_all_other_timers(self, selected_task_id):
+        """Add a timestamp to this task"""
+        for item in self.items:
+            if item.timer.is_counting and item.item_id != selected_task_id:
+                item.timer.stamps.append(int(time.time()))
+                self.changed = True
+
     def reset_timer_for_task(self, selected_task_id):
         """Reset the timer for one of the tasks"""
         for item in self.items:
