@@ -32,7 +32,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.5.2"
+__version__ = "2.5.3"
 
 
 def initialize_colors():
@@ -915,7 +915,7 @@ def main(stdscr) -> None:
     # Load the data:
     weather = Weather(cf.WEATHER_CITY)
     if cf.SHOW_WEATHER:
-        print(cf.MSG_WEATHER)
+        print(MSG_WEATHER)
         weather.load_from_wttr()
     screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR, cf.DEFAULT_CALENDAR_VIEW)
     file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, cf.USE_PERSIAN_CALENDAR)
