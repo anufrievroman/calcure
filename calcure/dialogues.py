@@ -59,7 +59,7 @@ def input_date(stdscr, y, x, prompt_string):
         month = int(date_unformated.split("/")[1])
         day = int(date_unformated.split("/")[2])
         return year, month, day
-    except ValueError:
+    except (ValueError, IndexError):
         return None, None, None
 
 

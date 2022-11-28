@@ -133,7 +133,6 @@ class Screen:
         """Check if a date corresponds to any actually existing date"""
         if None in [year, month, day]:
             return False
-        if 0 < month < 12:
+        if 1 <= month <= 12:
             return 0 < day <= Calendar(0, self.use_persian_calendar).last_day(year, month)
-        else:
-            return False
+        return False
