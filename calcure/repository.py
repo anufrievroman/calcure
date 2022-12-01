@@ -202,7 +202,7 @@ class FileRepository:
         try:
             import holidays as hl
             year = datetime.date.today().year
-            holiday_events = eval("hl."+self.country+"(years=[year-1, year, year+3])")
+            holiday_events = eval("hl."+self.country+"(years=[year-2, year-1, year, year+1, year+2, year+3, year+4])")
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
