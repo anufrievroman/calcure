@@ -347,7 +347,7 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                     task_id = user_tasks.items[number].item_id
                     user_tasks.toggle_item_status(task_id, Status.NORMAL)
             if screen.key == 'v':
-                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
+                number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DONE)
                 if user_tasks.is_valid_number(number):
                     task_id = user_tasks.items[number].item_id
                     user_tasks.toggle_item_status(task_id, Status.DONE)
