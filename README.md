@@ -72,9 +72,7 @@ Explanations of all settings are [in the wiki](https://github.com/anufrievroman/
 
 ## Roadmap
 
-- Translations (currently done: English, French, Russian, Italian, and Brazilian Portuguese)
 - Support for .ics files in read only mode
-- Improvement of the daily view (several days on the page)
 - Support for .ics files in read and write mode
 
 ## Contribution, translations, donations
