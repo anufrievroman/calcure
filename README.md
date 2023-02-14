@@ -25,7 +25,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ### Linux and Mac OS
 
-`pip install --upgrade calcure`
+`pip install calcure`
 
 ### Windows
 

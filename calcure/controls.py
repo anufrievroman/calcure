@@ -1,6 +1,7 @@
 """This module contains functions that react to user input on each screen"""
 
 import curses
+import importlib
 
 # Modules:
 from calcure.configuration import cf

@@ -65,7 +65,7 @@ class Config:
                 "privacy_icon":              "•",
                 "today_icon":                "•",
                 "birthday_icon":             "★",
-                "holiday_icon":              "☘️",
+                "holiday_icon":              "⛱",
                 "hidden_icon":               "...",
                 "done_icon":                 "✔",
                 "todo_icon":                 "•",

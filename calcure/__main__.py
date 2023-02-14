@@ -7,6 +7,7 @@ import curses
 import time
 import getopt
 import sys
+import importlib
 
 # Modules:
 from calcure.calendars import Calendar
@@ -34,7 +35,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.6"
+__version__ = "2.6.1"
 
 
 def initialize_colors():
@@ -919,14 +920,13 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         print(MSG_WEATHER)
         weather.load_from_wttr()
-    screen = Screen(stdscr, cf.PRIVACY_MODE, cf.DEFAULT_VIEW, cf.SPLIT_SCREEN, cf.RIGHT_PANE_PERCENTAGE, cf.USE_PERSIAN_CALENDAR, cf.DEFAULT_CALENDAR_VIEW)
-    file_repository = FileRepository(cf.TASKS_FILE, cf.EVENTS_FILE, cf.HOLIDAY_COUNTRY, cf.USE_PERSIAN_CALENDAR)
+    screen = Screen(stdscr, cf)
+    file_repository = FileRepository(cf)
     user_events = file_repository.load_events_from_csv()
     user_tasks = file_repository.load_tasks_from_csv()
     holidays = file_repository.load_holidays()
     birthdays = file_repository.load_birthdays_from_abook()
-    importer = Importer(user_tasks, user_events, cf.TASKS_FILE, cf.EVENTS_FILE, cf.CALCURSE_TODO_FILE,
-                                cf.CALCURSE_EVENTS_FILE, cf.TASKWARRIOR_FOLDER, cf.USE_PERSIAN_CALENDAR)
+    importer = Importer(user_tasks, user_events, cf)
 
     read_items_from_user_arguments(screen, user_tasks, user_events, file_repository)
 

@@ -9,14 +9,14 @@ from calcure.calendars import Calendar
 
 class Screen:
     """Main state of the program that describes what is displayed and how"""
-    def __init__(self, stdscr, privacy, state, split, right_pane_percentage, use_persian_calendar, default_calendar_view):
+    def __init__(self, stdscr, cf):
         self.stdscr = stdscr
-        self.privacy = privacy
-        self.state = state
-        self.calendar_state = CalState.DAILY if default_calendar_view == "daily" else CalState.MONTHLY
-        self.use_persian_calendar = use_persian_calendar
-        self.split = split
-        self.right_pane_percentage = right_pane_percentage
+        self.privacy = cf.PRIVACY_MODE
+        self.state = cf.DEFAULT_VIEW
+        self.calendar_state = CalState.DAILY if cf.DEFAULT_CALENDAR_VIEW == "daily" else CalState.MONTHLY
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+        self.split = cf.SPLIT_SCREEN
+        self.right_pane_percentage = cf.RIGHT_PANE_PERCENTAGE
         self.active_pane = False
         self.selection_mode = False
         self.refresh_now = False

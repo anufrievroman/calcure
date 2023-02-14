@@ -32,16 +32,16 @@ def convert_to_gregorian_date(year, month, day):
 class FileRepository:
     """Load and save events and tasks to files"""
 
-    def __init__(self, tasks_file, events_file, country, use_persian_calendar):
+    def __init__(self, cf):
         self.user_tasks = Tasks()
         self.user_events = Events()
         self.holidays = Events()
         self.birthdays = Birthdays()
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
-        self.tasks_file = tasks_file
-        self.events_file = events_file
-        self.country = country
-        self.use_persian_calendar = use_persian_calendar
+        self.tasks_file = cf.TASKS_FILE
+        self.events_file = cf.EVENTS_FILE
+        self.country = cf.HOLIDAY_COUNTRY
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
     @property
     def is_task_format_old(self):
@@ -237,16 +237,16 @@ class FileRepository:
 
 class Importer:
     """Import tasks and events from files of other programs"""
-    def __init__(self, user_tasks, user_events, tasks_file, events_file, calcurse_todo_file,
-                            calcurse_events_file, taskwarrior_folder, use_persian_calendar):
+
+    def __init__(self, user_tasks, user_events, cf):
         self.user_tasks = user_tasks
         self.user_events = user_events
-        self.tasks_file = tasks_file
-        self.events_file = events_file
-        self.calcurse_todo_file = calcurse_todo_file
-        self.calcurse_events_file = calcurse_events_file
-        self.taskwarrior_folder = taskwarrior_folder
-        self.use_persian_calendar = use_persian_calendar
+        self.tasks_file = cf.TASKS_FILE
+        self.events_file = cf.EVENTS_FILE
+        self.calcurse_todo_file = cf.CALCURSE_TODO_FILE
+        self.calcurse_events_file = cf.CALCURSE_EVENTS_FILE
+        self.taskwarrior_folder = cf.TASKWARRIOR_FOLDER
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
     def read_file(self, file):
         """Try to read a file and return its lines"""
