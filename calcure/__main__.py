@@ -31,6 +31,8 @@ elif cf.LANG == "br":
     from calcure.translations.br import *
 elif cf.LANG == "tr":
     from calcure.translations.tr import *
+elif cf.LANG == "zh":
+    from calcure.translations.zh import *
 else:
     from calcure.translations.en import *
 
