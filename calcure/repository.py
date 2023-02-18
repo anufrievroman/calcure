@@ -222,16 +222,16 @@ class FileRepository:
         return self.birthdays
 
     def load_tasks_from_ics(self):
-        """Load tasks from ics files"""
+        """Load tasks from each of the ics files"""
         if self.ics_task_files is not None:
             for filename in self.ics_task_files:
                 with open(filename, 'r', encoding="utf-8") as file:
                     ics_text = file.read()
 
-                tasks = IcsCalendar(ics_text)
-                for task in tasks.todos:
+                cal = IcsCalendar(ics_text)
+                for task in cal.todos:
                     if task.status != "CANCELLED":
-                        task_id = self.user_tasks.generate_id()
+                        task_id = self.user_ics_tasks.generate_id()
 
                         # Assign status from priority:
                         status = Status.NORMAL
@@ -252,12 +252,38 @@ class FileRepository:
         return self.user_ics_tasks
 
     def load_events_from_ics(self):
-        """Load tasks from ics files"""
-        if self.ics_task_files is not None:
-            for filename in self.ics_task_files:
+        """Load events from each of the ics files"""
+        if self.ics_event_files is not None:
+            for filename in self.ics_event_files:
                 with open(filename, 'r', encoding="utf-8") as file:
                     ics_text = file.read()
-                    # Parse file here
-                pass
+                cal = IcsCalendar(ics_text)
+                for index, event in enumerate(cal.events):
 
+                    # Default parameters:
+                    event_id = index
+                    repetition = '1'
+                    frequency = Frequency.ONCE
+                    status = Status.NORMAL
+                    is_private = False
+
+                    # Parameters of the event from ics if they exist:
+                    name = event.name if event.name is not None else ""
+                    all_day = event.all_day if event.all_day is not None else True
+                    year = event.begin.year if event.begin else 0
+                    month = event.begin.month if event.begin else 1
+                    day = event.begin.day if event.begin else 1
+
+                    # Add start time to name of non-all-day events:
+                    if not all_day:
+                        hour = event.begin.hour if event.begin else 0
+                        minute = event.begin.minute if event.begin else 0
+                        name = f"{hour:0=2}:{minute:0=2} {name}"
+
+                    # Convert to persian date if needed:
+                    if self.use_persian_calendar:
+                        year, month, day = convert_to_persian_date(year, month, day)
+
+                    self.user_ics_events.add_item(UserEvent(event_id, year, month, day,
+                                        name, repetition, frequency, status, is_private))
         return self.user_ics_events

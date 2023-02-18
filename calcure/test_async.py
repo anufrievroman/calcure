@@ -1,3 +1,5 @@
+"""This is a test for implement async loading of weather. Not really working yet"""
+
 import asyncio
 import curses
 
