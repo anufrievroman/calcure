@@ -21,13 +21,14 @@ class FileRepository:
         self.holidays = Events()
         self.birthdays = Birthdays()
         self.user_ics_tasks = Tasks()
+        self.user_ics_events = Events()
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = cf.TASKS_FILE
         self.events_file = cf.EVENTS_FILE
         self.country = cf.HOLIDAY_COUNTRY
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
-        self.ics_events_file = cf.ICS_EVENTS_FILE
-        self.ics_tasks_file = cf.ICS_TASKS_FILE
+        self.ics_event_files = cf.ICS_EVENT_FILES
+        self.ics_task_files = cf.ICS_TASK_FILES
 
     @property
     def is_task_format_old(self):
@@ -222,28 +223,41 @@ class FileRepository:
 
     def load_tasks_from_ics(self):
         """Load tasks from ics files"""
-        with open(self.ics_tasks_file, 'r', encoding="utf-8") as file:
-            ics_text = file.read()
+        if self.ics_task_files is not None:
+            for filename in self.ics_task_files:
+                with open(filename, 'r', encoding="utf-8") as file:
+                    ics_text = file.read()
 
-        tasks = IcsCalendar(ics_text)
-        for task in tasks.todos:
-            if task.status != "CANCELLED":
-                task_id = self.user_tasks.generate_id()
+                tasks = IcsCalendar(ics_text)
+                for task in tasks.todos:
+                    if task.status != "CANCELLED":
+                        task_id = self.user_tasks.generate_id()
 
-                # Assign status from priority:
-                status = Status.NORMAL
-                if task.priority is not None:
-                    if task.priority > 5:
-                        status = Status.UNIMPORTANT
-                    if task.priority < 5:
-                        status = Status.IMPORTANT
+                        # Assign status from priority:
+                        status = Status.NORMAL
+                        if task.priority is not None:
+                            if task.priority > 5:
+                                status = Status.UNIMPORTANT
+                            if task.priority < 5:
+                                status = Status.IMPORTANT
 
-                # Correct according to status:
-                if task.status == "COMPLETED":
-                    status = Status.DONE
+                        # Correct according to status:
+                        if task.status == "COMPLETED":
+                            status = Status.DONE
 
-                name = task.name
-                timer = Timer([])
-                is_private = False
-                self.user_ics_tasks.add_item(Task(task_id, name, status, timer, is_private))
+                        name = task.name
+                        timer = Timer([])
+                        is_private = False
+                        self.user_ics_tasks.add_item(Task(task_id, name, status, timer, is_private))
         return self.user_ics_tasks
+
+    def load_events_from_ics(self):
+        """Load tasks from ics files"""
+        if self.ics_task_files is not None:
+            for filename in self.ics_task_files:
+                with open(filename, 'r', encoding="utf-8") as file:
+                    ics_text = file.read()
+                    # Parse file here
+                pass
+
+        return self.user_ics_events

@@ -906,6 +906,7 @@ def main(stdscr) -> None:
     user_events = file_repository.load_events_from_csv()
     user_tasks = file_repository.load_tasks_from_csv()
     user_ics_tasks = file_repository.load_tasks_from_ics()
+    user_ics_events = file_repository.load_events_from_ics()
     holidays = file_repository.load_holidays()
     birthdays = file_repository.load_birthdays_from_abook()
     importer = Importer(user_tasks, user_events, cf)

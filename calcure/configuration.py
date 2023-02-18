@@ -222,8 +222,13 @@ class Config:
             self.ONE_TIMER_AT_A_TIME   = conf.getboolean("Parameters", "one_timer_at_a_time", fallback=False)
 
             # ICS files:
-            self.ICS_EVENTS_FILE    = conf.get("Parameters", "ics_events_file", fallback=None)
-            self.ICS_TASKS_FILE     = conf.get("Parameters", "ics_tasks_file", fallback=None)
+            self.ICS_EVENT_FILES = conf.get("Parameters", "ics_event_files", fallback=None)
+            if self.ICS_EVENT_FILES is not None:
+                self.ICS_EVENT_FILES = [str(i) for i in self.ICS_EVENT_FILES.split(",")]
+
+            self.ICS_TASK_FILES = conf.get("Parameters", "ics_task_files", fallback=None)
+            if self.ICS_TASK_FILES is not None:
+                self.ICS_TASK_FILES = [str(i) for i in self.ICS_TASK_FILES.split(",")]
 
             # Calendar colors:
             self.COLOR_TODAY           = int(conf.get("Colors", "color_today", fallback=2))
