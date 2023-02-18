@@ -13,11 +13,13 @@ import importlib
 from calcure.calendars import Calendar
 from calcure.configuration import cf
 from calcure.weather import Weather
-from calcure.repository import Importer, FileRepository
+from calcure.repository import FileRepository
+from calcure.importers import Importer
 from calcure.dialogues import clear_line
 from calcure.screen import Screen
 from calcure.data import *
 from calcure.controls import *
+from calcure.helpers import initialize_colors
 
 
 # Language:
@@ -37,46 +39,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.6.1"
-
-
-def initialize_colors():
-    """Define all the color pairs"""
-    curses.start_color()
-    curses.use_default_colors()
-    curses.init_pair(Color.DAY_NAMES.value, cf.COLOR_DAY_NAMES, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.WEEKENDS.value, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.HINTS.value, cf.COLOR_HINTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TODAY.value, cf.COLOR_TODAY, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.DAYS.value, cf.COLOR_DAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.WEEKEND_NAMES.value, cf.COLOR_WEEKEND_NAMES, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.BIRTHDAYS.value, cf.COLOR_BIRTHDAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.PROMPTS.value, cf.COLOR_PROMPTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.CONFIRMATIONS.value, cf.COLOR_CONFIRMATIONS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TITLE.value, cf.COLOR_TITLE, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TODO.value, cf.COLOR_TODO, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.DONE.value, cf.COLOR_DONE, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.IMPORTANT.value, cf.COLOR_IMPORTANT, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TIMER.value, cf.COLOR_TIMER, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TIMER_PAUSED.value, cf.COLOR_TIMER_PAUSED, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.HOLIDAYS.value, cf.COLOR_HOLIDAYS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.EVENTS.value, cf.COLOR_EVENTS, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.TIME.value, cf.COLOR_TIME, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.WEATHER.value, cf.COLOR_WEATHER, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.UNIMPORTANT.value, cf.COLOR_UNIMPORTANT, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.CALENDAR_HEADER.value, cf.COLOR_CALENDAR_HEADER, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.ACTIVE_PANE.value, cf.COLOR_ACTIVE_PANE, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.SEPARATOR.value, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.EMPTY.value, cf.COLOR_BACKGROUND, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.CALENDAR_BOARDER.value, cf.COLOR_CALENDAR_BOARDER, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.DEADLINES.value, cf.COLOR_DEADLINES, cf.COLOR_BACKGROUND)
-
-    if not cf.MINIMAL_WEEKEND_INDICATOR:
-        curses.init_pair(Color.WEEKENDS.value, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)
-    if not cf.MINIMAL_TODAY_INDICATOR:
-        curses.init_pair(Color.TODAY.value, curses.COLOR_BLACK, cf.COLOR_TODAY)
-    if not cf.MINIMAL_DAYS_INDICATOR:
-        curses.init_pair(Color.DAYS.value, curses.COLOR_BLACK, cf.COLOR_DAYS)
+__version__ = "2.7"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, file_repository):
@@ -243,20 +206,27 @@ class TimerView(View):
 class JournalView(View):
     """Displays a list of all tasks"""
 
-    def __init__(self, stdscr, y, x, user_tasks, screen):
+    def __init__(self, stdscr, y, x, user_tasks, user_ics_tasks, screen):
         super().__init__(stdscr, y, x)
         self.user_tasks = user_tasks
+        self.user_ics_tasks = user_ics_tasks
         self.screen = screen
 
     def render(self):
         """Render the list of tasks"""
-        if not self.user_tasks.items and cf.SHOW_NOTHING_PLANNED:
+        if not self.user_tasks.items and not self.user_ics_tasks.items and cf.SHOW_NOTHING_PLANNED:
             self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
         for index, task in enumerate(self.user_tasks.items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode:
                 self.display_line(self.y, self.x, str(index + 1), Color.TODAY)
+            self.y += 1
+
+        self.y += 1
+        for index, task in enumerate(self.user_ics_tasks.items):
+            task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
+            task_view.render()
             self.y += 1
 
 
@@ -528,6 +498,7 @@ class HeaderView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         _, x_max = self.stdscr.getmaxyx()
 
         # Show title:
@@ -557,6 +528,7 @@ class FooterView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         if not cf.SHOW_KEYBINDINGS: return
         clear_line(self.stdscr, self.screen.y_max - 1)
         if self.screen.state == AppState.CALENDAR:
@@ -577,6 +549,7 @@ class SeparatorView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         _, x_max = self.stdscr.getmaxyx()
         x_separator = x_max - self.screen.journal_pane_width
         y_cell = (self.screen.y_max - 3) // 6
@@ -598,6 +571,7 @@ class CalenarBoarderView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         x_cell = self.screen.x_max // 7
         y_cell = (self.screen.y_max - 3) // 6
 
@@ -627,6 +601,7 @@ class DaysNameView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         num = 2 if self.screen.x_max < 74 else 12
         x_cell = int(self.screen.x_max // 7)
 
@@ -688,8 +663,10 @@ class DailyScreenView(View):
         return cf.TODAY_ICON if self.screen.date == self.screen.today else ''
 
     def render(self):
+        """Render this view on the screen"""
         self.screen.state = AppState.CALENDAR
-        if self.screen.x_max < 6 or self.screen.y_max < 3: return
+        if self.screen.x_max < 6 or self.screen.y_max < 3:
+            return
         # self.fill_background()
         curses.halfdelay(255)
 
@@ -738,6 +715,7 @@ class MonthlyScreenView(View):
         self.screen = screen
 
     def render(self):
+        """Render this view on the screen"""
         self.screen.state = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
         curses.halfdelay(255)
@@ -779,10 +757,11 @@ class MonthlyScreenView(View):
 
 
 class JournalScreenView(View):
-    def __init__(self, stdscr, y, x, weather, user_tasks, screen):
+    def __init__(self, stdscr, y, x, weather, user_tasks, user_ics_tasks, screen):
         super().__init__(stdscr, y, x)
         self.weather = weather
         self.user_tasks = user_tasks
+        self.user_ics_tasks = user_ics_tasks
         self.screen = screen
         self.refresh_time = 255
 
@@ -810,7 +789,7 @@ class JournalScreenView(View):
         header_view.render()
 
         # Display the tasks:
-        journal_view = JournalView(self.stdscr, 2, self.screen.x_min, self.user_tasks, self.screen)
+        journal_view = JournalView(self.stdscr, 2, self.screen.x_min, self.user_tasks, self.user_ics_tasks, self.screen)
         journal_view.render()
 
 
@@ -926,6 +905,7 @@ def main(stdscr) -> None:
     file_repository = FileRepository(cf)
     user_events = file_repository.load_events_from_csv()
     user_tasks = file_repository.load_tasks_from_csv()
+    user_ics_tasks = file_repository.load_tasks_from_ics()
     holidays = file_repository.load_holidays()
     birthdays = file_repository.load_birthdays_from_abook()
     importer = Importer(user_tasks, user_events, cf)
@@ -936,13 +916,13 @@ def main(stdscr) -> None:
     stdscr = curses.initscr()
     curses.noecho()
     curses.curs_set(False)
-    initialize_colors()
+    initialize_colors(cf)
 
     # Initialise screen views:
     app_view = View(stdscr, 0, 0)
     monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, user_tasks, screen)
     daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, holidays, birthdays, user_tasks, screen)
-    journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, screen)
+    journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, user_ics_tasks, screen)
     help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
     welcome_screen_view = WelcomeScreenView(stdscr, 0, 0, screen)
     footer_view = FooterView(stdscr, 0, 0, screen)

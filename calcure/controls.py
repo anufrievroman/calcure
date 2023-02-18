@@ -142,6 +142,7 @@ def control_monthly_screen(stdscr, user_events, screen, importer):
                 confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     importer.import_events_from_calcurse()
+                    screen.refresh_now = True
 
             # Other actions:
             if vim_style_exit(stdscr, screen):
@@ -434,10 +435,12 @@ def control_journal_screen(stdscr, user_tasks, screen, importer):
                 confirmed = ask_confirmation(stdscr, MSG_TS_IM, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     importer.import_tasks_from_calcurse()
+                    screen.refresh_now = True
             if screen.key == "W":
                 confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
                 if confirmed:
                     importer.import_tasks_from_taskwarrior()
+                    screen.refresh_now = True
 
             # Other actions:
             if vim_style_exit(stdscr, screen):

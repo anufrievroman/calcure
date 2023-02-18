@@ -4,29 +4,12 @@ import configparser
 import pathlib
 import csv
 import os
-
 import datetime
-import jdatetime
+
+from ics import Calendar as IcsCalendar
 
 from calcure.data import *
-
-
-def convert_to_persian_date(year, month, day):
-    """Convert date from Gregorian to Persian calendar"""
-    persian_date =  jdatetime.date.fromgregorian(day=day, month=month, year=year)
-    day = persian_date.day
-    month = persian_date.month
-    year = persian_date.year
-    return year, month, day
-
-
-def convert_to_gregorian_date(year, month, day):
-    """Convert date from Persian to Gregorian calendar"""
-    gregorian_date = jdatetime.date(year, month, day).togregorian()
-    day = gregorian_date.day
-    month = gregorian_date.month
-    year = gregorian_date.year
-    return year, month, day
+from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
 
 
 class FileRepository:
@@ -37,11 +20,14 @@ class FileRepository:
         self.user_events = Events()
         self.holidays = Events()
         self.birthdays = Birthdays()
+        self.user_ics_tasks = Tasks()
         self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = cf.TASKS_FILE
         self.events_file = cf.EVENTS_FILE
         self.country = cf.HOLIDAY_COUNTRY
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+        self.ics_events_file = cf.ICS_EVENTS_FILE
+        self.ics_tasks_file = cf.ICS_TASKS_FILE
 
     @property
     def is_task_format_old(self):
@@ -94,17 +80,17 @@ class FileRepository:
             # Read task name and statuses:
             if row[0 + shift][0] == '.':
                 name = row[0 + shift][1:]
-                privacy = True
+                is_private = True
             else:
                 name = row[0 + shift]
-                privacy = False
+                is_private = False
             status = Status[row[1 + shift].upper()]
             stamps = row[(2 + shift):] if len(row) > 2 else []
-            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), privacy, year, month, day))
+            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), is_private, year, month, day))
         return self.user_tasks
 
     def load_events_from_csv(self):
-        """Reads from user's file or create it if it does not exist"""
+        """Reads from user's csv file or create it if it does not exist"""
         lines = self.read_or_create_file(self.events_file)
         for index, row in enumerate(lines):
             event_id = index
@@ -113,10 +99,10 @@ class FileRepository:
             day = int(row[3])
             if row[4][0] == '.':
                 name = row[4][1:]
-                privacy = True
+                is_private = True
             else:
                 name = row[4]
-                privacy = False
+                is_private = False
 
             # Account for old versions of the datafile:
             if len(row) > 5:
@@ -147,7 +133,7 @@ class FileRepository:
                 year, month, day = convert_to_persian_date(year, month, day)
 
             self.user_events.add_item(UserEvent(event_id, year, month, day,
-                                name, repetition, frequency, status, privacy))
+                                name, repetition, frequency, status, is_private))
         return self.user_events
 
     def save_tasks_to_csv(self):
@@ -176,7 +162,7 @@ class FileRepository:
         """Rewrite the data file with changed events"""
         original_file = self.events_file
         dummy_file = self.events_file + '.bak'
-        with open(dummy_file, "w", encoding="utf-8") as f:
+        with open(dummy_file, "w", encoding="utf-8") as file:
             for ev in self.user_events.items:
 
                 # If persian calendar was used, we convert event back to Gregorian for storage:
@@ -186,16 +172,16 @@ class FileRepository:
                     year, month, day = ev.year, ev. month, ev.day
 
                 name = f'{"."*ev.privacy}{ev.name}'
-                f.write(f'{ev.item_id},{year},{month},{day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
+                file.write(f'{ev.item_id},{year},{month},{day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
         os.remove(original_file)
         os.rename(dummy_file, original_file)
         self.user_events.changed = False
 
-    def load_deadlines(self):
-        """Create collection of events that are deadlines for tasks"""
-        for task in self.user_tasks.items:
-            self.deadlines.add_item(DeadlineEvent(task.item_id, task.year, task.month, task.day, task.name, task.status, task.privacy))
-        return self.deadlines
+    # def load_deadlines(self):
+        # """Create collection of events that are deadlines for tasks"""
+        # for task in self.user_tasks.items:
+            # self.deadlines.add_item(DeadlineEvent(task.item_id, task.year, task.month, task.day, task.name, task.status, task.privacy))
+            # return self.deadlines
 
     def load_holidays(self):
         """Load list of holidays in this country around this year"""
@@ -234,83 +220,30 @@ class FileRepository:
                     self.birthdays.add_item(Event(1, month, day, name))
         return self.birthdays
 
+    def load_tasks_from_ics(self):
+        """Load tasks from ics files"""
+        with open(self.ics_tasks_file, 'r', encoding="utf-8") as file:
+            ics_text = file.read()
 
-class Importer:
-    """Import tasks and events from files of other programs"""
-
-    def __init__(self, user_tasks, user_events, cf):
-        self.user_tasks = user_tasks
-        self.user_events = user_events
-        self.tasks_file = cf.TASKS_FILE
-        self.events_file = cf.EVENTS_FILE
-        self.calcurse_todo_file = cf.CALCURSE_TODO_FILE
-        self.calcurse_events_file = cf.CALCURSE_EVENTS_FILE
-        self.taskwarrior_folder = cf.TASKWARRIOR_FOLDER
-        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
-
-    def read_file(self, file):
-        """Try to read a file and return its lines"""
-        try:
-            with open(file, "r", encoding="utf-8") as f:
-                lines = f.readlines()
-            return lines
-        except (IOError, FileNotFoundError, NameError):
-            return []
-
-    def import_tasks_from_calcurse(self):
-        """Import tasks from calcurse database"""
-        lines = self.read_file(self.calcurse_todo_file)
-        for line in lines:
-            name = line[4:-1]
-            importance = line[1]
-            if (len(name) > 0) and not self.user_tasks.item_exists(name):
-                if importance in ['1', '2']:
-                    status = Status.IMPORTANT
-                elif importance in ['8', '9', '10']:
-                    status = Status.UNIMPORTANT
-                else:
-                    status = Status.NORMAL
+        tasks = IcsCalendar(ics_text)
+        for task in tasks.todos:
+            if task.status != "CANCELLED":
                 task_id = self.user_tasks.generate_id()
-                privacy = False
-                self.user_tasks.add_item(Task(task_id, name, status, Timer([]), privacy))
 
-    def import_tasks_from_taskwarrior(self):
-        """Import tasks from taskwarrior database"""
-        lines = self.read_file(self.taskwarrior_folder+"/pending.data")
-        for line in lines:
-            if len(line) > 0:
-                name = line.split('description:"', 1)[1]
-                name = name.split('"', 1)[0]
-                if not self.user_tasks.item_exists(name):
-                    task_id = self.user_tasks.generate_id()
-                    privacy = False
-                    self.user_tasks.add_item(Task(task_id, name, Status.NORMAL, Timer([]), privacy))
+                # Assign status from priority:
+                status = Status.NORMAL
+                if task.priority is not None:
+                    if task.priority > 5:
+                        status = Status.UNIMPORTANT
+                    if task.priority < 5:
+                        status = Status.IMPORTANT
 
-    def import_events_from_calcurse(self):
-        """Importing events from calcurse apt file into our events file"""
-        lines = self.read_file(self.calcurse_events_file)
-        for line in lines:
-            month = int(line[0:2])
-            day = int(line[3:5])
-            year = int(line[6:10])
-            if line[11] == "[":
-                name = line[15:-1]
-            elif line[11] == "@":
-                name = line[35:-1]
-                name = name.replace('|',' ')
-            else:
-                name = ''
-            if not self.user_events.items:
-                event_id = 0
-            else:
-                event_id = self.user_events.items[-1].item_id + 1
-            privacy = False
+                # Correct according to status:
+                if task.status == "COMPLETED":
+                    status = Status.DONE
 
-            # Convert to persian date if needed:
-            if self.use_persian_calendar:
-                year, month, day = convert_to_persian_date(year, month, day)
-
-            imported_event = UserEvent(event_id, year, month, day, name, 1,
-                                       Frequency.ONCE, Status.NORMAL, privacy)
-            if not self.user_events.event_exists(imported_event):
-                self.user_events.add_item(imported_event)
+                name = task.name
+                timer = Timer([])
+                is_private = False
+                self.user_ics_tasks.add_item(Task(task_id, name, status, timer, is_private))
+        return self.user_ics_tasks

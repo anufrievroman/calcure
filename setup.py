@@ -23,7 +23,7 @@ setuptools.setup(
             "calcure = calcure.__main__:cli"
         ]
     },
-    install_requires=['holidays', 'jdatetime'],
+    install_requires=['holidays', 'jdatetime', 'ics'],
     version=version,
     python_requires='~=3.7',
     classifiers=[

@@ -69,7 +69,7 @@ class Color(enum.Enum):
 
 
 class Task:
-    """Tasks crated by user"""
+    """Tasks crated by the user"""
 
     def __init__(self, item_id, name, status, timer, privacy, year=0, month=0, day=0):
         self.item_id = item_id
@@ -83,7 +83,7 @@ class Task:
 
 
 class Event:
-    """Parent class of events"""
+    """Parent class of all events"""
 
     def __init__(self, year, month, day, name):
         self.year = year
@@ -93,7 +93,7 @@ class Event:
 
 
 class UserEvent(Event):
-    """Events crated by user"""
+    """Events crated by the user"""
 
     def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy):
         super().__init__(year, month, day, name)

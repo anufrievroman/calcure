@@ -9,6 +9,7 @@ import getopt
 from calcure.data import AppState
 
 
+
 class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
@@ -219,6 +220,10 @@ class Config:
             self.REFRESH_INTERVAL      = int(conf.get("Parameters", "refresh_interval", fallback=1))
             self.RIGHT_PANE_PERCENTAGE = int(conf.get("Parameters", "right_pane_percentage", fallback=25))
             self.ONE_TIMER_AT_A_TIME   = conf.getboolean("Parameters", "one_timer_at_a_time", fallback=False)
+
+            # ICS files:
+            self.ICS_EVENTS_FILE    = conf.get("Parameters", "ics_events_file", fallback=None)
+            self.ICS_TASKS_FILE     = conf.get("Parameters", "ics_tasks_file", fallback=None)
 
             # Calendar colors:
             self.COLOR_TODAY           = int(conf.get("Colors", "color_today", fallback=2))
