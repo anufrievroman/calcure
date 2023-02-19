@@ -218,6 +218,11 @@ class FileRepository:
 
     def load_birthdays_from_abook(self):
         """Loading birthdays from abook contacts"""
+
+        # Quit if file does not exists:
+        if not os.path.exists(self.abook_file):
+            return self.birthdays
+
         abook = configparser.ConfigParser()
         abook.read(self.abook_file)
         for each_contact in abook.sections():
@@ -240,6 +245,10 @@ class FileRepository:
         """Load tasks from each of the ics files"""
         if self.ics_task_files is not None:
             for filename in self.ics_task_files:
+
+                # Quit if file does not exists:
+                if not os.path.exists(filename):
+                    return self.user_ics_tasks
 
                 # Clean and read the file, then remove tmp file:
                 clean_ics_file(filename)
@@ -286,6 +295,10 @@ class FileRepository:
         """Load events from each of the ics files"""
         if self.ics_event_files is not None:
             for filename in self.ics_event_files:
+
+                # Quit if file does not exists:
+                if not os.path.exists(filename):
+                    return self.user_ics_events
 
                 # Clean and read the file, then remove tmp file:
                 clean_ics_file(filename)
