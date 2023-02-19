@@ -41,11 +41,15 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 ## Dependencies
 
 - python 3
-- `holidays` and `jdatetime` python libraries. Install by `pip install holidays jdatetime`.
+- `holidays`, `jdatetime`, and 'ics' python libraries. Install by `pip install holidays jdatetime ics`.
 
 ## Usage
 
 Run `calcure` in your terminal. You may need to restart your terminal after the install.
+
+### Syncing with cloud calendars
+
+Calcure can display in read-only mode events and tasks from Nextcloud, Google, and other calendars. See this [wiki page](https://github.com/anufrievroman/calcure/wiki/Syncing-.ics-files-from-clouds) for examples.
 
 ### User arguments
 
