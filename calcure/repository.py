@@ -12,6 +12,18 @@ from calcure.data import *
 from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
 
 
+def clean_ics_file(filename):
+    """Remove multiple PRODID lines from ics file"""
+    original_file = filename
+    clean_file = filename + ".clean"
+    with open(original_file, 'r') as input_file, open(clean_file, 'w') as output_file:
+        previous_line = ""
+        for line in input_file:
+            if not ("PRODID:" in line and "PRODID:" in previous_line):
+                output_file.write(line)
+            previous_line = line
+
+
 class FileRepository:
     """Load and save events and tasks to files"""
 
@@ -228,8 +240,12 @@ class FileRepository:
         """Load tasks from each of the ics files"""
         if self.ics_task_files is not None:
             for filename in self.ics_task_files:
-                with open(filename, 'r', encoding="utf-8") as file:
+
+                # Clean and read the file, then remove tmp file:
+                clean_ics_file(filename)
+                with open(filename + ".clean", 'r', encoding="utf-8") as file:
                     ics_text = file.read()
+                os.remove(filename + ".clean")
 
                 cal = IcsCalendar(ics_text)
                 for task in cal.todos:
@@ -270,8 +286,12 @@ class FileRepository:
         """Load events from each of the ics files"""
         if self.ics_event_files is not None:
             for filename in self.ics_event_files:
-                with open(filename, 'r', encoding="utf-8") as file:
+
+                # Clean and read the file, then remove tmp file:
+                clean_ics_file(filename)
+                with open(filename + ".clean", 'r', encoding="utf-8") as file:
                     ics_text = file.read()
+                os.remove(filename + ".clean")
                 cal = IcsCalendar(ics_text)
                 for index, event in enumerate(cal.events):
 
