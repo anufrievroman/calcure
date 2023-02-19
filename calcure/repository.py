@@ -87,7 +87,11 @@ class FileRepository:
                 is_private = False
             status = Status[row[1 + shift].upper()]
             stamps = row[(2 + shift):] if len(row) > 2 else []
-            self.user_tasks.add_item(Task(task_id, name, status, Timer(stamps), is_private, year, month, day))
+            timer = Timer(stamps)
+
+            # Add task:
+            new_task = Task(task_id, name, status, timer, is_private, year, month, day)
+            self.user_tasks.add_item(new_task)
         return self.user_tasks
 
     def load_events_from_csv(self):
@@ -133,8 +137,9 @@ class FileRepository:
             if self.use_persian_calendar:
                 year, month, day = convert_to_persian_date(year, month, day)
 
-            self.user_events.add_item(UserEvent(event_id, year, month, day,
-                                name, repetition, frequency, status, is_private))
+            # Add event:
+            new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
+            self.user_events.add_item(new_event)
         return self.user_events
 
     def save_tasks_to_csv(self):
@@ -178,12 +183,6 @@ class FileRepository:
         os.rename(dummy_file, original_file)
         self.user_events.changed = False
 
-    # def load_deadlines(self):
-        # """Create collection of events that are deadlines for tasks"""
-        # for task in self.user_tasks.items:
-            # self.deadlines.add_item(DeadlineEvent(task.item_id, task.year, task.month, task.day, task.name, task.status, task.privacy))
-            # return self.deadlines
-
     def load_holidays(self):
         """Load list of holidays in this country around this year"""
         try:
@@ -198,7 +197,9 @@ class FileRepository:
                 else:
                     year, month, day = date.year, date.month, date.day
 
-                self.holidays.add_item(Event(year, month, day, name))
+                # Add holiday:
+                holiday = Event(year, month, day, name)
+                self.holidays.add_item(holiday)
         except (ModuleNotFoundError, SyntaxError, AttributeError):
             pass
         return self.holidays
@@ -218,7 +219,9 @@ class FileRepository:
                     if self.use_persian_calendar:
                         _, month, day = convert_to_persian_date(1000, month, day)
 
-                    self.birthdays.add_item(Event(1, month, day, name))
+                    # Add birthday:
+                    birthday = Event(1, month, day, name)
+                    self.birthdays.add_item(birthday)
         return self.birthdays
 
     def load_tasks_from_ics(self):
@@ -246,9 +249,21 @@ class FileRepository:
                             status = Status.DONE
 
                         name = task.name
+
+                        # Try reading task due date:
+                        try:
+                            year = task.due.year
+                            month = task.due.month
+                            day = task.due.day
+                        except AttributeError:
+                            year, month, day = 0, 0, 0
+
                         timer = Timer([])
                         is_private = False
-                        self.user_ics_tasks.add_item(Task(task_id, name, status, timer, is_private))
+
+                        # Add task:
+                        new_task = Task(task_id, name, status, timer, is_private, year, month, day)
+                        self.user_ics_tasks.add_item(new_task)
         return self.user_ics_tasks
 
     def load_events_from_ics(self):
@@ -284,6 +299,7 @@ class FileRepository:
                     if self.use_persian_calendar:
                         year, month, day = convert_to_persian_date(year, month, day)
 
-                    self.user_ics_events.add_item(UserEvent(event_id, year, month, day,
-                                        name, repetition, frequency, status, is_private))
+                    # Add event:
+                    new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
+                    self.user_ics_events.add_item(new_event)
         return self.user_ics_events

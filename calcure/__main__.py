@@ -372,7 +372,7 @@ class DailyView(View):
     """Display all events occurring on this days"""
 
     def __init__(self, stdscr, y, x, repeated_user_events, user_events, user_ics_events, holidays,
-                                birthdays, user_tasks, screen, index_offset, is_selection_day=True):
+                                birthdays, user_tasks, user_ics_tasks, screen, index_offset, is_selection_day=True):
         super().__init__(stdscr, y, x)
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
@@ -380,6 +380,7 @@ class DailyView(View):
         self.holidays = holidays.filter_events_that_day(screen)
         self.birthdays = birthdays.filter_events_that_day(screen)
         self.deadlines = user_tasks.filter_events_that_day(screen)
+        self.deadlines_ics = user_ics_tasks.filter_events_that_day(screen)
         self.screen = screen
         self.index_offset = index_offset
         self.y_cell = (self.screen.y_max - 3) // 6
@@ -403,23 +404,25 @@ class DailyView(View):
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
             index += 1
 
-        # Show repeated user events:
-        for event in self.repeated_user_events.items:
-            if index < self.y_cell - 1:
-                user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
-                user_event_view.render()
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
-            index += 1
+        # Show repeated user events and events from ics:
+        for event_list in [self.repeated_user_events.items, self.user_ics_events.items]:
+            for event in event_list:
+                if index < self.y_cell - 1:
+                    user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
+                    user_event_view.render()
+                else:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
+                index += 1
 
-        # Show deadlines for tasks:
-        for event in self.deadlines.items:
-            if index < self.y_cell - 1:
-                deadline_view = DeadlineView(self.stdscr, self.y + index, self.x, event, self.screen)
-                deadline_view.render()
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.DEADLINES)
-            index += 1
+        # Show deadlines for tasks, both from csv and ics files:
+        for deadline_list in [self.deadlines.items, self.deadlines_ics.items]:
+            for event in deadline_list:
+                if index < self.y_cell - 1:
+                    deadline_view = DeadlineView(self.stdscr, self.y + index, self.x, event, self.screen)
+                    deadline_view.render()
+                else:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.DEADLINES)
+                index += 1
 
         # Show holidays:
         if not cf.DISPLAY_HOLIDAYS:
@@ -442,19 +445,6 @@ class DailyView(View):
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
             index += 1
-
-        # Show ics user events:
-        for event in self.user_ics_events.items:
-            if index < self.y_cell - 1:
-                user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
-                user_event_view.render()
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
-            index += 1
-
-        # if index == 0 and self.screen.calendar_state == CalState.DAILY and cf.SHOW_NOTHING_PLANNED:
-            # self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
-            # index += 1
 
         self.num_events_this_day = index
 
@@ -635,7 +625,7 @@ class DaysNameView(View):
 class DailyScreenView(View):
     """Daily view showing events of the day"""
 
-    def __init__(self, stdscr, y, x, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, screen):
+    def __init__(self, stdscr, y, x, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, user_ics_tasks, screen):
         super().__init__(stdscr, y, x)
         self.weather = weather
         self.user_events = user_events
@@ -643,6 +633,7 @@ class DailyScreenView(View):
         self.holidays = holidays
         self.birthdays = birthdays
         self.user_tasks = user_tasks
+        self.user_ics_tasks = user_ics_tasks
         self.screen = screen
 
     @property
@@ -704,7 +695,7 @@ class DailyScreenView(View):
 
             daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
                                    self.user_events, self.user_ics_events, self.holidays, self.birthdays,
-                                   self.user_tasks, self.screen, 0, is_selection_day)
+                                   self.user_tasks, self.user_ics_tasks, self.screen, 0, is_selection_day)
             daily_view.render()
             vertical_shift += daily_view.num_events_this_day + 3
             self.screen.next_day()
@@ -718,7 +709,7 @@ class DailyScreenView(View):
 class MonthlyScreenView(View):
     """Monthly view showing events of the month"""
 
-    def __init__(self, stdscr, y, x, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, screen):
+    def __init__(self, stdscr, y, x, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, user_ics_tasks, screen):
         super().__init__(stdscr, y, x)
         self.weather = weather
         self.user_events = user_events
@@ -726,6 +717,7 @@ class MonthlyScreenView(View):
         self.holidays = holidays
         self.birthdays = birthdays
         self.user_tasks = user_tasks
+        self.user_ics_tasks = user_ics_tasks
         self.screen = screen
 
     def render(self):
@@ -762,7 +754,7 @@ class MonthlyScreenView(View):
                     self.screen.day = day
                     daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events,
                                            self.user_events, self.user_ics_events, self.holidays, self.birthdays,
-                                           self.user_tasks, self.screen, num_events_this_month)
+                                           self.user_tasks, self.user_ics_tasks, self.screen, num_events_this_month)
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
@@ -936,8 +928,10 @@ def main(stdscr) -> None:
 
     # Initialise screen views:
     app_view = View(stdscr, 0, 0)
-    monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, screen)
-    daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, screen)
+    monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events,
+                                            holidays, birthdays, user_tasks, user_ics_tasks, screen)
+    daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events,
+                                        holidays, birthdays, user_tasks, user_ics_tasks, screen)
     journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, user_ics_tasks, screen)
     help_screen_view = HelpScreenView(stdscr, 0, 0, screen)
     welcome_screen_view = WelcomeScreenView(stdscr, 0, 0, screen)
