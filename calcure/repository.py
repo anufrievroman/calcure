@@ -16,9 +16,10 @@ def clean_ics_file(filename):
     """Remove multiple PRODID lines from ics file"""
     original_file = filename
     clean_file = filename + ".clean"
+    previous_line = ""
     with open(original_file, 'r') as input_file, open(clean_file, 'w') as output_file:
-        previous_line = ""
         for line in input_file:
+            # If there is more than one PRODID line, skip them:
             if not ("PRODID:" in line and "PRODID:" in previous_line):
                 output_file.write(line)
             previous_line = line
@@ -51,6 +52,7 @@ class FileRepository:
 
     def read_or_create_file(self, file):
         """Read user's csv file or create new one if it does not exist"""
+
         # Try to read the file line by line:
         try:
             with open(file, "r", encoding="utf-8") as f:
@@ -243,96 +245,106 @@ class FileRepository:
 
     def load_tasks_from_ics(self):
         """Load tasks from each of the ics files"""
-        if self.ics_task_files is not None:
-            for filename in self.ics_task_files:
 
-                # Quit if file does not exists:
-                if not os.path.exists(filename):
-                    return self.user_ics_tasks
+        # Quit if the file is not specified:
+        if self.ics_task_files is None:
+            return self.user_ics_tasks
 
-                # Clean and read the file, then remove tmp file:
-                clean_ics_file(filename)
-                with open(filename + ".clean", 'r', encoding="utf-8") as file:
-                    ics_text = file.read()
-                os.remove(filename + ".clean")
+        for filename in self.ics_task_files:
 
-                cal = IcsCalendar(ics_text)
-                for task in cal.todos:
-                    if task.status != "CANCELLED":
-                        task_id = self.user_ics_tasks.generate_id()
+            # Quit if file does not exists:
+            if not os.path.exists(filename):
+                return self.user_ics_tasks
 
-                        # Assign status from priority:
-                        status = Status.NORMAL
-                        if task.priority is not None:
-                            if task.priority > 5:
-                                status = Status.UNIMPORTANT
-                            if task.priority < 5:
-                                status = Status.IMPORTANT
+            # Clean and read the file, then remove tmp file:
+            clean_ics_file(filename)
+            with open(filename + ".clean", 'r', encoding="utf-8") as file:
+                ics_text = file.read()
+            os.remove(filename + ".clean")
 
-                        # Correct according to status:
-                        if task.status == "COMPLETED":
-                            status = Status.DONE
+            cal = IcsCalendar(ics_text)
+            for task in cal.todos:
+                if task.status != "CANCELLED":
+                    task_id = self.user_ics_tasks.generate_id()
 
-                        name = task.name
+                    # Assign status from priority:
+                    status = Status.NORMAL
+                    if task.priority is not None:
+                        if task.priority > 5:
+                            status = Status.UNIMPORTANT
+                        if task.priority < 5:
+                            status = Status.IMPORTANT
 
-                        # Try reading task due date:
-                        try:
-                            year = task.due.year
-                            month = task.due.month
-                            day = task.due.day
-                        except AttributeError:
-                            year, month, day = 0, 0, 0
+                    # Correct according to status:
+                    if task.status == "COMPLETED":
+                        status = Status.DONE
 
-                        timer = Timer([])
-                        is_private = False
+                    name = task.name
 
-                        # Add task:
-                        new_task = Task(task_id, name, status, timer, is_private, year, month, day)
-                        self.user_ics_tasks.add_item(new_task)
+                    # Try reading task due date:
+                    try:
+                        year = task.due.year
+                        month = task.due.month
+                        day = task.due.day
+                    except AttributeError:
+                        year, month, day = 0, 0, 0
+
+                    timer = Timer([])
+                    is_private = False
+
+                    # Add task:
+                    new_task = Task(task_id, name, status, timer, is_private, year, month, day)
+                    self.user_ics_tasks.add_item(new_task)
+
         return self.user_ics_tasks
 
     def load_events_from_ics(self):
         """Load events from each of the ics files"""
-        if self.ics_event_files is not None:
-            for filename in self.ics_event_files:
 
-                # Quit if file does not exists:
-                if not os.path.exists(filename):
-                    return self.user_ics_events
+        # Quit if the file is not specified:
+        if self.ics_event_files is None:
+            return self.user_ics_events
 
-                # Clean and read the file, then remove tmp file:
-                clean_ics_file(filename)
-                with open(filename + ".clean", 'r', encoding="utf-8") as file:
-                    ics_text = file.read()
-                os.remove(filename + ".clean")
-                cal = IcsCalendar(ics_text)
-                for index, event in enumerate(cal.events):
+        for filename in self.ics_event_files:
 
-                    # Default parameters:
-                    event_id = index
-                    repetition = '1'
-                    frequency = Frequency.ONCE
-                    status = Status.NORMAL
-                    is_private = False
+            # Quit if file does not exists:
+            if not os.path.exists(filename):
+                return self.user_ics_events
 
-                    # Parameters of the event from ics if they exist:
-                    name = event.name if event.name is not None else ""
-                    all_day = event.all_day if event.all_day is not None else True
-                    year = event.begin.year if event.begin else 0
-                    month = event.begin.month if event.begin else 1
-                    day = event.begin.day if event.begin else 1
+            # Clean and read the file, then remove tmp file:
+            clean_ics_file(filename)
+            with open(filename + ".clean", 'r', encoding="utf-8") as file:
+                ics_text = file.read()
+            os.remove(filename + ".clean")
+            cal = IcsCalendar(ics_text)
+            for index, event in enumerate(cal.events):
 
-                    # Add start time to name of non-all-day events:
-                    if not all_day:
-                        hour = event.begin.hour if event.begin else 0
-                        minute = event.begin.minute if event.begin else 0
-                        name = f"{hour:0=2}:{minute:0=2} {name}"
+                # Default parameters:
+                event_id = index
+                repetition = '1'
+                frequency = Frequency.ONCE
+                status = Status.NORMAL
+                is_private = False
 
-                    # Convert to persian date if needed:
-                    if self.use_persian_calendar:
-                        year, month, day = convert_to_persian_date(year, month, day)
+                # Parameters of the event from ics if they exist:
+                name = event.name if event.name is not None else ""
+                all_day = event.all_day if event.all_day is not None else True
+                year = event.begin.year if event.begin else 0
+                month = event.begin.month if event.begin else 1
+                day = event.begin.day if event.begin else 1
 
-                    # Add event:
-                    new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
-                    self.user_ics_events.add_item(new_event)
+                # Add start time to name of non-all-day events:
+                if not all_day:
+                    hour = event.begin.hour if event.begin else 0
+                    minute = event.begin.minute if event.begin else 0
+                    name = f"{hour:0=2}:{minute:0=2} {name}"
+
+                # Convert to persian date if needed:
+                if self.use_persian_calendar:
+                    year, month, day = convert_to_persian_date(year, month, day)
+
+                # Add event:
+                new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
+                self.user_ics_events.add_item(new_event)
+
         return self.user_ics_events
