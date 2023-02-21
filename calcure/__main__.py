@@ -39,7 +39,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.7.1"
+__version__ = "2.7.3"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, file_repository):

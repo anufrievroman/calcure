@@ -5,8 +5,7 @@ import pathlib
 import csv
 import os
 import datetime
-
-from ics import Calendar as IcsCalendar
+import ics
 
 from calcure.data import *
 from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
@@ -256,8 +255,13 @@ class FileRepository:
             if not os.path.exists(filename):
                 return self.user_ics_tasks
 
-            ics_text = read_ics_file(filename)
-            cal = IcsCalendar(ics_text)
+                ics_text = read_ics_file(filename)
+            # Try parcing ics file:
+            try:
+                cal = ics.Calendar(ics_text)
+            except NotImplementedError: # More than one calendar in the file
+                return self.user_ics_tasks
+
             for task in cal.todos:
                 if task.status != "CANCELLED":
                     task_id = self.user_ics_tasks.generate_id()
@@ -307,7 +311,13 @@ class FileRepository:
                 return self.user_ics_events
 
             ics_text = read_ics_file(filename)
-            cal = IcsCalendar(ics_text)
+
+            # Try parcing ics file:
+            try:
+                cal = ics.Calendar(ics_text)
+            except NotImplementedError:  # More than one calendar in the file
+                return self.user_ics_events
+
             for index, event in enumerate(cal.events):
 
                 # Default parameters:
