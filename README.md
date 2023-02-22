@@ -1,7 +1,7 @@
 # Calcure
 
 
-Modern TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse) and [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior). See [wiki](https://anufrievroman.gitbook.io/calcure/) for more information.
+Modern TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse) and [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior). See [documentation](https://anufrievroman.gitbook.io/calcure/) for more information.
 
 ![screenshot](screenshot.png)
 
@@ -43,7 +43,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 ## Dependencies
 
 - python 3
-- `holidays`, `jdatetime`, and 'ics' python libraries. Install by `pip install holidays jdatetime ics`.
+- `holidays`, `jdatetime`, and `ics` python libraries can be installed by `pip install holidays jdatetime ics`.
 
 ## Usage
 
@@ -55,7 +55,7 @@ Calcure can display in read-only mode events and tasks from Nextcloud, Google, a
 
 ### User arguments
 
-Calcure supports automations and can be started in special mods using various user arguments. Please refer [to this wiki page](https://anufrievroman.gitbook.io/calcure/user-arguments) for the list of options.
+[Various user arguments](https://anufrievroman.gitbook.io/calcure/user-arguments) can be added started in special mods add tasks and events etc.
 
 ### Key bindings
 
@@ -65,19 +65,16 @@ Calcure supports automations and can be started in special mods using various us
 
 On the first run, program will create a configuration file at `~/.config/calcure/config.ini`.
 You can edit parameters, colors, and icons in the `config.ini` file.
-See [wiki](https://anufrievroman.gitbook.io/calcure/) for the [example of config.ini file](https://anufrievroman.gitbook.io/calcure/default-config) and [explanations of all settings](https://anufrievroman.gitbook.io/calcure/settings).
+[Example of config.ini file](https://anufrievroman.gitbook.io/calcure/default-config) and [explanations of all settings](https://anufrievroman.gitbook.io/calcure/settings) are available in the documentation.
 
 ## Troubleshooting
 
-- If your terminal shows empty squares instead of icons, probably it does not support unicode. In this case, in config set: `use_unicode_icons = No`.
-- Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
-- If weather is incorrect, set your city in config `weather_city = Tokyo`. By default, this setting is empty and program tries to detect your city automatically from your ip.
-- If after install the program does not run by just running `calcure`, try to restart your terminal, it may need to recheck the binaries.
+[Typical problems and solutions](https://anufrievroman.gitbook.io/calcure/troubleshooting) are described in documentation. If you faced a new problem, don't hesitate to open an issue.
 
 
 ## Contribution, translations, donations
 
-For full information about contribution, see [wiki pages](https://anufrievroman.gitbook.io/calcure/contribution).
+[Full information about contribution](https://anufrievroman.gitbook.io/calcure/contribution) is available in the documentation.
 
 If you wish to contribute to the development or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations (create a copy of `en.py` in translations folder in your language), packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
 
