@@ -1,13 +1,14 @@
 # Calcure
 
 
-Modern TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse) and [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior). See [wiki](https://github.com/anufrievroman/calcure/wiki) for more information.
+Modern TUI calendar and task manager with customizable interface. Manages your events and tasks, displays birthdays from your [abook](https://abook.sourceforge.io/), and can import events and tasks from [calcurse](https://github.com/lfos/calcurse) and [taskwarrior](https://github.com/GothenburgBitFactory/taskwarrior). See [wiki](https://anufrievroman.gitbook.io/calcure/) for more information.
 
 ![screenshot](screenshot.png)
 
 ## Features
 
 - Vim keys
+- View tasks and events from .ics file synced with clouds
 - Operation with fewest key presses possible
 - Todo list with subtasks, deadlines, and timers
 - Birthdays of your abook contacts
@@ -19,6 +20,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Resize and mobile friendly
 - Current weather ⛅
 - Support for Persian calendar
+
 
 
 ## Installation
@@ -49,22 +51,21 @@ Run `calcure` in your terminal. You may need to restart your terminal after the 
 
 ### Syncing with cloud calendars
 
-Calcure can display in read-only mode events and tasks from Nextcloud, Google, and other calendars. See this [wiki page](https://github.com/anufrievroman/calcure/wiki/Syncing-.ics-files-from-clouds) for examples.
+Calcure can display in read-only mode events and tasks from Nextcloud, Google, and other calendars. See this [wiki page](https://anufrievroman.gitbook.io/calcure/syncing-with-clouds) for examples.
 
 ### User arguments
 
-Calcure supports automations and can be started in special mods using various user arguments. Please refer [to this wiki page](https://github.com/anufrievroman/calcure/wiki/User-arguments) for the list of options.
+Calcure supports automations and can be started in special mods using various user arguments. Please refer [to this wiki page](https://anufrievroman.gitbook.io/calcure/user-arguments) for the list of options.
 
 ### Key bindings
 
-[List of all key bindings](https://github.com/anufrievroman/calcure/wiki/Key-bindings) can be accessed in the wiki and via `?` key in the program.
+[List of all key bindings](https://anufrievroman.gitbook.io/calcure/key-bindings) can be accessed in the wiki and via `?` key in the program.
 
 ### Settings
 
 On the first run, program will create a configuration file at `~/.config/calcure/config.ini`.
 You can edit parameters, colors, and icons in the `config.ini` file.
-An example of the [config.ini file is here](https://github.com/anufrievroman/calcure/wiki/Default-config.ini).
-Explanations of all settings are [in the wiki](https://github.com/anufrievroman/calcure/wiki/Settings).
+See [wiki](https://anufrievroman.gitbook.io/calcure/) for the [example of config.ini file](https://anufrievroman.gitbook.io/calcure/default-config) and [explanations of all settings](https://anufrievroman.gitbook.io/calcure/settings).
 
 ## Troubleshooting
 
@@ -72,17 +73,13 @@ Explanations of all settings are [in the wiki](https://github.com/anufrievroman/
 - Weather widget slows down launch of the program and requires internet. If that is a problem, switch weather off in config: `show_weather = No`.
 - If weather is incorrect, set your city in config `weather_city = Tokyo`. By default, this setting is empty and program tries to detect your city automatically from your ip.
 - If after install the program does not run by just running `calcure`, try to restart your terminal, it may need to recheck the binaries.
-- AUR package is autdated, please use `pip install calcure` for installation.
 
-## Roadmap
-
-- Support for .ics files in read only mode
-- Support for .ics files in read and write mode
 
 ## Contribution, translations, donations
+
+For full information about contribution, see [wiki pages](https://anufrievroman.gitbook.io/calcure/contribution).
 
 If you wish to contribute to the development or translations, feel free to open issues or propose PRs. Particularly, you are welcome to contribute to translations (create a copy of `en.py` in translations folder in your language), packaging for repositories, and syncing with popular calendar services. For big changes, please open an issue to discuss first. 
 
 If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
 
-For more information about contribution, see [wiki pages](https://github.com/anufrievroman/calcure/wiki/Contribution).
