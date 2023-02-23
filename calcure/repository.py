@@ -11,17 +11,25 @@ from calcure.data import *
 from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
 
 
-def read_ics_file(filename):
+def read_ics_lines(file):
     """Remove multiple PRODID lines from ics file"""
     previous_line = ""
     ics_text = ""
-    with open(filename, 'r', encoding="utf-8") as file:
-        for line in file:
-            # If there is more than one PRODID line, skip them:
-            if not ("PRODID:" in line and "PRODID:" in previous_line):
-                ics_text += line
-            previous_line = line
+    for line in file:
+        # If there is more than one PRODID line, skip them:
+        if not ("PRODID:" in line and "PRODID:" in previous_line):
+            ics_text += line
+        previous_line = line
     return ics_text
+
+def read_ics_file(filename):
+    if filename.startswith('http'):
+        import urllib.request
+        import io # https://stackoverflow.com/a/70384156/986793
+        with urllib.request.urlopen(filename) as response:
+            return read_ics_lines(io.TextIOWrapper(response, 'utf-8'))
+    with open(filename, 'r', encoding="utf-8") as file:
+        return read_ics_lines(file)
 
 
 class FileRepository:
@@ -307,7 +315,7 @@ class FileRepository:
         for filename in self.ics_event_files:
 
             # Quit if file does not exists:
-            if not os.path.exists(filename):
+            if not os.path.exists(filename) and not filename.startswith('http'):
                 return self.user_ics_events
 
             ics_text = read_ics_file(filename)
