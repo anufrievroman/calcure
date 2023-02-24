@@ -6,13 +6,16 @@ import csv
 import os
 import datetime
 import ics
+import urllib.request
+import io
+
 
 from calcure.data import *
 from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
 
 
 def read_ics_lines(file):
-    """Remove multiple PRODID lines from ics file"""
+    """Read the file line-by-line and remove multiple PRODID lines"""
     previous_line = ""
     ics_text = ""
     for line in file:
@@ -22,12 +25,19 @@ def read_ics_lines(file):
         previous_line = line
     return ics_text
 
+
 def read_ics_file(filename):
+    """Parse the file or url from user config"""
+
+    # If it is a URL, try to load it:
     if filename.startswith('http'):
-        import urllib.request
-        import io # https://stackoverflow.com/a/70384156/986793
-        with urllib.request.urlopen(filename) as response:
-            return read_ics_lines(io.TextIOWrapper(response, 'utf-8'))
+        try:
+            with urllib.request.urlopen(filename) as response:
+                return read_ics_lines(io.TextIOWrapper(response, 'utf-8'))
+        except urllib.error.HTTPError:
+            return ""
+
+    # If it is a local file, read it:
     with open(filename, 'r', encoding="utf-8") as file:
         return read_ics_lines(file)
 
@@ -260,10 +270,11 @@ class FileRepository:
         for filename in self.ics_task_files:
 
             # Quit if file does not exists:
-            if not os.path.exists(filename):
+            if not os.path.exists(filename) and not filename.startswith('http'):
                 return self.user_ics_tasks
 
-                ics_text = read_ics_file(filename)
+            ics_text = read_ics_file(filename)
+
             # Try parcing ics file:
             try:
                 cal = ics.Calendar(ics_text)
