@@ -1,6 +1,7 @@
 """Module that controls the weather storing and loading"""
 
 import subprocess
+import logging
 
 
 class Weather:
@@ -20,4 +21,5 @@ class Weather:
                                                         encoding='utf-8'))[:-1]
             self.forcast = self.forcast.split(':')[1]
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError, IndexError):
+            logging.warning("Weather failed to load.")
             self.forcast = ""

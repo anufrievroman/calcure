@@ -8,6 +8,7 @@ import datetime
 import ics
 import urllib.request
 import io
+import logging
 
 
 from calcure.data import *
@@ -35,6 +36,10 @@ def read_ics_file(filename):
             with urllib.request.urlopen(filename) as response:
                 return read_ics_lines(io.TextIOWrapper(response, 'utf-8'))
         except urllib.error.HTTPError:
+            logging.error("Failed to load %s. Probably url is wrong.", filename)
+            return ""
+        except urllib.error.URLError:
+            logging.error("Failed to load %s. Probably no internet connection.", filename)
             return ""
 
     # If it is a local file, read it:
@@ -78,16 +83,18 @@ class FileRepository:
 
         # Create file if it does not exist:
         except IOError:
+            logging.info("Creating %s.", file)
             try:
                 with open(file, "w+", encoding="utf-8") as f:
                     pass
                 return []
             # Pass if there was a problem with file system:
             except (FileNotFoundError, NameError):
+                logging.error("Problem occured acessing %s.", file)
                 return []
 
     def load_tasks_from_csv(self):
-        """Reads from user's file or create new one if it does not exist"""
+        """Reads from user's file or create a new one if it does not exist"""
         lines = self.read_or_create_file(self.tasks_file)
 
         for index, row in enumerate(lines):
@@ -231,7 +238,11 @@ class FileRepository:
                 # Add holiday:
                 holiday = Event(year, month, day, name)
                 self.holidays.add_item(holiday)
-        except (ModuleNotFoundError, SyntaxError, AttributeError):
+        except ModuleNotFoundError:
+            logging.error("Couldn't load holidays. Module holydays is not installed.")
+            pass
+        except (SyntaxError, AttributeError):
+            logging.error("Couldn't load holidays. Country might be incorrect.")
             pass
         return self.holidays
 
@@ -271,6 +282,7 @@ class FileRepository:
 
             # Quit if file does not exists:
             if not os.path.exists(filename) and not filename.startswith('http'):
+                logging.error("Failed to load %s as it does not seem to exist.", filename)
                 return self.user_ics_tasks
 
             ics_text = read_ics_file(filename)
@@ -279,7 +291,9 @@ class FileRepository:
             try:
                 cal = ics.Calendar(ics_text)
             except NotImplementedError: # More than one calendar in the file
+                logging.error("Failed to load %s.", filename)
                 return self.user_ics_tasks
+
 
             for task in cal.todos:
                 if task.status != "CANCELLED":
@@ -327,6 +341,7 @@ class FileRepository:
 
             # Quit if file does not exists:
             if not os.path.exists(filename) and not filename.startswith('http'):
+                logging.error("Failed to load %s as it does not seem to exist.", filename)
                 return self.user_ics_events
 
             ics_text = read_ics_file(filename)
@@ -335,6 +350,7 @@ class FileRepository:
             try:
                 cal = ics.Calendar(ics_text)
             except NotImplementedError:  # More than one calendar in the file
+                logging.error("Failed to load %s.", filename)
                 return self.user_ics_events
 
             for index, event in enumerate(cal.events):

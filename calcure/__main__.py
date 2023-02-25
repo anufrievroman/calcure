@@ -8,6 +8,7 @@ import time
 import getopt
 import sys
 import importlib
+import logging
 
 # Modules:
 from calcure.calendars import Calendar
@@ -39,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.7.3"
+__version__ = "2.7.4"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, file_repository):
@@ -64,6 +65,7 @@ def read_items_from_user_arguments(screen, user_tasks, user_events, file_reposit
                 file_repository.save_events_to_csv()
 
     except (getopt.GetoptError, ValueError):
+        logging.error("Invalid user arguments.")
         pass
 
 
@@ -906,7 +908,7 @@ def main(stdscr) -> None:
     # Load the data:
     weather = Weather(cf.WEATHER_CITY)
     if cf.SHOW_WEATHER:
-        print(MSG_WEATHER)
+        sys.stdout.write(f"\r{MSG_WEATHER}")
         weather.load_from_wttr()
     screen = Screen(stdscr, cf)
     file_repository = FileRepository(cf)

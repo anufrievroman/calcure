@@ -2,6 +2,7 @@
 
 import time
 import enum
+import logging
 
 from calcure.calendars import Calendar
 

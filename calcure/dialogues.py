@@ -1,6 +1,8 @@
 """ Module that controls interactions with the user, like questions and confirmations"""
 
 import curses
+import logging
+
 from calcure.data import Frequency, Color
 
 
@@ -37,6 +39,7 @@ def input_integer(stdscr, y, x, question):
     try:
         number = int(number) - 1
     except ValueError:
+        logging.warning("Incorrect input of integer %s.", number)
         return None
     return number
 
@@ -47,6 +50,7 @@ def input_day(stdscr, y, x, prompt_string):
     try:
         number = int(number)
     except ValueError:
+        logging.warning("Incorrect input of day %s.", number)
         return None
     return number
 
@@ -60,6 +64,7 @@ def input_date(stdscr, y, x, prompt_string):
         day = int(date_unformated.split("/")[2])
         return year, month, day
     except (ValueError, IndexError):
+        logging.warning("Incorrect input of date %s.", date_unformated)
         return None, None, None
 
 

@@ -5,6 +5,7 @@ import pathlib
 import configparser
 import sys
 import getopt
+import logging
 
 from calcure.data import AppState
 
@@ -22,12 +23,10 @@ class Config:
 
     def create_config_file(self):
         """Create config.ini file if it does not exist"""
+
         if os.path.exists(self.config_file):
             self.is_first_run = False
             return
-
-        if not os.path.exists(self.config_folder):
-            os.makedirs(self.config_folder)
 
         conf = configparser.ConfigParser()
         conf["Parameters"] = {
@@ -295,10 +294,9 @@ class Config:
             self.TASKS_FILE = self.data_folder + "/tasks.csv"
 
         except Exception:
-            ERR_FILE1 = "Looks like there is a problem in your config.ini file. Perhaps you edited it and entered a wrong line."
+            ERR_FILE1 = "Looks like there is a problem in your config.ini file. Perhaps you edited it and entered a wrong line. "
             ERR_FILE2 = "Try removing your config.ini file and run the program again, it will create a fresh working config file."
-            print(ERR_FILE1)
-            print(ERR_FILE2)
+            logging.error(ERR_FILE1 + ERR_FILE2)
             exit()
 
     def read_config_file_from_user_arguments(self):
@@ -311,6 +309,7 @@ class Config:
                     if not os.path.exists(self.config_file):
                         self.create_config_file()
         except getopt.GetoptError:
+            logging.error("Invalid user arguments")
             pass
 
     def read_parameters_from_user_arguments(self):
@@ -334,15 +333,28 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.5')
+                    print ('Calcure - version 2.7.4')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError:
+            logging.error("Invalid user arguments")
             pass
 
 
-# Read config file:
 cf = Config()
+
+# Create config folder:
+if not os.path.exists(cf.config_folder):
+    os.makedirs(cf.config_folder)
+
+# Start logging:
+logging.basicConfig(level=logging.INFO,
+                    format="[%(levelname)s] %(message)s",
+                    encoding='utf-8',
+                    handlers=[logging.FileHandler(f"{cf.config_folder}/info.log", 'w'),
+                              logging.StreamHandler()],)
+
+# Read config file:
 cf.create_config_file()
 cf.read_config_file_from_user_arguments()
 cf.read_config_file()

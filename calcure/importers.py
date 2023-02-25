@@ -1,4 +1,5 @@
 """Module that provides methods to import data from other programs"""
+import logging
 
 from calcure.data import *
 from calcure.helpers import convert_to_persian_date
@@ -24,6 +25,7 @@ class Importer:
                 lines = file.readlines()
             return lines
         except (IOError, FileNotFoundError, NameError):
+            logging.error("Problem occured acessing %s.", filename)
             return []
 
     def import_tasks_from_calcurse(self):
