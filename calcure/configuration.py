@@ -309,7 +309,6 @@ class Config:
                     if not os.path.exists(self.config_file):
                         self.create_config_file()
         except getopt.GetoptError:
-            logging.error("Invalid user arguments")
             pass
 
     def read_parameters_from_user_arguments(self):
@@ -333,7 +332,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.7.4')
+                    print ('Calcure - version 2.8')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError:

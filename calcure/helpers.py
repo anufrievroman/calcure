@@ -6,24 +6,6 @@ import jdatetime
 from calcure.data import Color
 
 
-def convert_to_persian_date(year, month, day):
-    """Convert date from Gregorian to Persian calendar"""
-    persian_date =  jdatetime.date.fromgregorian(day=day, month=month, year=year)
-    day = persian_date.day
-    month = persian_date.month
-    year = persian_date.year
-    return year, month, day
-
-
-def convert_to_gregorian_date(year, month, day):
-    """Convert date from Persian to Gregorian calendar"""
-    gregorian_date = jdatetime.date(year, month, day).togregorian()
-    day = gregorian_date.day
-    month = gregorian_date.month
-    year = gregorian_date.year
-    return year, month, day
-
-
 def initialize_colors(cf):
     """Define all the color pairs"""
     curses.start_color()

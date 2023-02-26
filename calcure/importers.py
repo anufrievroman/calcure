@@ -2,7 +2,7 @@
 import logging
 
 from calcure.data import *
-from calcure.helpers import convert_to_persian_date
+from calcure.calendars import convert_to_persian_date
 
 
 class Importer:

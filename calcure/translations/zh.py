@@ -53,7 +53,7 @@ KEYS_TODO = {
 MSG_NAME          = "CALCURE"
 MSG_VIM           = "Vim 键位 (j, k, ZZ, ZQ) 也可以工作!"
 MSG_INFO          = "对于更多信息, 参看:"
-MSG_SITE          = "https://github.com/anufrievroman/calcure"
+MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_EXIT          = "是否真的要退出? (y/n) "
 
 MSG_EVENT_HIGH    = "标记为更高优先级的事件号码: "

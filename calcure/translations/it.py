@@ -53,7 +53,7 @@ KEYS_TODO = {
 MSG_NAME          = "CALCURE"
 MSG_VIM           = "È possibile usare i tasti di Vim (j, k, ZZ, ZQ)!"
 MSG_INFO          = "Per maggiori informazioni, visitare:"
-MSG_SITE          = "https://github.com/anufrievroman/calcure"
+MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_EXIT          = "Vuoi davvero uscire? (y/n) "
 
 MSG_EVENT_HIGH    = "Imposta ad alta priorità l'evento con numero: "

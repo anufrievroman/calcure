@@ -7,11 +7,23 @@ from itertools import repeat
 import jdatetime
 
 
+def convert_to_persian_date(year, month, day):
+    """Convert date from Gregorian to Persian calendar"""
+    persian_date =  jdatetime.date.fromgregorian(day=day, month=month, year=year)
+    return persian_date.year, persian_date.month, persian_date.day
+
+
+def convert_to_gregorian_date(year, month, day):
+    """Convert date from Persian to Gregorian calendar"""
+    gregorian_date = jdatetime.date(year, month, day).togregorian()
+    return gregorian_date.year, gregorian_date.month, gregorian_date.day
+
+
 class Calendar:
     """
-    Calendar class, but in contrast to calendar library, here
+    Calendar class, but in contrast to native calendar library, here
     the type of the calendar (Gregorian or Persian) is passed as argument
-    and all menthods depend on it
+    and all menthods change accordingly.
     """
 
     def __init__(self, firstweekday, use_persian_calendar):

@@ -14,10 +14,11 @@ import logging
 from calcure.calendars import Calendar
 from calcure.configuration import cf
 from calcure.weather import Weather
-from calcure.repository import FileRepository
 from calcure.importers import Importer
 from calcure.dialogues import clear_line
 from calcure.screen import Screen
+from calcure.savers import TaskSaverCSV, EventSaverCSV
+from calcure.loaders import *
 from calcure.data import *
 from calcure.controls import *
 from calcure.helpers import initialize_colors
@@ -40,10 +41,10 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.7.4"
+__version__ = "2.7.5"
 
 
-def read_items_from_user_arguments(screen, user_tasks, user_events, file_repository):
+def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
     """Read --task and --event flags from user arguments to create new tasks or events"""
     try:
         opts, _ = getopt.getopt(sys.argv[1:], "pjhvi", ["folder=", "config=", "task=", "event="])
@@ -52,7 +53,7 @@ def read_items_from_user_arguments(screen, user_tasks, user_events, file_reposit
                 name = arg
                 user_tasks.add_item(Task(len(user_tasks.items), name, Status.NORMAL, Timer([]), False))
                 screen.state = AppState.EXIT
-                file_repository.save_tasks_to_csv()
+                task_saver_csv.save()
             if opt in '--event':
                 year = int(arg.split("-")[0])
                 month = int(arg.split("-")[1])
@@ -62,10 +63,8 @@ def read_items_from_user_arguments(screen, user_tasks, user_events, file_reposit
                 user_events.add_item(UserEvent(event_id, year, month, day, name,
                                         1, Frequency.ONCE, Status.NORMAL, False))
                 screen.state = AppState.EXIT
-                file_repository.save_events_to_csv()
-
+                event_saver_csv.save()
     except (getopt.GetoptError, ValueError):
-        logging.error("Invalid user arguments.")
         pass
 
 
@@ -911,16 +910,26 @@ def main(stdscr) -> None:
         sys.stdout.write(f"\r{MSG_WEATHER}")
         weather.load_from_wttr()
     screen = Screen(stdscr, cf)
-    file_repository = FileRepository(cf)
-    user_events = file_repository.load_events_from_csv()
-    user_tasks = file_repository.load_tasks_from_csv()
-    user_ics_tasks = file_repository.load_tasks_from_ics()
-    user_ics_events = file_repository.load_events_from_ics()
-    holidays = file_repository.load_holidays()
-    birthdays = file_repository.load_birthdays_from_abook()
+
+    event_loader_csv = EventLoaderCSV(cf)
+    task_loader_csv = TaskLoaderCSV(cf)
+    event_loader_ics = EventLoaderICS(cf)
+    task_loader_ics = TaskLoaderICS(cf)
+    birthday_loader = BirthdayLoader(cf)
+    holiday_loader = HolidayLoader(cf)
+
+    user_events = event_loader_csv.load()
+    user_tasks = task_loader_csv.load()
+    user_ics_events = event_loader_ics.load()
+    user_ics_tasks = task_loader_ics.load()
+    holidays = holiday_loader.load()
+    birthdays = birthday_loader.load()
+
+    event_saver_csv = EventSaverCSV(user_events, cf)
+    task_saver_csv = TaskSaverCSV(user_tasks, cf)
     importer = Importer(user_tasks, user_events, cf)
 
-    read_items_from_user_arguments(screen, user_tasks, user_events, file_repository)
+    read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv)
 
     # Initialise terminal screen:
     stdscr = curses.initscr()
@@ -1008,10 +1017,10 @@ def main(stdscr) -> None:
 
         # If something has been changed, save the data:
         if user_events.changed:
-            file_repository.save_events_to_csv()
+            event_saver_csv.save()
             screen.refresh_now = True
         if user_tasks.changed:
-            file_repository.save_tasks_to_csv()
+            task_saver_csv.save()
             screen.refresh_now = True
 
     # Cleaning up before quitting:

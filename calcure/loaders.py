@@ -1,4 +1,4 @@
-"""Module that controls import and export of the user data"""
+"""Module that controls loading data from files and libraries"""
 
 import configparser
 import pathlib
@@ -10,60 +10,41 @@ import urllib.request
 import io
 import logging
 
-
 from calcure.data import *
-from calcure.helpers import convert_to_persian_date, convert_to_gregorian_date
+from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
 
 
-def read_ics_lines(file):
-    """Read the file line-by-line and remove multiple PRODID lines"""
-    previous_line = ""
-    ics_text = ""
-    for line in file:
-        # If there is more than one PRODID line, skip them:
-        if not ("PRODID:" in line and "PRODID:" in previous_line):
-            ics_text += line
-        previous_line = line
-    return ics_text
+class LoaderCSV:
+    """Load data from CSV files"""
 
-
-def read_ics_file(filename):
-    """Parse the file or url from user config"""
-
-    # If it is a URL, try to load it:
-    if filename.startswith('http'):
+    def create_file(self, filename):
+        """Create CSV file"""
         try:
-            with urllib.request.urlopen(filename) as response:
-                return read_ics_lines(io.TextIOWrapper(response, 'utf-8'))
-        except urllib.error.HTTPError:
-            logging.error("Failed to load %s. Probably url is wrong.", filename)
-            return ""
-        except urllib.error.URLError:
-            logging.error("Failed to load %s. Probably no internet connection.", filename)
-            return ""
+            with open(filename, "w+", encoding="utf-8") as file:
+                pass
+            return []
+        except (FileNotFoundError, NameError):
+            logging.error("Problem occured trying to create %s.", filename)
+            return []
 
-    # If it is a local file, read it:
-    with open(filename, 'r', encoding="utf-8") as file:
-        return read_ics_lines(file)
+    def read_file(self, filename):
+        """Read CSV file or create new one if it does not exist"""
+        try:
+            with open(filename, "r", encoding="utf-8") as file:
+                lines = csv.reader(file, delimiter = ',')
+                return list(lines)
+        except IOError: # File does not exist
+            logging.info("Creating %s.", filename)
+            return self.create_file(filename)
 
 
-class FileRepository:
-    """Load and save events and tasks to files"""
+class TaskLoaderCSV(LoaderCSV):
+    """Load tasks from CSV files"""
 
     def __init__(self, cf):
         self.user_tasks = Tasks()
-        self.user_events = Events()
-        self.holidays = Events()
-        self.birthdays = Birthdays()
-        self.user_ics_tasks = Tasks()
-        self.user_ics_events = Events()
-        self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
         self.tasks_file = cf.TASKS_FILE
-        self.events_file = cf.EVENTS_FILE
-        self.country = cf.HOLIDAY_COUNTRY
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
-        self.ics_event_files = cf.ICS_EVENT_FILES
-        self.ics_task_files = cf.ICS_TASK_FILES
 
     @property
     def is_task_format_old(self):
@@ -72,30 +53,9 @@ class FileRepository:
             text = f.read()
         return text[0] == '"'
 
-    def read_or_create_file(self, file):
-        """Read user's csv file or create new one if it does not exist"""
-
-        # Try to read the file line by line:
-        try:
-            with open(file, "r", encoding="utf-8") as f:
-                read_lines = csv.reader(f, delimiter = ',')
-                return list(read_lines)
-
-        # Create file if it does not exist:
-        except IOError:
-            logging.info("Creating %s.", file)
-            try:
-                with open(file, "w+", encoding="utf-8") as f:
-                    pass
-                return []
-            # Pass if there was a problem with file system:
-            except (FileNotFoundError, NameError):
-                logging.error("Problem occured acessing %s.", file)
-                return []
-
-    def load_tasks_from_csv(self):
-        """Reads from user's file or create a new one if it does not exist"""
-        lines = self.read_or_create_file(self.tasks_file)
+    def load(self):
+        """Reads from CSV file"""
+        lines = self.read_file(self.tasks_file)
 
         for index, row in enumerate(lines):
             task_id = index
@@ -132,9 +92,18 @@ class FileRepository:
             self.user_tasks.add_item(new_task)
         return self.user_tasks
 
-    def load_events_from_csv(self):
-        """Reads from user's csv file or create it if it does not exist"""
-        lines = self.read_or_create_file(self.events_file)
+
+class EventLoaderCSV(LoaderCSV):
+    """Load events from CSV files"""
+
+    def __init__(self, cf):
+        self.user_events = Events()
+        self.events_file = cf.EVENTS_FILE
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+
+    def load(self):
+        """Read from CSV file"""
+        lines = self.read_file(self.events_file)
         for index, row in enumerate(lines):
             event_id = index
             year = int(row[1])
@@ -180,49 +149,17 @@ class FileRepository:
             self.user_events.add_item(new_event)
         return self.user_events
 
-    def save_tasks_to_csv(self):
-        """Rewrite the data file with changed tasks"""
-        original_file = self.tasks_file
-        dummy_file = self.tasks_file + '.bak'
-        with open(dummy_file, "w", encoding="utf-8") as f:
-            for task in self.user_tasks.items:
-                dot = "."
 
-                # If persian calendar was used, we convert event back to Gregorian for storage:
-                if self.use_persian_calendar and task.year != 0:
-                    year, month, day = convert_to_gregorian_date(task.year, task.month, task.day)
-                else:
-                    year, month, day = task.year, task.month, task.day
+class HolidayLoader:
+    """Load holidays for this country around this year"""
 
-                f.write(f'{year},{month},{day},"{dot*task.privacy}{task.name}",{task.status.name.lower()}')
-                for stamp in task.timer.stamps:
-                    f.write(f',{str(stamp)}')
-                f.write("\n")
-        os.remove(original_file)
-        os.rename(dummy_file, original_file)
-        self.user_tasks.changed = False
+    def __init__(self, cf):
+        self.holidays = Events()
+        self.country = cf.HOLIDAY_COUNTRY
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
-    def save_events_to_csv(self):
-        """Rewrite the data file with changed events"""
-        original_file = self.events_file
-        dummy_file = self.events_file + '.bak'
-        with open(dummy_file, "w", encoding="utf-8") as file:
-            for ev in self.user_events.items:
-
-                # If persian calendar was used, we convert event back to Gregorian for storage:
-                if self.use_persian_calendar:
-                    year, month, day = convert_to_gregorian_date(ev.year, ev.month, ev.day)
-                else:
-                    year, month, day = ev.year, ev. month, ev.day
-
-                name = f'{"."*ev.privacy}{ev.name}'
-                file.write(f'{ev.item_id},{year},{month},{day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
-        os.remove(original_file)
-        os.rename(dummy_file, original_file)
-        self.user_events.changed = False
-
-    def load_holidays(self):
-        """Load list of holidays in this country around this year"""
+    def load(self):
+        """Load list of holidays from 'holidays' module"""
         try:
             import holidays as hl
             year = datetime.date.today().year
@@ -238,6 +175,7 @@ class FileRepository:
                 # Add holiday:
                 holiday = Event(year, month, day, name)
                 self.holidays.add_item(holiday)
+
         except ModuleNotFoundError:
             logging.error("Couldn't load holidays. Module holydays is not installed.")
             pass
@@ -246,7 +184,16 @@ class FileRepository:
             pass
         return self.holidays
 
-    def load_birthdays_from_abook(self):
+
+class BirthdayLoader:
+    """Load birthdays of contacts"""
+
+    def __init__(self, cf):
+        self.birthdays = Birthdays()
+        self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+
+    def load(self):
         """Loading birthdays from abook contacts"""
 
         # Quit if file does not exists:
@@ -271,7 +218,52 @@ class FileRepository:
                     self.birthdays.add_item(birthday)
         return self.birthdays
 
-    def load_tasks_from_ics(self):
+
+class LoaderICS:
+    """Load data from ICS files"""
+
+    def read_lines(self, file):
+        """Read the file line-by-line and remove multiple PRODID lines"""
+        previous_line = ""
+        text = ""
+        for line in file:
+            # If there is more than one PRODID line, skip them:
+            if not ("PRODID:" in line and "PRODID:" in previous_line):
+                text += line
+            previous_line = line
+        return text
+
+    def read_file(self, filename):
+        """Parse the file or url from user config"""
+
+        # If it's a URL, try to load it:
+        if filename.startswith('http'):
+            try:
+                with urllib.request.urlopen(filename) as response:
+                    file = io.TextIOWrapper(response, 'utf-8')
+                    return self.read_lines(file)
+
+            except urllib.error.HTTPError:
+                logging.error("Failed to load %s. Probably url is wrong.", filename)
+                return ""
+            except urllib.error.URLError:
+                logging.error("Failed to load %s. Probably no internet connection.", filename)
+                return ""
+
+        # If it's a local file, read it:
+        with open(filename, 'r', encoding="utf-8") as file:
+            return self.read_lines(file)
+
+
+class TaskLoaderICS(LoaderICS):
+    """Load tasks from ICS files"""
+
+    def __init__(self, cf):
+        self.user_ics_tasks = Tasks()
+        self.ics_task_files = cf.ICS_TASK_FILES
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+
+    def load(self):
         """Load tasks from each of the ics files"""
 
         # Quit if the file is not specified:
@@ -285,7 +277,7 @@ class FileRepository:
                 logging.error("Failed to load %s as it does not seem to exist.", filename)
                 return self.user_ics_tasks
 
-            ics_text = read_ics_file(filename)
+            ics_text = self.read_file(filename)
 
             # Try parcing ics file:
             try:
@@ -330,7 +322,16 @@ class FileRepository:
 
         return self.user_ics_tasks
 
-    def load_events_from_ics(self):
+
+class EventLoaderICS(LoaderICS):
+    """Load events from ICS files"""
+
+    def __init__(self, cf):
+        self.user_ics_events = Events()
+        self.ics_event_files = cf.ICS_EVENT_FILES
+        self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+
+    def load(self):
         """Load events from each of the ics files"""
 
         # Quit if the file is not specified:
@@ -344,7 +345,7 @@ class FileRepository:
                 logging.error("Failed to load %s as it does not seem to exist.", filename)
                 return self.user_ics_events
 
-            ics_text = read_ics_file(filename)
+            ics_text = self.read_file(filename)
 
             # Try parcing ics file:
             try:
