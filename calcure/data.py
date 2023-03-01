@@ -39,40 +39,10 @@ class Frequency(enum.Enum):
     YEARLY = 5
 
 
-class Color(enum.Enum):
-    """Colors read from user config"""
-    DAY_NAMES = 1
-    WEEKENDS = 2
-    HINTS = 3
-    TODAY = 4
-    DAYS = 5
-    WEEKEND_NAMES = 6
-    BIRTHDAYS = 7
-    PROMPTS = 8
-    CONFIRMATIONS = 9
-    TITLE = 10
-    TODO = 11
-    DONE = 12
-    IMPORTANT = 13
-    TIMER = 14
-    TIMER_PAUSED = 15
-    HOLIDAYS = 16
-    EVENTS = 17
-    TIME = 18
-    WEATHER = 19
-    UNIMPORTANT = 20
-    CALENDAR_HEADER = 21
-    ACTIVE_PANE = 22
-    SEPARATOR = 23
-    EMPTY = 24
-    CALENDAR_BOARDER = 24
-    DEADLINES = 25
-
-
 class Task:
     """Tasks crated by the user"""
 
-    def __init__(self, item_id, name, status, timer, privacy, year=0, month=0, day=0):
+    def __init__(self, item_id, name, status, timer, privacy, year=0, month=0, day=0, calendar_number=None):
         self.item_id = item_id
         self.name = name
         self.status = status
@@ -81,6 +51,7 @@ class Task:
         self.year = year
         self.month = month
         self.day = day
+        self.calendar_number = calendar_number
 
 
 class Event:
@@ -96,23 +67,25 @@ class Event:
 class UserEvent(Event):
     """Events crated by the user"""
 
-    def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy):
+    def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy, calendar_number=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.repetition = repetition
         self.frequency = frequency
         self.status = status
         self.privacy = privacy
+        self.calendar_number = calendar_number
 
 
 class UserRepeatedEvent(Event):
     """Events that are repetitions of the original user events"""
 
-    def __init__(self, item_id, year, month, day, name, status, privacy):
+    def __init__(self, item_id, year, month, day, name, status, privacy, calendar_number=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.status = status
         self.privacy = privacy
+        self.calendar_number = calendar_number
 
 
 class Timer:

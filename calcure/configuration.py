@@ -10,7 +10,6 @@ import logging
 from calcure.data import AppState
 
 
-
 class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
@@ -100,6 +99,7 @@ class Config:
                 "color_active_pane":     "2",
                 "color_separator":       "7",
                 "color_calendar_border": "7",
+                "color_ics_calendars":   "2,3,1,7",
                 "color_background":      "-1",
                 }
 
@@ -251,6 +251,8 @@ class Config:
             self.COLOR_ACTIVE_PANE     = int(conf.get("Colors", "color_active_pane", fallback=2))
             self.COLOR_SEPARATOR       = int(conf.get("Colors", "color_separator", fallback=7))
             self.COLOR_CALENDAR_BOARDER= int(conf.get("Colors", "color_calendar_border", fallback=7))
+            self.COLOR_ICS_CALENDARS   = conf.get("Colors", "color_ics_calendars", fallback="2,3,1,7")
+            self.COLOR_ICS_CALENDARS   = [int(number) for number in self.COLOR_ICS_CALENDARS.split(",")]
 
             # Journal colors:
             self.COLOR_TODO           = int(conf.get("Colors", "color_todo", fallback=7))

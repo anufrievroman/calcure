@@ -3,7 +3,8 @@
 import curses
 import logging
 
-from calcure.data import Frequency, Color
+from calcure.data import Frequency
+from calcure.colors import Color
 
 
 def display_question(stdscr, y, x, question, color):

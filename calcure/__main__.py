@@ -18,10 +18,10 @@ from calcure.importers import Importer
 from calcure.dialogues import clear_line
 from calcure.screen import Screen
 from calcure.savers import TaskSaverCSV, EventSaverCSV
+from calcure.colors import Color, initialize_colors
 from calcure.loaders import *
 from calcure.data import *
 from calcure.controls import *
-from calcure.helpers import initialize_colors
 
 
 # Language:
@@ -41,7 +41,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.7.5"
+__version__ = "2.7.6"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -248,12 +248,17 @@ class EventView(View):
     @property
     def color(self):
         """Select the color depending on the status and type"""
-        color = Color.EVENTS
-        if self.event.status == Status.IMPORTANT:
-            color = Color.IMPORTANT
-        if self.event.status == Status.UNIMPORTANT:
-            color = Color.UNIMPORTANT
-        return color
+        if self.event.calendar_number is None:
+            if self.event.status == Status.IMPORTANT:
+                return Color.IMPORTANT
+            if self.event.status == Status.UNIMPORTANT:
+                return Color.UNIMPORTANT
+            return Color.EVENTS
+        else:
+            for color in Color:
+                if color.value == Color.ICS_CALENDARS0.value + self.event.calendar_number:
+                    return color
+            return Color.EVENTS
 
     def obfuscate_info(self):
         """Obfuscate the info if privacy mode is on"""

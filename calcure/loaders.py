@@ -270,7 +270,7 @@ class TaskLoaderICS(LoaderICS):
         if self.ics_task_files is None:
             return self.user_ics_tasks
 
-        for filename in self.ics_task_files:
+        for calendar_number, filename in enumerate(self.ics_task_files):
 
             # Quit if file does not exists:
             if not os.path.exists(filename) and not filename.startswith('http'):
@@ -317,7 +317,7 @@ class TaskLoaderICS(LoaderICS):
                     is_private = False
 
                     # Add task:
-                    new_task = Task(task_id, name, status, timer, is_private, year, month, day)
+                    new_task = Task(task_id, name, status, timer, is_private, year, month, day, calendar_number)
                     self.user_ics_tasks.add_item(new_task)
 
         return self.user_ics_tasks
@@ -338,7 +338,7 @@ class EventLoaderICS(LoaderICS):
         if self.ics_event_files is None:
             return self.user_ics_events
 
-        for filename in self.ics_event_files:
+        for calendar_number, filename in enumerate(self.ics_event_files):
 
             # Quit if file does not exists:
             if not os.path.exists(filename) and not filename.startswith('http'):
@@ -381,7 +381,7 @@ class EventLoaderICS(LoaderICS):
                     year, month, day = convert_to_persian_date(year, month, day)
 
                 # Add event:
-                new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
+                new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private, calendar_number)
                 self.user_ics_events.add_item(new_event)
 
         return self.user_ics_events

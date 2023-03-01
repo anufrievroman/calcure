@@ -2,8 +2,47 @@
 
 import curses
 import jdatetime
+from enum import Enum, auto
 
-from calcure.data import Color
+
+class Color(Enum):
+    """Colors read from user config"""
+    DAY_NAMES = auto()
+    WEEKENDS = auto()
+    HINTS = auto()
+    TODAY = auto()
+    DAYS = auto()
+    WEEKEND_NAMES = auto()
+    BIRTHDAYS = auto()
+    PROMPTS = auto()
+    CONFIRMATIONS = auto()
+    TITLE = auto()
+    TODO = auto()
+    DONE = auto()
+    IMPORTANT = auto()
+    TIMER = auto()
+    TIMER_PAUSED = auto()
+    HOLIDAYS = auto()
+    EVENTS = auto()
+    TIME = auto()
+    WEATHER = auto()
+    UNIMPORTANT = auto()
+    CALENDAR_HEADER = auto()
+    ACTIVE_PANE = auto()
+    SEPARATOR = auto()
+    EMPTY = auto()
+    CALENDAR_BOARDER = auto()
+    DEADLINES = auto()
+    ICS_CALENDARS0 = auto()
+    ICS_CALENDARS1 = auto()
+    ICS_CALENDARS2 = auto()
+    ICS_CALENDARS3 = auto()
+    ICS_CALENDARS4 = auto()
+    ICS_CALENDARS5 = auto()
+    ICS_CALENDARS6 = auto()
+    ICS_CALENDARS7 = auto()
+    ICS_CALENDARS8 = auto()
+    ICS_CALENDARS9 = auto()
 
 
 def initialize_colors(cf):
@@ -44,3 +83,13 @@ def initialize_colors(cf):
     if not cf.MINIMAL_DAYS_INDICATOR:
         curses.init_pair(Color.DAYS.value, curses.COLOR_BLACK, cf.COLOR_DAYS)
 
+    if cf.ICS_EVENT_FILES is None:
+        return
+
+    # Assign color pair for each ics file:
+    for index in range(len(cf.ICS_EVENT_FILES)):
+        if index < len(cf.COLOR_ICS_CALENDARS):
+            color = cf.COLOR_ICS_CALENDARS[index]
+        else:
+            color = cf.COLOR_EVENTS
+        curses.init_pair(Color.ICS_CALENDARS0.value + index, color, cf.COLOR_BACKGROUND)
