@@ -233,26 +233,48 @@ class LoaderICS:
             previous_line = line
         return text
 
-    def read_file(self, filename):
-        """Parse the file or url from user config"""
+    def read_file(self, path):
+        """Parse an ics file if it exists"""
+        if not os.path.exists(path):
+            logging.error("Failed to load %s. Probably path is incorrect.", path)
+            return ""
+        with open(path, 'r', encoding="utf-8") as file:
+            return self.read_lines(file)
+
+    def read_url(self, path):
+        """Parse an ics URL if it exists and networks works"""
+        try:
+            with urllib.request.urlopen(path) as response:
+                file = io.TextIOWrapper(response, 'utf-8')
+                return self.read_lines(file)
+        except urllib.error.HTTPError:
+            logging.error("Failed to load %s. Probably url is wrong.", path)
+            return ""
+        except urllib.error.URLError:
+            logging.error("Failed to load %s. Probably no internet connection.", path)
+            return ""
+
+    def read_resource(self, path):
+        """Determine type of the resourse, parse it, and return list of strings for each file"""
+        ics_files = []
 
         # If it's a URL, try to load it:
-        if filename.startswith('http'):
-            try:
-                with urllib.request.urlopen(filename) as response:
-                    file = io.TextIOWrapper(response, 'utf-8')
-                    return self.read_lines(file)
-
-            except urllib.error.HTTPError:
-                logging.error("Failed to load %s. Probably url is wrong.", filename)
-                return ""
-            except urllib.error.URLError:
-                logging.error("Failed to load %s. Probably no internet connection.", filename)
-                return ""
+        if path.startswith('http'):
+            ics_files.append(self.read_url(path))
+            return ics_files
 
         # If it's a local file, read it:
-        with open(filename, 'r', encoding="utf-8") as file:
-            return self.read_lines(file)
+        if path.endswith('.ics'):
+            ics_files.append(self.read_file(path))
+            return ics_files
+
+        # Otherwise, assume it's a folder, and read every file inside:
+        for root, directories, files in os.walk(path):
+            for filename in files:
+                # Get the full path to the file
+                file_path = os.path.join(root, filename)
+                ics_files.append(self.read_file(file_path))
+        return ics_files
 
 
 class TaskLoaderICS(LoaderICS):
@@ -266,59 +288,56 @@ class TaskLoaderICS(LoaderICS):
     def load(self):
         """Load tasks from each of the ics files"""
 
-        # Quit if the file is not specified:
+        # Quit if the files are not specified in config:
         if self.ics_task_files is None:
             return self.user_ics_tasks
 
         for calendar_number, filename in enumerate(self.ics_task_files):
 
-            # Quit if file does not exists:
-            if not os.path.exists(filename) and not filename.startswith('http'):
-                logging.error("Failed to load %s as it does not seem to exist.", filename)
-                return self.user_ics_tasks
+            # For each resourse from config, load a list that has one or more ics files:
+            ics_files = self.read_resource(filename)
+            for ics_file in ics_files:
 
-            ics_text = self.read_file(filename)
+                # Try parcing content of the ics file:
+                try:
+                    cal = ics.Calendar(ics_file)
+                except NotImplementedError: # More than one calendar in the file
+                    logging.error("Failed to load %s.", filename)
+                    return self.user_ics_tasks
 
-            # Try parcing ics file:
-            try:
-                cal = ics.Calendar(ics_text)
-            except NotImplementedError: # More than one calendar in the file
-                logging.error("Failed to load %s.", filename)
-                return self.user_ics_tasks
+                for task in cal.todos:
+                    if task.status != "CANCELLED":
+                        task_id = self.user_ics_tasks.generate_id()
 
+                        # Assign status from priority:
+                        status = Status.NORMAL
+                        if task.priority is not None:
+                            if task.priority > 5:
+                                status = Status.UNIMPORTANT
+                            if task.priority < 5:
+                                status = Status.IMPORTANT
 
-            for task in cal.todos:
-                if task.status != "CANCELLED":
-                    task_id = self.user_ics_tasks.generate_id()
+                        # Correct according to status:
+                        if task.status == "COMPLETED":
+                            status = Status.DONE
 
-                    # Assign status from priority:
-                    status = Status.NORMAL
-                    if task.priority is not None:
-                        if task.priority > 5:
-                            status = Status.UNIMPORTANT
-                        if task.priority < 5:
-                            status = Status.IMPORTANT
+                        name = task.name
 
-                    # Correct according to status:
-                    if task.status == "COMPLETED":
-                        status = Status.DONE
+                        # Try reading task due date:
+                        try:
+                            year = task.due.year
+                            month = task.due.month
+                            day = task.due.day
+                        except AttributeError:
+                            year, month, day = 0, 0, 0
 
-                    name = task.name
+                        timer = Timer([])
+                        is_private = False
 
-                    # Try reading task due date:
-                    try:
-                        year = task.due.year
-                        month = task.due.month
-                        day = task.due.day
-                    except AttributeError:
-                        year, month, day = 0, 0, 0
-
-                    timer = Timer([])
-                    is_private = False
-
-                    # Add task:
-                    new_task = Task(task_id, name, status, timer, is_private, year, month, day, calendar_number)
-                    self.user_ics_tasks.add_item(new_task)
+                        # Add task:
+                        new_task = Task(task_id, name, status, timer, is_private,
+                                        year, month, day, calendar_number)
+                        self.user_ics_tasks.add_item(new_task)
 
         return self.user_ics_tasks
 
@@ -334,54 +353,52 @@ class EventLoaderICS(LoaderICS):
     def load(self):
         """Load events from each of the ics files"""
 
-        # Quit if the file is not specified:
+        # Quit if the files are not specified in config:
         if self.ics_event_files is None:
             return self.user_ics_events
 
         for calendar_number, filename in enumerate(self.ics_event_files):
 
-            # Quit if file does not exists:
-            if not os.path.exists(filename) and not filename.startswith('http'):
-                logging.error("Failed to load %s as it does not seem to exist.", filename)
-                return self.user_ics_events
+            # For each resourse from config, load a list that has one or more ics files:
+            ics_files = self.read_resource(filename)
+            for ics_file in ics_files:
 
-            ics_text = self.read_file(filename)
+                # Try parcing content of the ics file:
+                try:
+                    cal = ics.Calendar(ics_file)
+                except NotImplementedError:  # More than one calendar in the file
+                    logging.error("Failed to load %s.", filename)
+                    return self.user_ics_events
 
-            # Try parcing ics file:
-            try:
-                cal = ics.Calendar(ics_text)
-            except NotImplementedError:  # More than one calendar in the file
-                logging.error("Failed to load %s.", filename)
-                return self.user_ics_events
+                for index, event in enumerate(cal.events):
 
-            for index, event in enumerate(cal.events):
+                    # Default parameters:
+                    event_id = index
+                    repetition = '1'
+                    frequency = Frequency.ONCE
+                    status = Status.NORMAL
+                    is_private = False
 
-                # Default parameters:
-                event_id = index
-                repetition = '1'
-                frequency = Frequency.ONCE
-                status = Status.NORMAL
-                is_private = False
+                    # Parameters of the event from ics if they exist:
+                    name = event.name if event.name is not None else ""
+                    all_day = event.all_day if event.all_day is not None else True
+                    year = event.begin.year if event.begin else 0
+                    month = event.begin.month if event.begin else 1
+                    day = event.begin.day if event.begin else 1
 
-                # Parameters of the event from ics if they exist:
-                name = event.name if event.name is not None else ""
-                all_day = event.all_day if event.all_day is not None else True
-                year = event.begin.year if event.begin else 0
-                month = event.begin.month if event.begin else 1
-                day = event.begin.day if event.begin else 1
+                    # Add start time to name of non-all-day events:
+                    if not all_day:
+                        hour = event.begin.hour if event.begin else 0
+                        minute = event.begin.minute if event.begin else 0
+                        name = f"{hour:0=2}:{minute:0=2} {name}"
 
-                # Add start time to name of non-all-day events:
-                if not all_day:
-                    hour = event.begin.hour if event.begin else 0
-                    minute = event.begin.minute if event.begin else 0
-                    name = f"{hour:0=2}:{minute:0=2} {name}"
+                    # Convert to persian date if needed:
+                    if self.use_persian_calendar:
+                        year, month, day = convert_to_persian_date(year, month, day)
 
-                # Convert to persian date if needed:
-                if self.use_persian_calendar:
-                    year, month, day = convert_to_persian_date(year, month, day)
-
-                # Add event:
-                new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private, calendar_number)
-                self.user_ics_events.add_item(new_event)
+                    # Add event:
+                    new_event = UserEvent(event_id, year, month, day, name, repetition,
+                                          frequency, status, is_private, calendar_number)
+                    self.user_ics_events.add_item(new_event)
 
         return self.user_ics_events

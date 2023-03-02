@@ -2,9 +2,8 @@
 
 import enum
 import datetime
-from itertools import repeat
-
 import jdatetime
+from itertools import repeat
 
 
 def convert_to_persian_date(year, month, day):

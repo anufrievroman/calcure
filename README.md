@@ -10,7 +10,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 ## Features
 
 - Vim keys
-- View tasks and events from .ics file synced with clouds
+- View tasks and events from .ics files synced with clouds
 - Operation with fewest key presses possible
 - Todo list with subtasks, deadlines, and timers
 - Birthdays of your abook contacts

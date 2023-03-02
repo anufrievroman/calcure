@@ -83,13 +83,13 @@ def initialize_colors(cf):
     if not cf.MINIMAL_DAYS_INDICATOR:
         curses.init_pair(Color.DAYS.value, curses.COLOR_BLACK, cf.COLOR_DAYS)
 
+    # Assign color pair for each ics resourse:
     if cf.ICS_EVENT_FILES is None:
         return
 
-    # Assign color pair for each ics file:
     for index in range(len(cf.ICS_EVENT_FILES)):
         if index < len(cf.COLOR_ICS_CALENDARS):
-            color = cf.COLOR_ICS_CALENDARS[index]
+            color = cf.COLOR_ICS_CALENDARS[index] # Take colors from config
         else:
-            color = cf.COLOR_EVENTS
+            color = cf.COLOR_ICS_CALENDARS[-1] # Remaining resourses assume the last assigned color
         curses.init_pair(Color.ICS_CALENDARS0.value + index, color, cf.COLOR_BACKGROUND)

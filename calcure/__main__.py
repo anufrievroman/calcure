@@ -2,7 +2,6 @@
 
 """This is the main module that contains views and the main logic"""
 
-# Libraries:
 import curses
 import time
 import getopt
@@ -10,7 +9,6 @@ import sys
 import importlib
 import logging
 
-# Modules:
 from calcure.calendars import Calendar
 from calcure.configuration import cf
 from calcure.weather import Weather
@@ -41,7 +39,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.7.6"
+__version__ = "2.8.0"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -247,7 +245,7 @@ class EventView(View):
 
     @property
     def color(self):
-        """Select the color depending on the status and type"""
+        """Assign color depending on the status or calendar number if it's from .ics file"""
         if self.event.calendar_number is None:
             if self.event.status == Status.IMPORTANT:
                 return Color.IMPORTANT
@@ -916,6 +914,7 @@ def main(stdscr) -> None:
         weather.load_from_wttr()
     screen = Screen(stdscr, cf)
 
+    # Initialise loaders:
     event_loader_csv = EventLoaderCSV(cf)
     task_loader_csv = TaskLoaderCSV(cf)
     event_loader_ics = EventLoaderICS(cf)
@@ -923,6 +922,7 @@ def main(stdscr) -> None:
     birthday_loader = BirthdayLoader(cf)
     holiday_loader = HolidayLoader(cf)
 
+    # Load the data:
     user_events = event_loader_csv.load()
     user_tasks = task_loader_csv.load()
     user_ics_events = event_loader_ics.load()
@@ -930,6 +930,7 @@ def main(stdscr) -> None:
     holidays = holiday_loader.load()
     birthdays = birthday_loader.load()
 
+    # Initialise savers and importers:
     event_saver_csv = EventSaverCSV(user_events, cf)
     task_saver_csv = TaskSaverCSV(user_tasks, cf)
     importer = Importer(user_tasks, user_events, cf)
