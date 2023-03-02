@@ -389,7 +389,7 @@ class DailyView(View):
         self.index_offset = index_offset
         self.y_cell = (self.screen.y_max - 3) // 6
         self.x_cell = self.screen.x_max // 7
-        self.hidden_events_sign = cf.HIDDEN_ICON + " "*(self.x_cell-len(cf.HIDDEN_ICON))
+        self.hidden_events_sign = cf.HIDDEN_ICON + " "*(self.screen.x_max-self.x-len(cf.HIDDEN_ICON))
         self.num_events_this_day = 0
         self.is_selection_day = is_selection_day
 
