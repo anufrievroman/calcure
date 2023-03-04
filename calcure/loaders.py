@@ -339,8 +339,10 @@ class TaskLoaderICS(LoaderICS):
 
                 except NotImplementedError: # More than one calendar in the file
                     logging.error("Failed to load %s. Probably more that one calendar in this file.", filename)
+                    pass
                 except Exception:
                     logging.error("Failed to load %s.", filename)
+                    pass
         return self.user_ics_tasks
 
 
@@ -402,7 +404,9 @@ class EventLoaderICS(LoaderICS):
 
                 except NotImplementedError:  # More than one calendar in the file
                     logging.error("Failed to load %s. Probably more that one calendar in this file", filename)
+                    pass
                 except Exception:
                     logging.error("Failed to load %s.", filename)
+                    pass
 
         return self.user_ics_events
