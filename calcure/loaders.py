@@ -227,8 +227,9 @@ class LoaderICS:
         previous_line = ""
         text = ""
         for line in file:
-            # If there is more than one PRODID line, skip them:
-            if not ("PRODID:" in line and "PRODID:" in previous_line):
+            # If there is more than one PRODID line or a TZUNTIL line, skip them:
+            if not ("PRODID:" in line and "PRODID:" in previous_line) and
+               not ("TZUNTIL" in line):
                 text += line
             previous_line = line
         return text
@@ -301,47 +302,45 @@ class TaskLoaderICS(LoaderICS):
                 # Try parcing content of the ics file:
                 try:
                     cal = ics.Calendar(ics_file)
+
+                    for task in cal.todos:
+                        if task.status != "CANCELLED":
+                            task_id = self.user_ics_tasks.generate_id()
+
+                            # Assign status from priority:
+                            status = Status.NORMAL
+                            if task.priority is not None:
+                                if task.priority > 5:
+                                    status = Status.UNIMPORTANT
+                                if task.priority < 5:
+                                    status = Status.IMPORTANT
+
+                            # Correct according to status:
+                            if task.status == "COMPLETED":
+                                status = Status.DONE
+
+                            name = task.name
+
+                            # Try reading task due date:
+                            try:
+                                year = task.due.year
+                                month = task.due.month
+                                day = task.due.day
+                            except AttributeError:
+                                year, month, day = 0, 0, 0
+
+                            timer = Timer([])
+                            is_private = False
+
+                            # Add task:
+                            new_task = Task(task_id, name, status, timer, is_private,
+                                            year, month, day, calendar_number)
+                            self.user_ics_tasks.add_item(new_task)
+
                 except NotImplementedError: # More than one calendar in the file
                     logging.error("Failed to load %s. Probably more that one calendar in this file.", filename)
-                    return self.user_ics_tasks
                 except Exception:
                     logging.error("Failed to load %s.", filename)
-                    return self.user_ics_tasks
-
-                for task in cal.todos:
-                    if task.status != "CANCELLED":
-                        task_id = self.user_ics_tasks.generate_id()
-
-                        # Assign status from priority:
-                        status = Status.NORMAL
-                        if task.priority is not None:
-                            if task.priority > 5:
-                                status = Status.UNIMPORTANT
-                            if task.priority < 5:
-                                status = Status.IMPORTANT
-
-                        # Correct according to status:
-                        if task.status == "COMPLETED":
-                            status = Status.DONE
-
-                        name = task.name
-
-                        # Try reading task due date:
-                        try:
-                            year = task.due.year
-                            month = task.due.month
-                            day = task.due.day
-                        except AttributeError:
-                            year, month, day = 0, 0, 0
-
-                        timer = Timer([])
-                        is_private = False
-
-                        # Add task:
-                        new_task = Task(task_id, name, status, timer, is_private,
-                                        year, month, day, calendar_number)
-                        self.user_ics_tasks.add_item(new_task)
-
         return self.user_ics_tasks
 
 
@@ -369,42 +368,41 @@ class EventLoaderICS(LoaderICS):
                 # Try parcing content of the ics file:
                 try:
                     cal = ics.Calendar(ics_file)
+
+                    for index, event in enumerate(cal.events):
+
+                        # Default parameters:
+                        event_id = index
+                        repetition = '1'
+                        frequency = Frequency.ONCE
+                        status = Status.NORMAL
+                        is_private = False
+
+                        # Parameters of the event from ics if they exist:
+                        name = event.name if event.name is not None else ""
+                        all_day = event.all_day if event.all_day is not None else True
+                        year = event.begin.year if event.begin else 0
+                        month = event.begin.month if event.begin else 1
+                        day = event.begin.day if event.begin else 1
+
+                        # Add start time to name of non-all-day events:
+                        if not all_day:
+                            hour = event.begin.hour if event.begin else 0
+                            minute = event.begin.minute if event.begin else 0
+                            name = f"{hour:0=2}:{minute:0=2} {name}"
+
+                        # Convert to persian date if needed:
+                        if self.use_persian_calendar:
+                            year, month, day = convert_to_persian_date(year, month, day)
+
+                        # Add event:
+                        new_event = UserEvent(event_id, year, month, day, name, repetition,
+                                              frequency, status, is_private, calendar_number)
+                        self.user_ics_events.add_item(new_event)
+
                 except NotImplementedError:  # More than one calendar in the file
                     logging.error("Failed to load %s. Probably more that one calendar in this file", filename)
-                    return self.user_ics_events
                 except Exception:
                     logging.error("Failed to load %s.", filename)
-                    return self.user_ics_events
-
-                for index, event in enumerate(cal.events):
-
-                    # Default parameters:
-                    event_id = index
-                    repetition = '1'
-                    frequency = Frequency.ONCE
-                    status = Status.NORMAL
-                    is_private = False
-
-                    # Parameters of the event from ics if they exist:
-                    name = event.name if event.name is not None else ""
-                    all_day = event.all_day if event.all_day is not None else True
-                    year = event.begin.year if event.begin else 0
-                    month = event.begin.month if event.begin else 1
-                    day = event.begin.day if event.begin else 1
-
-                    # Add start time to name of non-all-day events:
-                    if not all_day:
-                        hour = event.begin.hour if event.begin else 0
-                        minute = event.begin.minute if event.begin else 0
-                        name = f"{hour:0=2}:{minute:0=2} {name}"
-
-                    # Convert to persian date if needed:
-                    if self.use_persian_calendar:
-                        year, month, day = convert_to_persian_date(year, month, day)
-
-                    # Add event:
-                    new_event = UserEvent(event_id, year, month, day, name, repetition,
-                                          frequency, status, is_private, calendar_number)
-                    self.user_ics_events.add_item(new_event)
 
         return self.user_ics_events
