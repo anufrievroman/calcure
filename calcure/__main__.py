@@ -219,7 +219,7 @@ class JournalView(View):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode:
-                self.display_line(self.y, self.x, str(index + 1), Color.TODAY)
+                self.display_line(self.y, self.x, str(index + 1), Color.ACTIVE_PANE)
             self.y += 1
 
         self.y += 1
@@ -403,7 +403,7 @@ class DailyView(View):
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
                 if self.screen.selection_mode and self.is_selection_day:
-                    self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.TODAY)
+                    self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.ACTIVE_PANE)
             else:
                 self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
             index += 1
@@ -694,7 +694,8 @@ class DailyScreenView(View):
 
         is_selection_day = True
         for _ in range(max_num_days):
-            day_string = f'{self.screen.day} {DAYS[self.week_day]} {self.icon}'
+            day_string = f"{self.screen.day} {DAYS[self.week_day]} {self.icon}"
+            day_string += " " * (max([len(day_name) for day_name in DAYS]) + 3 + len(self.icon) - len(day_string))
             self.display_line(self.y + 2 + vertical_shift, self.x, day_string, self.color)
 
             daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
@@ -878,13 +879,13 @@ class HelpScreenView(View):
         self.display_line(self.global_shift_y + 2, self.global_shift_x + 8,
                           TITLE_KEYS_GENERAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_GENERAL):
-            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, key, Color.TODAY)
+            self.display_line(self.global_shift_y + index + 3, self.global_shift_x, key, Color.ACTIVE_PANE)
             self.display_line(self.global_shift_y + index + 3, self.global_shift_x + 8, KEYS_GENERAL[key], Color.TODO)
 
         self.display_line(self.global_shift_y + 4 + len(KEYS_GENERAL), self.global_shift_x + 8,
                           TITLE_KEYS_CALENDAR, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_CALENDAR):
-            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, key, Color.TODAY)
+            self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x, key, Color.ACTIVE_PANE)
             self.display_line(self.global_shift_y + index + 5 + len(KEYS_GENERAL), self.global_shift_x + 8,
                                                                             KEYS_CALENDAR[key], Color.TODO)
 
@@ -893,7 +894,7 @@ class HelpScreenView(View):
         d_y = self.global_shift_y + self.shift_y
         self.display_line(d_y, d_x + 8, TITLE_KEYS_JOURNAL, Color.TITLE, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
         for index, key in enumerate(KEYS_TODO):
-            self.display_line(d_y + index + 1, d_x, key, Color.TODAY)
+            self.display_line(d_y + index + 1, d_x, key, Color.ACTIVE_PANE)
             self.display_line(d_y + index + 1, d_x + 8, KEYS_TODO[key], Color.TODO)
 
         # Additional info:
