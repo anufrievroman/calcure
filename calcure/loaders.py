@@ -229,7 +229,7 @@ class LoaderICS:
         for line in file:
             # If there is more than one PRODID line or a TZUNTIL line, skip them:
             if (not ("PRODID:" in line and "PRODID:" in previous_line) and
-               not ("TZUNTIL" in line)):
+                not ("TZUNTIL" in line)):
                 text += line
             previous_line = line
         return text
@@ -237,7 +237,7 @@ class LoaderICS:
     def read_file(self, path):
         """Parse an ics file if it exists"""
         if not os.path.exists(path):
-            logging.error("Failed to load %s. Probably path is incorrect.", path)
+            logging.error("Failed to load %s because file does not exist.", path)
             return ""
         with open(path, 'r', encoding="utf-8") as file:
             return self.read_lines(file)
@@ -249,10 +249,10 @@ class LoaderICS:
                 file = io.TextIOWrapper(response, 'utf-8')
                 return self.read_lines(file)
         except urllib.error.HTTPError:
-            logging.error("Failed to load %s. Probably url is wrong.", path)
+            logging.error("Failed to load from %s. Probably url is wrong.", path)
             return ""
         except urllib.error.URLError:
-            logging.error("Failed to load %s. Probably no internet connection.", path)
+            logging.error("Failed to load from %s. Probably no internet connection.", path)
             return ""
 
     def read_resource(self, path):
@@ -337,12 +337,8 @@ class TaskLoaderICS(LoaderICS):
                                             year, month, day, calendar_number)
                             self.user_ics_tasks.add_item(new_task)
 
-                except NotImplementedError: # More than one calendar in the file
-                    logging.error("Failed to load %s. Probably more that one calendar in this file.", filename)
-                    pass
                 except Exception:
-                    logging.error("Failed to load %s.", filename)
-                    pass
+                    logging.error("Failed to parse %s.", filename)
         return self.user_ics_tasks
 
 
@@ -402,11 +398,7 @@ class EventLoaderICS(LoaderICS):
                                               frequency, status, is_private, calendar_number)
                         self.user_ics_events.add_item(new_event)
 
-                except NotImplementedError:  # More than one calendar in the file
-                    logging.error("Failed to load %s. Probably more that one calendar in this file", filename)
-                    pass
                 except Exception:
-                    logging.error("Failed to load %s.", filename)
-                    pass
+                    logging.error("Failed to parse %s.", filename)
 
         return self.user_ics_events
