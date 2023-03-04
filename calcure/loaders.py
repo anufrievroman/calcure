@@ -228,8 +228,8 @@ class LoaderICS:
         text = ""
         for line in file:
             # If there is more than one PRODID line or a TZUNTIL line, skip them:
-            if not ("PRODID:" in line and "PRODID:" in previous_line) and
-               not ("TZUNTIL" in line):
+            if (not ("PRODID:" in line and "PRODID:" in previous_line) and
+               not ("TZUNTIL" in line)):
                 text += line
             previous_line = line
         return text
