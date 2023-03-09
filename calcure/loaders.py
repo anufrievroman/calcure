@@ -23,8 +23,8 @@ class LoaderCSV:
             with open(filename, "w+", encoding="utf-8") as file:
                 pass
             return []
-        except (FileNotFoundError, NameError):
-            logging.error("Problem occured trying to create %s.", filename)
+        except (FileNotFoundError, NameError) as e_message:
+            logging.error("Problem occured trying to create %s. %s", filename, e_message)
             return []
 
     def read_file(self, filename):
@@ -177,10 +177,10 @@ class HolidayLoader:
                 self.holidays.add_item(holiday)
 
         except ModuleNotFoundError:
-            logging.error("Couldn't load holidays. Module holydays is not installed.")
+            logging.error("Couldn't load holidays. Module holydays is not installed. Try 'pip install holydays'")
             pass
-        except (SyntaxError, AttributeError):
-            logging.error("Couldn't load holidays. Country might be incorrect.")
+        except (SyntaxError, AttributeError) as e_message:
+            logging.error("Couldn't load holidays. Country might be incorrect. %s", e_message)
             pass
         return self.holidays
 
@@ -198,6 +198,7 @@ class BirthdayLoader:
 
         # Quit if file does not exists:
         if not os.path.exists(self.abook_file):
+            logging.warning("Couldn't load birthdays. File. %s does not exist.", self.abook_file)
             return self.birthdays
 
         abook = configparser.ConfigParser()
@@ -250,11 +251,11 @@ class LoaderICS:
             with urllib.request.urlopen(path) as response:
                 file = io.TextIOWrapper(response, 'utf-8')
                 return self.read_lines(file)
-        except urllib.error.HTTPError:
-            logging.error("Failed to load from %s. Probably url is wrong.", path)
+        except urllib.error.HTTPError as e_message:
+            logging.error("Failed to load from %s. Probably url is wrong. %s", path, e_message)
             return ""
-        except urllib.error.URLError:
-            logging.error("Failed to load from %s. Probably no internet connection.", path)
+        except urllib.error.URLError as e_message:
+            logging.error("Failed to load from %s. Probably no internet connection. %s", path, e_message)
             return ""
 
     def read_resource(self, path):
@@ -339,8 +340,9 @@ class TaskLoaderICS(LoaderICS):
                                             year, month, day, calendar_number)
                             self.user_ics_tasks.add_item(new_task)
 
-                except Exception:
-                    logging.error("Failed to parse %s.", filename)
+                except Exception as e_message:
+                    logging.error("Failed to parse %s. %s", filename, e_message)
+
         return self.user_ics_tasks
 
 
@@ -400,7 +402,7 @@ class EventLoaderICS(LoaderICS):
                                               frequency, status, is_private, calendar_number)
                         self.user_ics_events.add_item(new_event)
 
-                except Exception:
-                    logging.error("Failed to parse %s.", filename)
+                except Exception as e_message:
+                    logging.error("Failed to parse %s. %s", filename, e_message)
 
         return self.user_ics_events

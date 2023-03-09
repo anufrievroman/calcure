@@ -337,8 +337,8 @@ class Config:
                     print ('Calcure - version 2.8.2')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
-        except getopt.GetoptError:
-            logging.error("Invalid user arguments")
+        except getopt.GetoptError as e_message:
+            logging.error("Invalid user arguments. %s", e_message)
             pass
 
 
