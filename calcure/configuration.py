@@ -99,7 +99,7 @@ class Config:
                 "color_active_pane":     "2",
                 "color_separator":       "7",
                 "color_calendar_border": "7",
-                "color_ics_calendars":   "2,3,1,7",
+                "color_ics_calendars":   "2,3,1,7,4,5,2,3,1,7",
                 "color_background":      "-1",
                 }
 

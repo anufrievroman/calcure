@@ -224,14 +224,16 @@ class LoaderICS:
 
     def read_lines(self, file):
         """Read the file line-by-line and remove multiple PRODID lines"""
-        previous_line = ""
+        already_has_prodid = False
         text = ""
         for line in file:
             # If there is more than one PRODID line or a TZUNTIL line, skip them:
-            if (not ("PRODID:" in line and "PRODID:" in previous_line) and
-                not ("TZUNTIL" in line)):
+            if ((not (already_has_prodid and "PRODID:" in line)) and
+                (not "TZUNTIL" in line)):
                 text += line
-            previous_line = line
+
+            if "PRODID:" in line:
+                already_has_prodid = True
         return text
 
     def read_file(self, path):
