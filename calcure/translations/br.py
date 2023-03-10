@@ -92,6 +92,7 @@ MSG_TS_DEAD_ADD   = "Adicionar data limite da tarefa número: "
 MSG_TS_DEAD_DEL   = "Remover data limite da tarefa número: "
 MSG_TS_DEAD_DATE  = "Adicionar data limite em (AAAA/MM/DD): "
 MSG_WEATHER       = "Clima está carregando..."
+MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"

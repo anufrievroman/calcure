@@ -92,6 +92,7 @@ MSG_TS_DEAD_ADD   = "Add deadline for task number: "
 MSG_TS_DEAD_DEL   = "Remove deadline of the task number: "
 MSG_TS_DEAD_DATE  = "Add deadline on (YYYY/MM/DD): "
 MSG_WEATHER       = "Weather is loading..."
+MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 
 CALENDAR_HINT     = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 CALENDAR_HINT_D   = "Space · Switch to journal   a · Add event  n/p · Change day   ? · All keybindings"

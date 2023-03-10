@@ -92,6 +92,7 @@ MSG_TS_DEAD_ADD   = "Görev numarası için son tarih ekle: "
 MSG_TS_DEAD_DEL   = "Görev numarasının son tarihini kaldırın: "
 MSG_TS_DEAD_DATE  = "Son tarih ekleyin (YYYY/MM/DD): "
 MSG_WEATHER       = "Hava durumu yükleniyor..."
+MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"

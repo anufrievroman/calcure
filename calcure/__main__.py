@@ -10,6 +10,7 @@ import importlib
 import logging
 
 from calcure.calendars import Calendar
+from calcure.errors import error
 from calcure.configuration import cf
 from calcure.weather import Weather
 from calcure.importers import Importer
@@ -546,6 +547,22 @@ class FooterView(View):
         self.display_line(self.screen.y_max - 1, 0, hint, Color.HINTS)
 
 
+class ErrorView(View):
+    """Display the error messages"""
+
+    def __init__(self, stdscr, y, x, screen):
+        super().__init__(stdscr, y, x)
+        self.screen = screen
+        self.error = error
+
+    def render(self):
+        """Render this view on the screen"""
+        if self.error.has_occured:
+            clear_line(self.stdscr, self.screen.y_max - 2)
+            self.display_line(self.screen.y_max - 2, 0, MSG_ERRORS, Color.IMPORTANT)
+            self.error.clear_buffer()
+
+
 class SeparatorView(View):
     """Display the separator in the split screen"""
 
@@ -955,6 +972,7 @@ def main(stdscr) -> None:
     welcome_screen_view = WelcomeScreenView(stdscr, 0, 0, screen)
     footer_view = FooterView(stdscr, 0, 0, screen)
     separator_view = SeparatorView(stdscr, 0, 0, screen)
+    error_view = ErrorView(stdscr, 0, 0, screen)
 
     # Show welcome screen on the first run:
     if cf.is_first_run:
@@ -982,6 +1000,7 @@ def main(stdscr) -> None:
             monthly_screen_view.render()
             if screen.split: separator_view.render()
             footer_view.render()
+            error_view.render()
             control_monthly_screen(stdscr, user_events, screen, importer)
 
         # Daily (active) screen:
@@ -994,6 +1013,7 @@ def main(stdscr) -> None:
             daily_screen_view.render()
             if screen.split: separator_view.render()
             footer_view.render()
+            error_view.render()
             control_daily_screen(stdscr, user_events, screen, importer)
 
         # JOURNAL
@@ -1012,6 +1032,7 @@ def main(stdscr) -> None:
             journal_screen_view.render()
             if screen.split: separator_view.render()
             footer_view.render()
+            error_view.render()
             control_journal_screen(stdscr, user_tasks, screen, importer)
 
         # Help screen:

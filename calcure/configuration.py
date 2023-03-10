@@ -342,18 +342,12 @@ class Config:
             pass
 
 
+# Initialise config:
 cf = Config()
 
 # Create config folder:
 if not os.path.exists(cf.config_folder):
     os.makedirs(cf.config_folder)
-
-# Start logging:
-logging.basicConfig(level=logging.INFO,
-                    format="[%(levelname)s] %(message)s",
-                    encoding='utf-8',
-                    handlers=[logging.FileHandler(f"{cf.config_folder}/info.log", 'w'),
-                              logging.StreamHandler()],)
 
 # Read config file:
 cf.create_config_file()

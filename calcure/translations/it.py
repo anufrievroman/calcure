@@ -92,6 +92,7 @@ MSG_TS_DEAD_ADD   = "Aggiungi una scadenza per l'attività con numero: "
 MSG_TS_DEAD_DEL   = "Rimuovi la scadenza per l'attività con numero: "
 MSG_TS_DEAD_DATE  = "Aggiungi una scandeza per il (AAAA/MM/GG): "
 MSG_WEATHER       = "Caricamento del meteo..."
+MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
 CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"
