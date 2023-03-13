@@ -28,9 +28,9 @@ else:
 def safe_run(func):
     """Decorator preventing crashes on keyboard interruption and no input"""
 
-    def inner(stdscr, screen, collection, importer):
+    def inner(stdscr, screen, *args, **kwargs):
         try:
-            func(stdscr, screen, collection, importer)
+            func(stdscr, screen, *args, **kwargs)
 
         # Handle keyboard interruption with ctr+c:
         except KeyboardInterrupt:
@@ -462,7 +462,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
 
 
 @safe_run
-def control_help_screen(stdscr, screen, _, __):
+def control_help_screen(stdscr, screen):
     """Process user input on the help screen"""
     # Getting user's input:
     screen.key = stdscr.getkey()
@@ -478,7 +478,7 @@ def control_help_screen(stdscr, screen, _, __):
 
 
 @safe_run
-def control_welcome_screen(stdscr, screen, _, __):
+def control_welcome_screen(stdscr, screen):
     """Process user input on the welcome screen"""
     # Getting user's input:
     screen.key = stdscr.getkey()

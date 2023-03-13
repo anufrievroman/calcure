@@ -979,7 +979,7 @@ def main(stdscr) -> None:
         screen.state = AppState.WELCOME
     while screen.state == AppState.WELCOME:
         welcome_screen_view.render()
-        control_welcome_screen(stdscr, screen, None, None)
+        control_welcome_screen(stdscr, screen)
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
@@ -1038,7 +1038,7 @@ def main(stdscr) -> None:
         # Help screen:
         elif screen.state == AppState.HELP:
             help_screen_view.render()
-            control_help_screen(stdscr, screen, None, None)
+            control_help_screen(stdscr, screen)
 
         else:
             break
