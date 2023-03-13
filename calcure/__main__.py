@@ -979,7 +979,7 @@ def main(stdscr) -> None:
         screen.state = AppState.WELCOME
     while screen.state == AppState.WELCOME:
         welcome_screen_view.render()
-        control_welcome_screen(stdscr, screen)
+        control_welcome_screen(stdscr, screen, None, None)
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
@@ -1001,7 +1001,7 @@ def main(stdscr) -> None:
             if screen.split: separator_view.render()
             footer_view.render()
             error_view.render()
-            control_monthly_screen(stdscr, user_events, screen, importer)
+            control_monthly_screen(stdscr, screen, user_events, importer)
 
         # Daily (active) screen:
         elif screen.state == AppState.CALENDAR and screen.calendar_state == CalState.DAILY:
@@ -1014,7 +1014,7 @@ def main(stdscr) -> None:
             if screen.split: separator_view.render()
             footer_view.render()
             error_view.render()
-            control_daily_screen(stdscr, user_events, screen, importer)
+            control_daily_screen(stdscr, screen, user_events, importer)
 
         # JOURNAL
 
@@ -1033,12 +1033,12 @@ def main(stdscr) -> None:
             if screen.split: separator_view.render()
             footer_view.render()
             error_view.render()
-            control_journal_screen(stdscr, user_tasks, screen, importer)
+            control_journal_screen(stdscr, screen, user_tasks, importer)
 
         # Help screen:
         elif screen.state == AppState.HELP:
             help_screen_view.render()
-            control_help_screen(stdscr, screen)
+            control_help_screen(stdscr, screen, None, None)
 
         else:
             break
