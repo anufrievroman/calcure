@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.8.3"
+__version__ = "2.8.4"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -109,7 +109,6 @@ class TaskView(View):
         super().__init__(stdscr, y, x)
         self.task = task
         self.screen = screen
-        self.info = f'{self.icon} {self.task.name[self.indent:]}'
 
     @property
     def color(self):
@@ -145,14 +144,19 @@ class TaskView(View):
             return 2
         return 0
 
-    def obfuscate_info(self):
-        """Obfuscate the info if privacy mode is on"""
-        self.info = f'{cf.TODO_ICON} {cf.PRIVACY_ICON * len(self.task.name[self.indent:])}'
+    @property
+    def info(self):
+        """Icon and name of the task, which is decorated if needed"""
+        name = self.task.name[self.indent:]
+        if self.screen.privacy or self.task.privacy:
+            return f'{cf.TODO_ICON} {cf.PRIVACY_ICON * len(name)}'
+        if self.task.status == Status.DONE and cf.STRIKETHROUGH_DONE_TASKS:
+            strike = "\u0336"
+            return f'{self.icon} {strike}{strike.join(name)}{strike}'
+        return f'{self.icon} {name}'
 
     def render(self):
         """Render a line with an icon, task, deadline, and timer"""
-        if self.screen.privacy or self.task.privacy:
-            self.obfuscate_info()
         self.display_line(self.y, self.x + self.indent, self.info, self.color)
 
         deadline_indentation = self.screen.x_min + 2 + len(self.info) + self.indent
