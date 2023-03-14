@@ -289,6 +289,45 @@ class TaskLoaderICS(LoaderICS):
         self.ics_task_files = cf.ICS_TASK_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
+    def parse_task(self, task, calendar_number):
+        """Parse single task and add it to the user_ics_tasks"""
+
+        if task.status == "CANCELLED":
+            return
+
+        task_id = self.user_ics_tasks.generate_id()
+
+        # Assign status from priority:
+        status = Status.NORMAL
+        if task.priority is not None:
+            if task.priority > 5:
+                status = Status.UNIMPORTANT
+            if task.priority < 5:
+                status = Status.IMPORTANT
+
+        # Correct according to status:
+        if task.status == "COMPLETED":
+            status = Status.DONE
+
+        name = task.name
+
+        # Try reading task due date:
+        try:
+            year = task.due.year
+            month = task.due.month
+            day = task.due.day
+        except AttributeError:
+            year, month, day = 0, 0, 0
+
+        timer = Timer([])
+        is_private = False
+
+        # Add task:
+        new_task = Task(task_id, name, status, timer, is_private,
+                        year, month, day, calendar_number)
+        self.user_ics_tasks.add_item(new_task)
+
+
     def load(self):
         """Load tasks from each of the ics files"""
 
@@ -297,49 +336,13 @@ class TaskLoaderICS(LoaderICS):
             return self.user_ics_tasks
 
         for calendar_number, filename in enumerate(self.ics_task_files):
-
             # For each resourse from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
-
-                # Try parcing content of the ics file:
                 try:
                     cal = ics.Calendar(ics_file)
-
                     for task in cal.todos:
-                        if task.status != "CANCELLED":
-                            task_id = self.user_ics_tasks.generate_id()
-
-                            # Assign status from priority:
-                            status = Status.NORMAL
-                            if task.priority is not None:
-                                if task.priority > 5:
-                                    status = Status.UNIMPORTANT
-                                if task.priority < 5:
-                                    status = Status.IMPORTANT
-
-                            # Correct according to status:
-                            if task.status == "COMPLETED":
-                                status = Status.DONE
-
-                            name = task.name
-
-                            # Try reading task due date:
-                            try:
-                                year = task.due.year
-                                month = task.due.month
-                                day = task.due.day
-                            except AttributeError:
-                                year, month, day = 0, 0, 0
-
-                            timer = Timer([])
-                            is_private = False
-
-                            # Add task:
-                            new_task = Task(task_id, name, status, timer, is_private,
-                                            year, month, day, calendar_number)
-                            self.user_ics_tasks.add_item(new_task)
-
+                        self.parse_task(task, calendar_number)
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)
 
@@ -354,6 +357,38 @@ class EventLoaderICS(LoaderICS):
         self.ics_event_files = cf.ICS_EVENT_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
+    def parse_event(self, event, index, calendar_number):
+        """Parse singe event and add it to user_ics_events"""
+
+        # Default parameters:
+        event_id = index
+        repetition = '1'
+        frequency = Frequency.ONCE
+        status = Status.NORMAL
+        is_private = False
+
+        # Parameters of the event from ics file, if they exist:
+        name = event.name if event.name is not None else ""
+        all_day = event.all_day if event.all_day is not None else True
+        year = event.begin.year if event.begin else 0
+        month = event.begin.month if event.begin else 1
+        day = event.begin.day if event.begin else 1
+
+        # Add start time to the name of non-all-day events:
+        if not all_day:
+            hour = event.begin.hour if event.begin else 0
+            minute = event.begin.minute if event.begin else 0
+            name = f"{hour:0=2}:{minute:0=2} {name}"
+
+        # Convert to persian date if needed:
+        if self.use_persian_calendar:
+            year, month, day = convert_to_persian_date(year, month, day)
+
+        # Add event:
+        new_event = UserEvent(event_id, year, month, day, name, repetition,
+                              frequency, status, is_private, calendar_number)
+        self.user_ics_events.add_item(new_event)
+
     def load(self):
         """Load events from each of the ics files"""
 
@@ -362,47 +397,13 @@ class EventLoaderICS(LoaderICS):
             return self.user_ics_events
 
         for calendar_number, filename in enumerate(self.ics_event_files):
-
             # For each resourse from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
-
-                # Try parcing content of the ics file:
                 try:
                     cal = ics.Calendar(ics_file)
-
                     for index, event in enumerate(cal.events):
-
-                        # Default parameters:
-                        event_id = index
-                        repetition = '1'
-                        frequency = Frequency.ONCE
-                        status = Status.NORMAL
-                        is_private = False
-
-                        # Parameters of the event from ics if they exist:
-                        name = event.name if event.name is not None else ""
-                        all_day = event.all_day if event.all_day is not None else True
-                        year = event.begin.year if event.begin else 0
-                        month = event.begin.month if event.begin else 1
-                        day = event.begin.day if event.begin else 1
-
-                        # Add start time to name of non-all-day events:
-                        if not all_day:
-                            hour = event.begin.hour if event.begin else 0
-                            minute = event.begin.minute if event.begin else 0
-                            name = f"{hour:0=2}:{minute:0=2} {name}"
-
-                        # Convert to persian date if needed:
-                        if self.use_persian_calendar:
-                            year, month, day = convert_to_persian_date(year, month, day)
-
-                        # Add event:
-                        new_event = UserEvent(event_id, year, month, day, name, repetition,
-                                              frequency, status, is_private, calendar_number)
-                        self.user_ics_events.add_item(new_event)
-
+                        self.parse_event(event, index, calendar_number)
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)
-
         return self.user_ics_events
