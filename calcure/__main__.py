@@ -90,7 +90,12 @@ class View:
             return
 
         # Cut the text if it does not fit the screen:
-        text = text[:(x_max - 1 - x)]
+        real_text = text.replace('\u0336', "")
+        number_of_characters = len(real_text)
+        available_space = x_max - x
+        if number_of_characters > available_space:
+            text = f"{text[:available_space - 3]}..."
+
 
         if bold and underlined:
             self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD | curses.A_UNDERLINE)
