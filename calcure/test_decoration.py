@@ -21,3 +21,5 @@ text__ = text_.replace('\u0336', "")
 
 print(text__)
 print(len(text__))
+
+print(text_.count('\u0336'))

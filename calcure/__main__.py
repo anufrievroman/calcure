@@ -93,8 +93,9 @@ class View:
         real_text = text.replace('\u0336', "")
         number_of_characters = len(real_text)
         available_space = x_max - x
+        number_of_special = text.count('\u0336')
         if number_of_characters > available_space:
-            text = f"{text[:available_space - 3]}..."
+            text = f"{text[:available_space - 1 + number_of_special]}"
 
 
         if bold and underlined:
