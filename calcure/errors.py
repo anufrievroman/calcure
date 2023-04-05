@@ -33,7 +33,7 @@ error = Error()
 # Start logging:
 logging.basicConfig(level=logging.INFO,
                     format="[%(levelname)s] %(message)s",
-                    encoding='utf-8',
+                    # encoding='utf-8',
                     handlers=[logging.FileHandler(error.file, 'w'),
                               logging.StreamHandler(),
                               logging.StreamHandler(error.buffer),

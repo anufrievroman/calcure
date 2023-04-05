@@ -292,8 +292,9 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.JOURNAL
         if screen.key == "?":
             screen.state = AppState.HELP
-        if screen.key in ["q", "KEY_BACKSPACE", "\b", "\x7f"]:
-            screen.calendar_state = CalState.MONTHLY
+        if screen.key == "q":
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
             screen.refresh_now = True

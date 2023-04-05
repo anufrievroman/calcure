@@ -95,8 +95,8 @@ class View:
         available_space = x_max - x
         number_of_special = text.count('\u0336')
         if number_of_characters > available_space:
-            text = f"{text[:available_space - 1 + number_of_special]}"
-
+            coefficient = 2 if number_of_special > 0 else 1
+            text = f"{text[:(available_space - 1)*coefficient]}"
 
         if bold and underlined:
             self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD | curses.A_UNDERLINE)
@@ -410,55 +410,55 @@ class DailyView(View):
 
         # Show user events:
         for event in self.user_events.items:
-            if index < self.y_cell - 1:
+            if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
+            else:
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
                 if self.screen.selection_mode and self.is_selection_day:
                     self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.ACTIVE_PANE)
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
             index += 1
 
         # Show repeated user events and events from ics:
         for event_list in [self.repeated_user_events.items, self.user_ics_events.items]:
             for event in event_list:
-                if index < self.y_cell - 1:
+                if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
+                else:
                     user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                     user_event_view.render()
-                else:
-                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
                 index += 1
 
         # Show deadlines for tasks, both from csv and ics files:
         for deadline_list in [self.deadlines.items, self.deadlines_ics.items]:
             for event in deadline_list:
-                if index < self.y_cell - 1:
+                if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.DEADLINES)
+                else:
                     deadline_view = DeadlineView(self.stdscr, self.y + index, self.x, event, self.screen)
                     deadline_view.render()
-                else:
-                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.DEADLINES)
                 index += 1
 
         # Show holidays:
         if not cf.DISPLAY_HOLIDAYS:
             return
         for event in self.holidays.items:
-            if index < self.y_cell - 1:
+            if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.HOLIDAYS)
+            else:
                 holiday_view = HolidayView(self.stdscr, self.y + index, self.x, event, self.screen)
                 holiday_view.render()
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.HOLIDAYS)
             index += 1
 
         # Show birthdays:
         if not cf.BIRTHDAYS_FROM_ABOOK:
             return
         for event in self.birthdays.items:
-            if index < self.y_cell - 1:
+            if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
+            else:
                 birthday_view = BirthdayView(self.stdscr, self.y + index, self.x, event, self.screen)
                 birthday_view.render()
-            else:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
             index += 1
 
         self.num_events_this_day = index
