@@ -336,7 +336,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.8.2')
+                    print ('Calcure - version 2.8.6')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError as e_message:

@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.8.5"
+__version__ = "2.8.6"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -98,14 +98,17 @@ class View:
             coefficient = 2 if number_of_special > 0 else 1
             text = f"{text[:(available_space - 1)*coefficient]}"
 
-        if bold and underlined:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD | curses.A_UNDERLINE)
-        elif bold and not underlined:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD)
-        elif underlined and not bold:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_UNDERLINE)
-        else:
-            self.stdscr.addstr(y, x, text, curses.color_pair(color.value))
+        try:
+            if bold and underlined:
+                self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD | curses.A_UNDERLINE)
+            elif bold and not underlined:
+                self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_BOLD)
+            elif underlined and not bold:
+                self.stdscr.addstr(y, x, text, curses.color_pair(color.value) | curses.A_UNDERLINE)
+            else:
+                self.stdscr.addstr(y, x, text, curses.color_pair(color.value))
+        except curses.error: # Fix for occasional error with large zoom (reason is unclear)
+            return
 
 
 class TaskView(View):
