@@ -277,7 +277,12 @@ class LoaderICS:
             for filename in files:
                 # Get the full path to the file
                 file_path = os.path.join(root, filename)
-                ics_files.append(self.read_file(file_path))
+
+                # `path` may contain files with metadata, e.g. `color` and
+                # `displayname`. For now, exclude those while loading.
+                if file_path.endswith('.ics'):
+                    ics_files.append(self.read_file(file_path))
+
         return ics_files
 
 
