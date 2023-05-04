@@ -25,14 +25,14 @@ KEYS_CALENDAR = {
         "   x   ": "Etkinlik silme",
         "  e,r  ": "Etkinlik düzenleme",
         "   m   ": "Etkinlik taşıma",
-        "   g   ": "Belirli bir güne git",
+        "  g(G) ": "Belirli bir güne git",
         "   v   ": "Günlük/aylık görünümü değiştir",
         "   h   ": "Etkinliği yüksek öncelikli olarak değiştir",
         "   l   ": "Etkinliği düşük öncelikli olarak değiştir",
         "   d   ": "Toggle event as done",
         "   .   ": "Etkinlik gizliliğini aç / kapat",
         "   C   ": "Calcurse'den etkinlikleri içe aktarma",
-        "   G   ": "Geçerli aya (güne) dön",
+        "   R   ": "Geçerli aya (güne) dön",
         }
 
 KEYS_TODO = {
@@ -96,10 +96,11 @@ MSG_TS_DEAD_DATE  = "Son tarih ekleyin (YYYY/MM/DD): "
 MSG_WEATHER       = "Hava durumu yükleniyor..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_GOTO_G        = "Go to date: "
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"
-JOURNAL_HINT      = "Space · Takvime geç   a · Görev ekle   v · Tamamlandı   i · Önemli   ? · Tüm tuş atamaları"
+JOURNAL_HINT      = "Space · Takvime geç   a · Görev ekle   d · Tamamlandı   i · Önemli   ? · Tüm tuş atamaları"
 
 DAYS = ["PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ", "PAZAR"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

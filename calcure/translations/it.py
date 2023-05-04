@@ -26,13 +26,13 @@ KEYS_CALENDAR = {
         "   r   ": "Modifica un evento",
         "   m   ": "Sposta un evento",
         "   v   ": "Alterna la visualizzazione giornaliera/mensile",
-        "   g   ": "Vai ad un determinato giorno",
+        "  g(G) ": "Vai ad un determinato giorno",
         "   h   ": "Imposta un evento come ad alta priorità",
         "   l   ": "Imposta un evento come a bassa priorità",
-        "   d   ": "Toggle event as done",
+        "   d   ": "Imposta un evento come fatto",
         "   .   ": "Imposta la privacy per un evento",
         "   C   ": "Importa eventi da calcurse",
-        "   G   ": "Ritorna al mese corrente (giorno)",
+        "   R   ": "Ritorna al mese corrente (giorno)",
         }
 
 KEYS_TODO = {
@@ -95,11 +95,12 @@ MSG_TS_DEAD_DEL   = "Rimuovi la scadenza per l'attività con numero: "
 MSG_TS_DEAD_DATE  = "Aggiungi una scandeza per il (AAAA/MM/GG): "
 MSG_WEATHER       = "Caricamento del meteo..."
 MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
-MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_GOTO          = "Vai alla data (YYYY/MM/DD): "
+MSG_GOTO_D        = "Vai alla data: "
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
 CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"
-JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Add task   v · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
+JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Add task   d · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
 
 DAYS = ["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDì", "SABATO", "DOMENICA"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

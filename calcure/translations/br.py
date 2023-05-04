@@ -26,7 +26,7 @@ KEYS_CALENDAR = {
         "   r   ": "Editar um evento",
         "   m   ": "Mover evento",
         "   v   ": "Alternar visualização diária/mensal",
-        "   g   ": "Ir para dia específico",
+        "  g(G) ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
         "   l   ": "Alternar evento como baixa prioridade",
         "   d   ": "Toggle event as done",
@@ -96,10 +96,11 @@ MSG_TS_DEAD_DATE  = "Adicionar data limite em (AAAA/MM/DD): "
 MSG_WEATHER       = "Clima está carregando..."
 MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_GOTO_D        = "Go to date: "
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"
-JOURNAL_HINT      = "Espaço · Mudar para calendar   a · Adicionar tarefa   v · Feito   i · Importante   ? · Todas as combinações de teclas"
+JOURNAL_HINT      = "Espaço · Mudar para calendar   a · Adicionar tarefa   d · Feito   i · Importante   ? · Todas as combinações de teclas"
 
 DAYS = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

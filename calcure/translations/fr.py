@@ -26,13 +26,13 @@ KEYS_CALENDAR = {
         "   r   ": "Modifier un événement",
         "   m   ": "Déplacer l'événement",
         "   v   ": "Basculer la vue quotidienne/mensuelle",
-        "   g   ": "Aller à un certain jour",
+        "  g(G) ": "Aller à un certain jour",
         "   h   ": "Désactiver l'événement en haute priorité",
         "   l   ": "Basculer l'événement en priorité basse",
         "   d   ": "Toggle event as done",
         "   .   ": "Activer la confidentialité des événements",
         "   C   ": "Importer des événements depuis calcurse",
-        "   G   ": "Revenir au mois (jour) en cours",
+        "   R   ": "Revenir au mois (jour) en cours",
         }
 
 KEYS_TODO = {
@@ -57,14 +57,14 @@ MSG_INFO          = "Pour plus d'informations, visitez:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_EXIT          = "Vraiment quitter ? (y/n) "
 
-MSG_EVENT_HIGH    = "Marquer comme numéro d'événement hautement prioritaire: "
-MSG_EVENT_LOW     = "Marquer comme numéro d'événement basse priorité: "
-MSG_EVENT_DONE    = "Mark as done event number: "
+MSG_EVENT_HIGH    = "Marquer comme hautement prioritaire l'événement numéro: "
+MSG_EVENT_LOW     = "Marquer comme basse priorité l'événement numéro: "
+MSG_EVENT_DONE    = "Marquer comme terminé l'événement numéro: "
 MSG_EVENT_RESET   = "Réinitialiser le statut pour l'événement numéro : "
-MSG_EVENT_DEL     = "Supprimer le numéro d'événement: "
-MSG_EVENT_REN     = "Renommer le numéro d'événement: "
+MSG_EVENT_DEL     = "Supprimer l'événement numéro: "
+MSG_EVENT_REN     = "Renommer l'événement numéro: "
 MSG_NEW_TITLE     = "Entrez un nouveau titre: "
-MSG_EVENT_MOVE    = "Déplacer le numéro d'événement: "
+MSG_EVENT_MOVE    = "Déplacer l'événement numéro: "
 MSG_EVENT_MOVE_TO = "Déplacer l'événement vers: "
 MSG_EVENT_DATE    = "Entrez la date: "
 MSG_EVENT_TITLE   = "Entrez le titre: "
@@ -80,9 +80,9 @@ MSG_TS_RES        = "Réinitialiser l'état de la tâche numéro: "
 MSG_TS_DONE       = "Marquer comme terminé le numéro de tâche: "
 MSG_TS_DEL        = "Supprimer le numéro de tâche: "
 MSG_TS_DEL_ALL    = "Vraiment supprimer toutes les tâches ? (y/n)"
-MSG_TS_MOVE       = "Déplacer la tâche du numéro: "
+MSG_TS_MOVE       = "Déplacer la tâche numéro: "
 MSG_TS_MOVE_TO    = "Déplacer la tâche vers le numéro: "
-MSG_TS_EDIT       = "Modifier le numéro de tâche: "
+MSG_TS_EDIT       = "Modifier le numéro tâche: "
 MSG_TS_TOG        = "Basculer le numéro de sous-tâche: "
 MSG_TS_SUB        = "Ajouter une sous-tâche pour la tâche numéro: "
 MSG_TS_TITLE      = "Entrez la sous-tâche: "
@@ -90,16 +90,17 @@ MSG_TS_IM         = "Importer des tâches depuis Calcurse ? (y/n)"
 MSG_TS_TW         = "Importer des tâches depuis Taskwarrior ? (y/n)"
 MSG_TS_NOTHING    = "Rien de prévu..."
 MSG_TS_PRIVACY    = "Basculer la confidentialité du numéro de tâche: "
-MSG_TS_DEAD_ADD   = "Ajouter un délai pour la tâche numéro: "
-MSG_TS_DEAD_DEL   = "Supprimer l'échéance de la tâche numéro: "
-MSG_TS_DEAD_DATE  = "Ajouter une date limite le (AAAA/MM/JJ): "
+MSG_TS_DEAD_ADD   = "Ajouter le deadline pour la tâche numéro: "
+MSG_TS_DEAD_DEL   = "Supprimer le deadline de la tâche numéro: "
+MSG_TS_DEAD_DATE  = "Ajouter le deadline (AAAA/MM/JJ): "
 MSG_WEATHER       = "La météo se charge..."
 MSG_ERRORS        = "Des erreurs se sont produites. Voir info.log dans votre dossier de configuration."
-MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_GOTO          = "Aller au (YYYY/MM/DD): "
+MSG_GOTO_D        = "Aller au: "
 
 CALENDAR_HINT     = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de mois  ? · Aider"
 CALENDAR_HINT_D   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de jour  ? · All keybindings"
-JOURNAL_HINT      = "Espace · Passer au calendrier  a · Ajouter une tâche  v · Terminé  i · Important  ? · All keybindings"
+JOURNAL_HINT      = "Espace · Passer au calendrier  a · Ajouter une tâche  d · Terminé  i · Important  ? · All keybindings"
 
 DAYS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

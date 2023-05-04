@@ -121,10 +121,10 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.next_month()
         if screen.key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
             screen.previous_month()
-        if screen.key in ["KEY_HOME", "G"]:
+        if screen.key in ["KEY_HOME", "R"]:
             screen.reset_to_today()
 
-        # Handle "g" as go to selected day:
+        # Handle "g" and "G" as go to selected day:
         if screen.key == "g":
             clear_line(stdscr, screen.y_max-2, 0)
             year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
@@ -132,6 +132,14 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 screen.day = day
                 screen.month = month
                 screen.year = year
+                screen.calendar_state = CalState.DAILY
+
+        if screen.key == "G":
+            clear_line(stdscr, screen.y_max-2, 0)
+            question = f"{MSG_GOTO_D} {screen.year}/{screen.month}/"
+            day = input_day(stdscr, screen.y_max-2, 0, question)
+            if screen.is_valid_date(screen.year, screen.month, day):
+                screen.day = day
                 screen.calendar_state = CalState.DAILY
 
         # Change the view to daily:
@@ -265,7 +273,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.next_day()
         if screen.key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
             screen.previous_day()
-        if screen.key in ["KEY_HOME", "G"]:
+        if screen.key in ["KEY_HOME", "R"]:
             screen.reset_to_today()
 
         # Add single event:
@@ -290,7 +298,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             if confirmed:
                 importer.import_events_from_calcurse()
 
-        # Handle "g" as go to selected day:
+        # Handle "g" and "G" as go to selected (prefilled) day:
         if screen.key == "g":
             clear_line(stdscr, screen.y_max-2, 0)
             year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
@@ -298,6 +306,14 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 screen.day = day
                 screen.month = month
                 screen.year = year
+                screen.calendar_state = CalState.DAILY
+
+        if screen.key == "G":
+            clear_line(stdscr, screen.y_max-2, 0)
+            question = f"{MSG_GOTO_D} {screen.year}/{screen.month}/"
+            day = input_day(stdscr, screen.y_max-2, 0, question)
+            if screen.is_valid_date(screen.year, screen.month, day):
+                screen.day = day
                 screen.calendar_state = CalState.DAILY
 
         # Change the view to monthly:

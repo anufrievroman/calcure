@@ -25,14 +25,14 @@ KEYS_CALENDAR = {
         "   x   ": "Delete an event",
         "   r   ": "Rename an event",
         "   m   ": "Move event",
-        "   g   ": "Go to a certain day",
+        "  g(G) ": "Go to a certain day",
         "   v   ": "Toggle daily/monthly view",
         "   h   ": "Toggle event as high priority",
         "   l   ": "Toggle event as low priority",
         "   d   ": "Toggle event as done",
         "   .   ": "Toggle event privacy",
         "   C   ": "Import events from calcurse",
-        "   G   ": "Return to current month (day)",
+        "   R   ": "Return to current month (day)",
         }
 
 KEYS_TODO = {
@@ -96,10 +96,11 @@ MSG_TS_DEAD_DATE  = "Add deadline on (YYYY/MM/DD): "
 MSG_WEATHER       = "Weather is loading..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_GOTO_D        = "Go to date: "
 
 CALENDAR_HINT     = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 CALENDAR_HINT_D   = "Space · Switch to journal   a · Add event  n/p · Change day   ? · All keybindings"
-JOURNAL_HINT      = "Space · Switch to calendar   a · Add task   v · Done   i · Important   ? · All keybindings"
+JOURNAL_HINT      = "Space · Switch to calendar   a · Add task   d · Done   i · Important   ? · All keybindings"
 
 DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]
