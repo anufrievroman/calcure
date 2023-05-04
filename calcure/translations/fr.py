@@ -24,7 +24,7 @@ KEYS_CALENDAR = {
         "  p,🠐  ": "mois (jour) précédent",
         "  d,x  ": "Supprimer un événement",
         "   r   ": "Modifier un événement",
-        "   m   ": "Déplacer l'événement",
+        "  m(M) ": "Déplacer l'événement",
         "   v   ": "Basculer la vue quotidienne/mensuelle",
         "  g(G) ": "Aller à un certain jour",
         "   h   ": "Désactiver l'événement en haute priorité",
@@ -64,8 +64,9 @@ MSG_EVENT_RESET   = "Réinitialiser le statut pour l'événement numéro : "
 MSG_EVENT_DEL     = "Supprimer l'événement numéro: "
 MSG_EVENT_REN     = "Renommer l'événement numéro: "
 MSG_NEW_TITLE     = "Entrez un nouveau titre: "
-MSG_EVENT_MOVE    = "Déplacer l'événement numéro: "
-MSG_EVENT_MOVE_TO = "Déplacer l'événement vers: "
+MSG_EVENT_MV      = "Déplacer l'événement numéro: "
+MSG_EVENT_MV_TO   = "Déplacer l'événement vers (YYYY/MM/DD): "
+MSG_EVENT_MV_TO_D = "Déplacer l'événement vers: "
 MSG_EVENT_DATE    = "Entrez la date: "
 MSG_EVENT_TITLE   = "Entrez le titre: "
 MSG_EVENT_REP     = "Combien de répétitions de l'événement: "

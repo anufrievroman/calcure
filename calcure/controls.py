@@ -97,15 +97,21 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 user_events.rename_item(event_id, new_name)
 
         # Move event:
-        if screen.key == 'm':
-            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
+        if screen.key in ['m', 'M']:
+            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
-                question = f'{MSG_EVENT_MOVE_TO} {screen.year}/{screen.month}/'
-                day = input_day(stdscr, screen.y_max-2, 0, question)
-                if screen.is_valid_day(day):
-                    user_events.change_day(event_id, day)
+                if screen.key == 'm':
+                    year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
+                    if screen.is_valid_date(year, month, day):
+                        user_events.change_date(event_id, year, month, day)
+
+                if screen.key == 'M':
+                    question = f'{MSG_EVENT_MV_TO_D} {screen.year}/{screen.month}/'
+                    day = input_day(stdscr, screen.y_max-2, 0, question)
+                    if screen.is_valid_day(day):
+                        user_events.change_day(event_id, day)
 
     # Otherwise, we check for user input:
     else:
@@ -113,7 +119,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', '.']:
+        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']:
             screen.selection_mode = True
 
         # Navigation:
@@ -249,15 +255,21 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 user_events.rename_item(item_id, new_name)
 
         # Move event:
-        if screen.key == 'm':
-            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MOVE)
+        if screen.key in ['m', 'M']:
+            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
             if user_events.filter_events_that_day(screen).is_valid_number(number):
                 item_id = user_events.filter_events_that_day(screen).items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
-                question = f'{MSG_EVENT_MOVE_TO}{screen.year}/{screen.month}/'
-                day = input_day(stdscr, screen.y_max-2, 0, question)
-                if screen.is_valid_day(day):
-                    user_events.change_day(item_id, day)
+                if screen.key == 'm':
+                    year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
+                    if screen.is_valid_date(year, month, day):
+                        user_events.change_date(event_id, year, month, day)
+
+                if screen.key == 'M':
+                    question = f'{MSG_EVENT_MV_TO_D}{screen.year}/{screen.month}/'
+                    day = input_day(stdscr, screen.y_max-2, 0, question)
+                    if screen.is_valid_day(day):
+                        user_events.change_day(event_id, day)
 
     # Otherwise, we check for user input:
     else:
@@ -265,7 +277,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', '.']:
+        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']:
             screen.selection_mode = True
 
         # Navigation:

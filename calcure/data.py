@@ -316,13 +316,22 @@ class Events(Collection):
         return False
 
     def change_day(self, selected_item_id, new_day):
-        """Move an event to another day"""
+        """Move an event to another day within this month"""
         for item in self.items:
             if item.item_id == selected_item_id:
                 item.day = new_day
                 self.changed = True
                 break
 
+    def change_date(self, selected_item_id, new_year, new_month, new_day):
+        """Move an event to another date"""
+        for item in self.items:
+            if item.item_id == selected_item_id:
+                item.year = new_year
+                item.month = new_month
+                item.day = new_day
+                self.changed = True
+                break
 
 class Birthdays(Events):
     """List of birthdays imported from abook"""

@@ -24,7 +24,7 @@ KEYS_CALENDAR = {
         "  p,🠐  ": "Mês (dia) anterior",
         "   x   ": "Deletar um evento",
         "   r   ": "Editar um evento",
-        "   m   ": "Mover evento",
+        "  m(M) ": "Mover evento",
         "   v   ": "Alternar visualização diária/mensal",
         "  g(G) ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
@@ -64,8 +64,9 @@ MSG_EVENT_RESET   = "Reseta status para evento número:"
 MSG_EVENT_DEL     = "Deleta evento número: "
 MSG_EVENT_REN     = "Renomeia evento número: "
 MSG_NEW_TITLE     = "Digitar novo título: "
-MSG_EVENT_MOVE    = "Move evento número: "
-MSG_EVENT_MOVE_TO = "Mover evento para: "
+MSG_EVENT_MV      = "Move evento número: "
+MSG_EVENT_MV_TO   = "Mover evento para (YYYY/MM/DD): "
+MSG_EVENT_MV_TO_D = "Mover evento para: "
 MSG_EVENT_DATE    = "Digitar data: "
 MSG_EVENT_TITLE   = "Digitar título: "
 MSG_EVENT_REP     = "Repetir evento quantas vezes: "

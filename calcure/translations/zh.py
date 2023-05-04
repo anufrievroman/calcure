@@ -24,7 +24,7 @@ KEYS_CALENDAR = {
         "  p,🠐  ": "上个月 (日)",
         "   x   ": "删除事件",
         "   r   ": "编辑事件",
-        "   m   ": "移动事件",
+        "  m(M) ": "移动事件",
         "   g   ": "跳转到指定的一天",
         "   v   ": "切换每天/每月视图模式",
         "   h   ": "切换事件为更高的优先级",
@@ -64,8 +64,9 @@ MSG_EVENT_RESET   = "重设状态的事件号码: "
 MSG_EVENT_DEL     = "删除事件的号码: "
 MSG_EVENT_REN     = "重命名事件的号码: "
 MSG_NEW_TITLE     = "输入新的标题: "
-MSG_EVENT_MOVE    = "移动事件的号码: "
-MSG_EVENT_MOVE_TO = "移动事件到: "
+MSG_EVENT_MV      = "移动事件的号码: "
+MSG_EVENT_MV_TO   = "移动事件到 (YYYY/MM/DD): "
+MSG_EVENT_MV_TO_D = "移动事件到: "
 MSG_EVENT_DATE    = "输入日期: "
 MSG_EVENT_TITLE   = "输入标题: "
 MSG_EVENT_REP     = "事件重复多少次: "

@@ -24,7 +24,7 @@ KEYS_CALENDAR = {
         "  p,🠐  ": "Önceki ay (gün)",
         "   x   ": "Etkinlik silme",
         "  e,r  ": "Etkinlik düzenleme",
-        "   m   ": "Etkinlik taşıma",
+        "  m(M) ": "Etkinlik taşıma",
         "  g(G) ": "Belirli bir güne git",
         "   v   ": "Günlük/aylık görünümü değiştir",
         "   h   ": "Etkinliği yüksek öncelikli olarak değiştir",
@@ -64,8 +64,9 @@ MSG_EVENT_RESET   = "Etkinlik numarası için durumu sıfırla: "
 MSG_EVENT_DEL     = "Etkinlik numarasını sil: "
 MSG_EVENT_REN     = "Etkinlik numarasını yeniden adlandır: "
 MSG_NEW_TITLE     = "Yeni başlık girin: "
-MSG_EVENT_MOVE    = "Etkinlik numarasını taşı: "
-MSG_EVENT_MOVE_TO = "Etkinliği şuraya taşı: "
+MSG_EVENT_MV      = "Etkinlik numarasını taşı: "
+MSG_EVENT_MV_TO   = "Etkinliği şuraya taşı (YYYY/MM/DD): "
+MSG_EVENT_MV_TO_D = "Etkinliği şuraya taşı: "
 MSG_EVENT_DATE    = "Tarih girin: "
 MSG_EVENT_TITLE   = "Başlığı girin: "
 MSG_EVENT_REP     = "Etkinliğin kaç kez tekrarlanacağı: "
