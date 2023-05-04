@@ -22,13 +22,14 @@ KEYS_CALENDAR = {
         "  a(A) ": "Etkinlik (yinelenen) ekleme",
         "  n,🠒  ": "Gelecek ay (gün)",
         "  p,🠐  ": "Önceki ay (gün)",
-        "  d,x  ": "Etkinlik silme",
-        "  e,c  ": "Etkinlik düzenleme",
+        "   x   ": "Etkinlik silme",
+        "  e,r  ": "Etkinlik düzenleme",
         "   m   ": "Etkinlik taşıma",
         "   g   ": "Belirli bir güne git",
         "   v   ": "Günlük/aylık görünümü değiştir",
         "   h   ": "Etkinliği yüksek öncelikli olarak değiştir",
         "   l   ": "Etkinliği düşük öncelikli olarak değiştir",
+        "   d   ": "Toggle event as done",
         "   .   ": "Etkinlik gizliliğini aç / kapat",
         "   C   ": "Calcurse'den etkinlikleri içe aktarma",
         "   G   ": "Geçerli aya (güne) dön",
@@ -38,9 +39,9 @@ KEYS_TODO = {
         "  a(A) ": "Yeni (alt) görev ekle",
         "  h(H) ": "Görevlerden birini (tümünü) yüksek öncelikli olarak değiştirin",
         "  l(L) ": "Görevlerden birini (tümünü) düşük öncelikli olarak değiştirin",
-        "  v(V) ": "Görevlerden birini (tümünü) yapıldı olarak değiştirin",
+        "  d(D) ": "Görevlerden birini (tümünü) yapıldı olarak değiştirin",
         "  u(U) ": "Görevlerden birinin (tümünün) işaretini kaldırın",
-        "  d(D) ": "Görevlerden birini (tümünü) silme (tüm alt görevlerle birlikte)",
+        "  x(X) ": "Görevlerden birini (tümünü) silme (tüm alt görevlerle birlikte)",
         "  t(T) ": "Bir görev için zamanlayıcıyı başlatma/duraklatma (kaldırma)",
         "  e,c  ": "Görev düzenleme",
         "   s   ": "Görev ve alt görev arasında geçiş yapma",
@@ -58,6 +59,7 @@ MSG_EXIT          = "Gerçekten çıkıyorsun musun? (y/n) "
 
 MSG_EVENT_HIGH    = "Yüksek öncelikli olay numarası olarak işaretle: "
 MSG_EVENT_LOW     = "Düşük öncelikli olay numarası olarak işaretle: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "Etkinlik numarası için durumu sıfırla: "
 MSG_EVENT_DEL     = "Etkinlik numarasını sil: "
 MSG_EVENT_REN     = "Etkinlik numarasını yeniden adlandır: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "Görev numarasının son tarihini kaldırın: "
 MSG_TS_DEAD_DATE  = "Son tarih ekleyin (YYYY/MM/DD): "
 MSG_WEATHER       = "Hava durumu yükleniyor..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"

@@ -23,12 +23,13 @@ KEYS_CALENDAR = {
         "  n,🠒  ": "Le mois (jour) prochain",
         "  p,🠐  ": "mois (jour) précédent",
         "  d,x  ": "Supprimer un événement",
-        "  e,c  ": "Modifier un événement",
+        "   r   ": "Modifier un événement",
         "   m   ": "Déplacer l'événement",
         "   v   ": "Basculer la vue quotidienne/mensuelle",
         "   g   ": "Aller à un certain jour",
         "   h   ": "Désactiver l'événement en haute priorité",
         "   l   ": "Basculer l'événement en priorité basse",
+        "   d   ": "Toggle event as done",
         "   .   ": "Activer la confidentialité des événements",
         "   C   ": "Importer des événements depuis calcurse",
         "   G   ": "Revenir au mois (jour) en cours",
@@ -38,11 +39,11 @@ KEYS_TODO = {
         "  a(A) ": "Ajouter une nouvelle (sous-)tâche",
         "  h(H) ": "Bascule une (toutes) des tâches en haute priorité",
         "  l(L) ": "Désactiver une (toutes) les tâches en priorité basse",
-        "  v(V) ": "Bascule une (toutes) les tâches comme terminée",
+        "  d(D) ": "Bascule une (toutes) les tâches comme terminée",
         "  u(U) ": "Démarquer une (toutes) les tâches",
-        "  d(D) ": "Supprimer une (toutes) les tâches (avec toutes les sous-tâches)",
+        "  x(X) ": "Supprimer une (toutes) les tâches (avec toutes les sous-tâches)",
         "  t(T) ": "Démarrer/mettre en pause (supprimer) le minuteur pour une tâche",
-        "  e,c  ": "Modifier une tâche",
+        "   r   ": "Modifier une tâche",
         "   s   ": "Basculer entre tâche et sous-tâche",
         "   .   ": "Basculer la confidentialité des tâches",
         "  f(F) ": "Modifier (supprimer) l'échéance de la tâche",
@@ -58,6 +59,7 @@ MSG_EXIT          = "Vraiment quitter ? (y/n) "
 
 MSG_EVENT_HIGH    = "Marquer comme numéro d'événement hautement prioritaire: "
 MSG_EVENT_LOW     = "Marquer comme numéro d'événement basse priorité: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "Réinitialiser le statut pour l'événement numéro : "
 MSG_EVENT_DEL     = "Supprimer le numéro d'événement: "
 MSG_EVENT_REN     = "Renommer le numéro d'événement: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "Supprimer l'échéance de la tâche numéro: "
 MSG_TS_DEAD_DATE  = "Ajouter une date limite le (AAAA/MM/JJ): "
 MSG_WEATHER       = "La météo se charge..."
 MSG_ERRORS        = "Des erreurs se sont produites. Voir info.log dans votre dossier de configuration."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de mois  ? · Aider"
 CALENDAR_HINT_D   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de jour  ? · All keybindings"

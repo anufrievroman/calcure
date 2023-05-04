@@ -22,13 +22,14 @@ KEYS_CALENDAR = {
         "  a(A) ": "Aggiungi un evento (ricorrente)",
         "  n,🠒  ": "Mese successivo (giorno)",
         "  p,🠐  ": "Mese precedente (giorno)",
-        "  d,x  ": "Cancella un evento",
-        "  e,c  ": "Modifica un evento",
+        "   x   ": "Cancella un evento",
+        "   r   ": "Modifica un evento",
         "   m   ": "Sposta un evento",
         "   v   ": "Alterna la visualizzazione giornaliera/mensile",
         "   g   ": "Vai ad un determinato giorno",
         "   h   ": "Imposta un evento come ad alta priorità",
         "   l   ": "Imposta un evento come a bassa priorità",
+        "   d   ": "Toggle event as done",
         "   .   ": "Imposta la privacy per un evento",
         "   C   ": "Importa eventi da calcurse",
         "   G   ": "Ritorna al mese corrente (giorno)",
@@ -38,11 +39,11 @@ KEYS_TODO = {
         "  a(A) ": "Aggiungi una nuova (sotto)attività",
         "  h(H) ": "Imposta una fra (o tutte) le attività come ad alta priorità",
         "  l(L) ": "Imposta una fra (o tutte) le attività come a bassa priorità",
-        "  v(V) ": "Imposta una fra (o tutte) le attività come completate",
+        "  d(D) ": "Imposta una fra (o tutte) le attività come completate",
         "  u(U) ": "Deseleziona una fra (o tutte) le attività",
-        "  d(D) ": "Cancella una fra (o tutte) le attività (con tutte le sue sottoattività)",
+        "  x(X) ": "Cancella una fra (o tutte) le attività (con tutte le sue sottoattività)",
         "  t(T) ": "Avvia/ferma (o cancella) il timer per una attività",
-        "  e,c  ": "Modifica una attività",
+        "   r   ": "Modifica una attività",
         "   s   ": "Passa da attività a sottoattività (e viceversa)",
         "   .   ": "Imposta la privacy dell'attività",
         "  f(F) ": "Cambia (o rimuovi) la scadenza per una attività",
@@ -58,6 +59,7 @@ MSG_EXIT          = "Vuoi davvero uscire? (y/n) "
 
 MSG_EVENT_HIGH    = "Imposta ad alta priorità l'evento con numero: "
 MSG_EVENT_LOW     = "Imposta come a bassa priorità l'evento con numero: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "Ripristina lo stato per l'evento con numero: "
 MSG_EVENT_DEL     = "Cancella l'evento con numero: "
 MSG_EVENT_REN     = "Rinomina l'evento con numero: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "Rimuovi la scadenza per l'attività con numero: "
 MSG_TS_DEAD_DATE  = "Aggiungi una scandeza per il (AAAA/MM/GG): "
 MSG_WEATHER       = "Caricamento del meteo..."
 MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
 CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"

@@ -22,13 +22,14 @@ KEYS_CALENDAR = {
         "  a(A) ": "Adiciona um evento (recorrente)",
         "  n,🠒  ": "Próximo mês (dia)",
         "  p,🠐  ": "Mês (dia) anterior",
-        "  d,x  ": "Deletar um evento",
-        "  e,c  ": "Editar um evento",
+        "   x   ": "Deletar um evento",
+        "   r   ": "Editar um evento",
         "   m   ": "Mover evento",
         "   v   ": "Alternar visualização diária/mensal",
         "   g   ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
         "   l   ": "Alternar evento como baixa prioridade",
+        "   d   ": "Toggle event as done",
         "   .   ": "Alternar privacidade do evento",
         "   C   ": "Importar eventos do calcurse",
         "   G   ": "Retornar para o mês (dia) recorrente",
@@ -38,11 +39,11 @@ KEYS_TODO = {
         "  a(A) ": "Adicionar uma nova (sub)tarefa",
         "  h(H) ": "Alternar uma (todas) as tarefas como alta prioridade",
         "  l(L) ": "Alternar uma (todas) as tarefas como baixa prioridade",
-        "  v(V) ": "Alternar uma (todas) as tarefas como feitas",
+        "  d(D) ": "Alternar uma (todas) as tarefas como feitas",
         "  u(U) ": "Desmarcar uma (todas) as tarefas",
-        "  d(D) ": "Deletar uma (todas) as tarefas (com todas as subtarefas)",
+        "  x(X) ": "Deletar uma (todas) as tarefas (com todas as subtarefas)",
         "  t(T) ": "Começar/pausar temporizador para a tarefa",
-        "  e,c  ": "Editar uma tarefa",
+        "   r   ": "Editar uma tarefa",
         "   s   ": "Alternar entre tarefa e subtarefa",
         "   .   ": "Alternar privacidade da tarefa",
         "  f(F) ": "Mudar (remover) data limite da tarefa",
@@ -58,6 +59,7 @@ MSG_EXIT          = "Realmente sair? (y/n) "
 
 MSG_EVENT_HIGH    = "Marca como alta prioridade evento número: "
 MSG_EVENT_LOW     = "Marca como baixa prioridade evento número: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "Reseta status para evento número:"
 MSG_EVENT_DEL     = "Deleta evento número: "
 MSG_EVENT_REN     = "Renomeia evento número: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "Remover data limite da tarefa número: "
 MSG_TS_DEAD_DATE  = "Adicionar data limite em (AAAA/MM/DD): "
 MSG_WEATHER       = "Clima está carregando..."
 MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"

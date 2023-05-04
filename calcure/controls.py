@@ -67,6 +67,11 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_status(event_id, Status.NORMAL)
+        if screen.key == 'd':
+            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
+            if user_events.filter_events_that_month(screen).is_valid_number(number):
+                event_id = user_events.filter_events_that_month(screen).items[number].item_id
+                user_events.toggle_item_status(event_id, Status.DONE)
 
         # Toggle event privacy:
         if screen.key == '.':
@@ -76,14 +81,14 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 user_events.toggle_item_privacy(event_id)
 
         # Delete event:
-        if screen.key in ['d', 'x']:
+        if screen.key in ['x']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.delete_item(event_id)
 
-        # Edit event:
-        if screen.key in ['e', 'c']:
+        # Rename event:
+        if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
@@ -108,7 +113,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm', '.']:
+        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', '.']:
             screen.selection_mode = True
 
         # Navigation:
@@ -121,10 +126,12 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
 
         # Handle "g" as go to selected day:
         if screen.key == "g":
-            question = f'Go to date: {str(screen.year)}/{str(screen.month)}/'
-            day = input_day(stdscr, screen.y_max-2, 0, question)
-            if screen.is_valid_day(day):
+            clear_line(stdscr, screen.y_max-2, 0)
+            year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
+            if screen.is_valid_date(year, month, day):
                 screen.day = day
+                screen.month = month
+                screen.year = year
                 screen.calendar_state = CalState.DAILY
 
         # Change the view to daily:
@@ -204,6 +211,11 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             if user_events.filter_events_that_day(screen).is_valid_number(number):
                 item_id = user_events.filter_events_that_day(screen).items[number].item_id
                 user_events.toggle_item_status(item_id, Status.NORMAL)
+        if screen.key == 'd':
+            number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
+            if user_events.filter_events_that_day(screen).is_valid_number(number):
+                item_id = user_events.filter_events_that_day(screen).items[number].item_id
+                user_events.toggle_item_status(item_id, Status.DONE)
 
         # Toggle event privacy:
         if screen.key == '.':
@@ -213,14 +225,14 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 user_events.toggle_item_privacy(event_id)
 
         # Delete event:
-        if screen.key in ['d', 'x']:
+        if screen.key in ['x']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if user_events.filter_events_that_day(screen).is_valid_number(number):
                 item_id = user_events.filter_events_that_day(screen).items[number].item_id
                 user_events.delete_item(item_id)
 
-        # Edit event:
-        if screen.key in ['e', 'c']:
+        # Remane event:
+        if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if user_events.filter_events_that_day(screen).is_valid_number(number):
                 item_id = user_events.filter_events_that_day(screen).items[number].item_id
@@ -245,7 +257,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'c', 'm', '.']:
+        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', '.']:
             screen.selection_mode = True
 
         # Navigation:
@@ -277,6 +289,16 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
+
+        # Handle "g" as go to selected day:
+        if screen.key == "g":
+            clear_line(stdscr, screen.y_max-2, 0)
+            year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
+            if screen.is_valid_date(year, month, day):
+                screen.day = day
+                screen.month = month
+                screen.year = year
+                screen.calendar_state = CalState.DAILY
 
         # Change the view to monthly:
         if screen.key == "v":
@@ -354,7 +376,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.items[number].item_id
                 user_tasks.toggle_item_status(task_id, Status.NORMAL)
-        if screen.key == 'v':
+        if screen.key in ['d', 'v']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DONE)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.items[number].item_id
@@ -368,7 +390,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                 user_tasks.toggle_item_privacy(task_id)
 
         # Modify the task:
-        if screen.key in ['d', 'x']:
+        if screen.key in ['x']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEL)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.items[number].item_id
@@ -379,7 +401,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                 clear_line(stdscr, screen.y_max-2)
                 number_to = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE_TO)
                 user_tasks.move_task(number_from, number_to)
-        if screen.key in ['e', 'c']:
+        if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_EDIT)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.items[number].item_id
@@ -408,7 +430,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select a task, change to selection mode:
-        if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'c', 'A', 'm', '.', 'f', 'F']:
+        if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']:
             screen.selection_mode = True
 
         # Add single task:
@@ -419,7 +441,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             user_tasks.add_item(Task(task_id, task_name, Status.NORMAL, Timer([]), False))
 
         # Bulk operations:
-        if screen.key == "V":
+        if screen.key in ["V", "D"]:
             user_tasks.change_all_statuses(Status.DONE)
         if screen.key == "U":
             user_tasks.change_all_statuses(Status.NORMAL)
@@ -427,7 +449,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             user_tasks.change_all_statuses(Status.UNIMPORTANT)
         if screen.key in ["I", "H"]:
             user_tasks.change_all_statuses(Status.IMPORTANT)
-        if screen.key in ["D", "X"]:
+        if screen.key in ["X"]:
             confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.delete_all_items()

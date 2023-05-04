@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.8.6"
+__version__ = "2.9"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -79,7 +79,7 @@ class View:
         """Fill the screen background with background color"""
         y_max, x_max = self.stdscr.getmaxyx()
         for index in range(y_max - 1):
-            self.stdscr.addstr(index, 0, " " * x_max, curses.color_pair(1))
+            self.stdscr.addstr(index, 0, " " * x_max, curses.color_pair(Color.EMPTY.value))
 
     def display_line(self, y, x, text, color, bold=False, underlined=False):
         """Display the line of text respecting the slyling and available space"""
@@ -92,11 +92,11 @@ class View:
         # Cut the text if it does not fit the screen:
         real_text = text.replace('\u0336', "")
         number_of_characters = len(real_text)
-        available_space = x_max - x
+        avaliable_space = x_max - x
         number_of_special = text.count('\u0336')
-        if number_of_characters > available_space:
+        if number_of_characters > avaliable_space:
             coefficient = 2 if number_of_special > 0 else 1
-            text = f"{text[:(available_space - 1)*coefficient]}"
+            text = f"{text[:(avaliable_space - 1)*coefficient]}"
 
         try:
             if bold and underlined:
@@ -261,6 +261,9 @@ class EventView(View):
     def color(self):
         """Assign color depending on the status or calendar number if it's from .ics file"""
         if self.event.calendar_number is None:
+
+            if self.event.status == Status.DONE:
+                return Color.DONE
             if self.event.status == Status.IMPORTANT:
                 return Color.IMPORTANT
             if self.event.status == Status.UNIMPORTANT:
@@ -501,7 +504,7 @@ class TitleView(View):
 
     def render(self):
         """Render this view on the screen"""
-        if self.screen.active_pane and self.screen.split:
+        if self.screen.is_active_pane and self.screen.split:
             self.display_line(0, self.screen.x_min, self.title, Color.ACTIVE_PANE, cf.BOLD_ACTIVE_PANE, cf.UNDERLINED_ACTIVE_PANE)
         else:
             self.display_line(0, self.screen.x_min, self.title, Color.CALENDAR_HEADER, cf.BOLD_TITLE, cf.UNDERLINED_TITLE)
@@ -701,11 +704,9 @@ class DailyScreenView(View):
 
     def render(self):
         """Render this view on the screen"""
-        self.screen.state = AppState.CALENDAR
+        self.screen.currently_drawn = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3:
             return
-        # self.fill_background()
-        curses.halfdelay(255)
 
         # Form a string with month, year, and day with today icon:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
@@ -757,9 +758,8 @@ class MonthlyScreenView(View):
 
     def render(self):
         """Render this view on the screen"""
-        self.screen.state = AppState.CALENDAR
+        self.screen.currently_drawn = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
-        curses.halfdelay(255)
 
         # Info about the month:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
@@ -805,26 +805,12 @@ class JournalScreenView(View):
         self.user_tasks = user_tasks
         self.user_ics_tasks = user_ics_tasks
         self.screen = screen
-        self.refresh_time = 255
-
-    def calculate_refresh_rate(self):
-        """Check if a timer is running and change the refresh rate"""
-        self.refresh_time = 255
-        for task in self.user_tasks.items:
-            if task.timer.is_counting:
-                self.refresh_time = cf.REFRESH_INTERVAL * 10
-                self.screen.refresh_now = False
-                break
 
     def render(self):
         """Journal view showing all tasks"""
-        self.screen.state = AppState.JOURNAL
+        self.screen.currently_drawn = AppState.JOURNAL
         if self.screen.x_max < 6 or self.screen.y_max < 3:
             return
-
-        # Check if any of the timers is counting, and increase the update time:
-        self.calculate_refresh_rate()
-        curses.halfdelay(self.refresh_time)
 
         # Display header and footer:
         header_view = HeaderView(self.stdscr, 0, 0, cf.JOURNAL_HEADER, self.weather, self.screen)
@@ -849,7 +835,6 @@ class WelcomeScreenView(View):
     def render(self):
         """Draw the welcome screen"""
         self.calibrate_position()
-        curses.halfdelay(255)
         self.stdscr.clear()
         self.fill_background()
 
@@ -899,7 +884,6 @@ class HelpScreenView(View):
         self.calibrate_position()
         if self.x_max < 6 or self.y_max < 3:
             return
-        curses.halfdelay(255)
         self.stdscr.clear()
         self.fill_background()
 
@@ -996,54 +980,42 @@ def main(stdscr) -> None:
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
-        if not screen.split:
-            stdscr.clear()
-            app_view.fill_background()
-        screen.active_pane = False
+        stdscr.clear()
+        app_view.fill_background()
 
-        # CALENDARS
+        # Calculate screen refreh rate:
+        curses.halfdelay(200)
+        if user_tasks.has_active_timer and screen.state == AppState.JOURNAL:
+            curses.halfdelay(cf.REFRESH_INTERVAL * 10)
 
-        # Monthly (active) screen:
-        if screen.state == AppState.CALENDAR and screen.calendar_state == CalState.MONTHLY:
-            if screen.split and not screen.selection_mode:
-                stdscr.clear()
-                app_view.fill_background()
+        # Calendar screens:
+        if screen.state == AppState.CALENDAR:
+
+            if screen.calendar_state == CalState.MONTHLY:
+                monthly_screen_view.render()
+            else:
+                daily_screen_view.render()
+
+            if screen.split:
                 journal_screen_view.render()
-            screen.active_pane = True
-            monthly_screen_view.render()
-            if screen.split: separator_view.render()
+                separator_view.render()
             footer_view.render()
             error_view.render()
-            control_monthly_screen(stdscr, screen, user_events, importer)
 
-        # Daily (active) screen:
-        elif screen.state == AppState.CALENDAR and screen.calendar_state == CalState.DAILY:
-            if screen.split and not screen.selection_mode:
-                stdscr.clear()
-                app_view.fill_background()
-                journal_screen_view.render()
-            screen.active_pane = True
-            daily_screen_view.render()
-            if screen.split: separator_view.render()
-            footer_view.render()
-            error_view.render()
-            control_daily_screen(stdscr, screen, user_events, importer)
+            if screen.calendar_state == CalState.MONTHLY:
+                control_monthly_screen(stdscr, screen, user_events, importer)
+            else:
+                control_daily_screen(stdscr, screen, user_events, importer)
 
-        # JOURNAL
-
-        # Journal (active) screen:
+        # Journal screen:
         elif screen.state == AppState.JOURNAL:
-            if screen.split and not screen.selection_mode:
-                if screen.refresh_now:
-                    stdscr.clear()
-                    app_view.fill_background()
+            if screen.split:
                 if screen.calendar_state == CalState.MONTHLY:
                     monthly_screen_view.render()
                 else:
                     daily_screen_view.render()
-            screen.active_pane = True
+                separator_view.render()
             journal_screen_view.render()
-            if screen.split: separator_view.render()
             footer_view.render()
             error_view.render()
             control_journal_screen(stdscr, screen, user_tasks, importer)

@@ -22,13 +22,14 @@ KEYS_CALENDAR = {
         "  a(A) ": "增加一个（再次发生）事件",
         "  n,🠒  ": "下个月 (日)",
         "  p,🠐  ": "上个月 (日)",
-        "  d,x  ": "删除事件",
-        "  e,c  ": "编辑事件",
+        "   x   ": "删除事件",
+        "   r   ": "编辑事件",
         "   m   ": "移动事件",
         "   g   ": "跳转到指定的一天",
         "   v   ": "切换每天/每月视图模式",
         "   h   ": "切换事件为更高的优先级",
         "   l   ": "切换事件为更低的优先级",
+        "   d   ": "Toggle event as done",
         "   .   ": "切换事件为隐私模式",
         "   C   ": "从calcurse中导入事件",
         "   G   ": "返回当前的月 (日)",
@@ -38,11 +39,11 @@ KEYS_TODO = {
         "  a(A) ": "新增一个 (子) 任务",
         "  h(H) ": "切换一个 (所有) 任务为更高优先级",
         "  l(L) ": "切换一个 (所有) 任务为更低优先级",
-        "  v(V) ": "切换一个 (所有) 任务为已完成",
+        "  d(D) ": "切换一个 (所有) 任务为已完成",
         "  u(U) ": "不标记一个 (所有) 任务",
-        "  d(D) ": "删除一个 (所有) 任务 (和其子任务)",
+        "  x(X) ": "删除一个 (所有) 任务 (和其子任务)",
         "  t(T) ": "开始/暂停 (移除) 时刻为一个任务",
-        "  e,c  ": "编辑一个任务",
+        "   r   ": "编辑一个任务",
         "   s   ": "切换任务和子任务",
         "   .   ": "切换任务为隐私模式",
         "  f(F) ": "修改 (移除) 任务的截止日期",
@@ -58,6 +59,7 @@ MSG_EXIT          = "是否真的要退出? (y/n) "
 
 MSG_EVENT_HIGH    = "标记为更高优先级的事件号码: "
 MSG_EVENT_LOW     = "标记为更低优先级的事件号码: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "重设状态的事件号码: "
 MSG_EVENT_DEL     = "删除事件的号码: "
 MSG_EVENT_REN     = "重命名事件的号码: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "移除截止日期为事件号码: "
 MSG_TS_DEAD_DATE  = "增加截至日期在(YYYY/MM/DD): "
 MSG_WEATHER       = "天气插件正在加载..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Space · 转换到通知栏   a · 增加事件  n/p · 改变月   ? · 所有键位绑定"
 CALENDAR_HINT_D   = "Space · 转换到通知栏   a · 增加事件  n/p · 改变日   ? · 所有键位绑定"

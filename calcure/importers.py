@@ -25,7 +25,7 @@ class Importer:
                 lines = file.readlines()
             return lines
         except (IOError, FileNotFoundError, NameError):
-            logging.error("Problem occured acessing %s.", filename)
+            logging.error("Problem occurred accessing %s.", filename)
             return []
 
     def import_tasks_from_calcurse(self):

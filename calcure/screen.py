@@ -17,13 +17,18 @@ class Screen:
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.split = cf.SPLIT_SCREEN
         self.right_pane_percentage = cf.RIGHT_PANE_PERCENTAGE
-        self.active_pane = False
+        self.currently_drawn = self.state
         self.selection_mode = False
-        self.refresh_now = False
+        self.refresh_now = True
         self.key = None
         self.day = self.today.day
         self.month = self.today.month
         self.year = self.today.year
+
+    @property
+    def is_active_pane(self):
+        """Return True if currently drawn pane in the active one"""
+        return self.state == self.currently_drawn
 
     @property
     def y_max(self):
@@ -45,7 +50,7 @@ class Screen:
         _, x_max = self.stdscr.getmaxyx()
         if x_max < 40:
             self.split = False
-        if self.split and self.state != AppState.JOURNAL:
+        if self.split and self.currently_drawn != AppState.JOURNAL:
             return x_max - self.journal_pane_width
         return x_max
 
@@ -55,7 +60,7 @@ class Screen:
         _, x_max = self.stdscr.getmaxyx()
         if x_max < self.journal_pane_width:
             self.split = False
-        if self.split and self.state == AppState.JOURNAL:
+        if self.split and self.currently_drawn == AppState.JOURNAL:
             return x_max - self.journal_pane_width + 2
         return 0
 

@@ -232,6 +232,13 @@ class Collection:
 class Tasks(Collection):
     """List of tasks created by the user"""
 
+    @property
+    def has_active_timer(self):
+        for item in self.items:
+            if item.timer.is_counting:
+                return True
+        return False
+
     def add_subtask(self, task, number):
         """Add a subtask for certain task in the journal"""
         level = '----'if (self.items[number].name[:2] == '--') else '--'

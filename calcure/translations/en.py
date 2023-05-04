@@ -22,13 +22,14 @@ KEYS_CALENDAR = {
         "  a(A) ": "Add a (recurring) event",
         "  n,🠒  ": "Next month (day)",
         "  p,🠐  ": "Previous month (day)",
-        "  d,x  ": "Delete an event",
-        "  e,c  ": "Edit an event",
+        "   x   ": "Delete an event",
+        "   r   ": "Rename an event",
         "   m   ": "Move event",
         "   g   ": "Go to a certain day",
         "   v   ": "Toggle daily/monthly view",
         "   h   ": "Toggle event as high priority",
         "   l   ": "Toggle event as low priority",
+        "   d   ": "Toggle event as done",
         "   .   ": "Toggle event privacy",
         "   C   ": "Import events from calcurse",
         "   G   ": "Return to current month (day)",
@@ -38,11 +39,11 @@ KEYS_TODO = {
         "  a(A) ": "Add new (sub)task",
         "  h(H) ": "Toggle one (all) of the tasks as high priority",
         "  l(L) ": "Toggle one (all) of the tasks as low priority",
-        "  v(V) ": "Toggle one (all) of the tasks as done",
+        "  d(D) ": "Toggle one (all) of the tasks as done",
         "  u(U) ": "Unmark one (all) of the tasks",
-        "  d(D) ": "Delete one (all) of the tasks (with all subtasks)",
+        "  x(X) ": "Delete one (all) of the tasks (with all subtasks)",
         "  t(T) ": "Start/pause (remove) timer for a task",
-        "  e,c  ": "Edit a task",
+        "   r   ": "Rename a task",
         "   s   ": "Toggle between task and subtask",
         "   .   ": "Toggle task privacy",
         "  f(F) ": "Change (remove) task deadline",
@@ -58,6 +59,7 @@ MSG_EXIT          = "Really exit? (y/n) "
 
 MSG_EVENT_HIGH    = "Mark as high priority event number: "
 MSG_EVENT_LOW     = "Mark as low priority event number: "
+MSG_EVENT_DONE    = "Mark as done event number: "
 MSG_EVENT_RESET   = "Reset status for event number: "
 MSG_EVENT_DEL     = "Delete event number: "
 MSG_EVENT_REN     = "Rename event number: "
@@ -93,6 +95,7 @@ MSG_TS_DEAD_DEL   = "Remove deadline of the task number: "
 MSG_TS_DEAD_DATE  = "Add deadline on (YYYY/MM/DD): "
 MSG_WEATHER       = "Weather is loading..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
+MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 
 CALENDAR_HINT     = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 CALENDAR_HINT_D   = "Space · Switch to journal   a · Add event  n/p · Change day   ? · All keybindings"
