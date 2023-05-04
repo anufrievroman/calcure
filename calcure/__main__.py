@@ -261,7 +261,6 @@ class EventView(View):
     def color(self):
         """Assign color depending on the status or calendar number if it's from .ics file"""
         if self.event.calendar_number is None:
-
             if self.event.status == Status.DONE:
                 return Color.DONE
             if self.event.status == Status.IMPORTANT:
@@ -275,13 +274,23 @@ class EventView(View):
                     return color
             return Color.EVENTS
 
+    def decorate_info(self):
+        """Icon and name of the event, which is decorated if needed"""
+        if self.event.status == Status.DONE and cf.STRIKETHROUGH_DONE_TASKS:
+            strike = "\u0336"
+            self.info = f'{self.icon} {strike}{strike.join(self.event.name)}{strike}'
+
     def obfuscate_info(self):
         """Obfuscate the info if privacy mode is on"""
-        self.info = f'{cf.EVENT_ICON} {cf.PRIVACY_ICON * len(self.event.name)}'
+        if self.screen.privacy or self.event.privacy:
+            self.info = f'{cf.EVENT_ICON} {cf.PRIVACY_ICON * len(self.event.name)}'
 
     def cut_info(self):
         """Cut the name to fit into the cell of the calendar"""
-        self.info = self.info[:self.screen.x_max - self.x]
+        avaliable_space = self.screen.x_max - self.x
+        number_of_special = self.info[:avaliable_space].count('\u0336')
+        number_of_special += 2 if number_of_special > 2 else 0
+        self.info = self.info[:self.screen.x_max - self.x + number_of_special]
         x_cell = self.screen.x_max // 7
         if (cf.CUT_TITLES or cf.SHOW_CALENDAR_BOARDERS) and self.screen.calendar_state == CalState.MONTHLY:
             self.info = self.info[:(x_cell - 1)]
@@ -316,8 +325,8 @@ class UserEventView(EventView):
 
     def render(self):
         """Render this view on the screen"""
-        if self.screen.privacy or self.event.privacy:
-            self.obfuscate_info()
+        self.decorate_info()
+        self.obfuscate_info()
         self.fill_remaining_space()
         self.cut_info()
         self.minimize_info()
