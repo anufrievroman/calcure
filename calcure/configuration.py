@@ -41,6 +41,7 @@ class Config:
                 "privacy_mode":              "No",
                 "show_weather":              "No",
                 "weather_city":              "",
+                "weather_metric_units":      "Yes",
                 "minimal_today_indicator":   "Yes",
                 "minimal_days_indicator":    "Yes",
                 "minimal_weekend_indicator": "Yes",
@@ -206,6 +207,7 @@ class Config:
             self.WEEKEND_DAYS              = [int(i) for i in self.WEEKEND_DAYS.split(",")]
             self.HOLIDAY_COUNTRY           = conf.get("Parameters", "holiday_country", fallback="UnitedStates")
             self.WEATHER_CITY              = conf.get("Parameters", "weather_city", fallback="")
+            self.WEATHER_METRIC_UNITS      = conf.getboolean("Parameters", "weather_metric_units", fallback=True)
             self.DEFAULT_CALENDAR_VIEW     = conf.get("Parameters", "default_calendar_view", fallback="monthly")
 
             # Journal settings:
@@ -336,7 +338,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.9')
+                    print ('Calcure - version 2.9.1')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError as e_message:

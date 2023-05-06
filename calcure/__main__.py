@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.9"
+__version__ = "2.9.1"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -536,7 +536,7 @@ class HeaderView(View):
         title_view = TitleView(self.stdscr, 0, self.screen.x_min, self.title, self.screen)
         title_view.render()
 
-        if self.screen.state == AppState.JOURNAL and self.screen.split:
+        if self.screen.currently_drawn == AppState.JOURNAL and self.screen.split:
             return
 
         # Show weather is space allows and it is loaded:
@@ -932,7 +932,7 @@ def main(stdscr) -> None:
     """Main function that runs and switches screens"""
 
     # Load the data:
-    weather = Weather(cf.WEATHER_CITY)
+    weather = Weather(cf.WEATHER_CITY, cf.WEATHER_METRIC_UNITS)
     if cf.SHOW_WEATHER:
         sys.stdout.write(f"\r{MSG_WEATHER}")
         weather.load_from_wttr()
