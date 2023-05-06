@@ -232,7 +232,7 @@ class JournalView(View):
         for index, task in enumerate(self.user_tasks.items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
-            if self.screen.selection_mode:
+            if self.screen.selection_mode and self.screen.state == AppState.JOURNAL:
                 self.display_line(self.y, self.x, str(index + 1), Color.ACTIVE_PANE)
             self.y += 1
 
@@ -430,7 +430,8 @@ class DailyView(View):
             else:
                 user_event_view = UserEventView(self.stdscr, self.y + index, self.x, event, self.screen)
                 user_event_view.render()
-                if self.screen.selection_mode and self.is_selection_day:
+
+                if self.screen.selection_mode and self.is_selection_day and self.screen.state == AppState.CALENDAR:
                     self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.ACTIVE_PANE)
             index += 1
 
