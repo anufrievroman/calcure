@@ -98,6 +98,7 @@ MSG_WEATHER       = "Hava durumu yükleniyor..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 MSG_GOTO_G        = "Go to date: "
+MSG_INPUT         = "Incorrect input."
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"

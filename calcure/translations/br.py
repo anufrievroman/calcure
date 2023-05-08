@@ -98,6 +98,7 @@ MSG_WEATHER       = "Clima está carregando..."
 MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 MSG_GOTO_D        = "Go to date: "
+MSG_INPUT         = "Incorrect input."
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"

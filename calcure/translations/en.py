@@ -96,6 +96,7 @@ MSG_TS_DEAD_DEL   = "Remove deadline of the task number: "
 MSG_TS_DEAD_DATE  = "Add deadline on (YYYY/MM/DD): "
 MSG_WEATHER       = "Weather is loading..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
+MSG_INPUT         = "Incorrect input."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
 MSG_GOTO_D        = "Go to date: "
 

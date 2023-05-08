@@ -97,6 +97,7 @@ MSG_TS_DEAD_DATE  = "增加截至日期在(YYYY/MM/DD): "
 MSG_WEATHER       = "天气插件正在加载..."
 MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
 MSG_GOTO          = "Go to date (YYYY/MM/DD): "
+MSG_INPUT         = "Incorrect input."
 
 CALENDAR_HINT     = "Space · 转换到通知栏   a · 增加事件  n/p · 改变月   ? · 所有键位绑定"
 CALENDAR_HINT_D   = "Space · 转换到通知栏   a · 增加事件  n/p · 改变日   ? · 所有键位绑定"

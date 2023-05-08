@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.9.1"
+__version__ = "2.9.2"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -585,7 +585,13 @@ class ErrorView(View):
         """Render this view on the screen"""
         if self.error.has_occured:
             clear_line(self.stdscr, self.screen.y_max - 2)
-            self.display_line(self.screen.y_max - 2, 0, MSG_ERRORS, Color.IMPORTANT)
+
+            # Depending on error type, display different messages:
+            if self.error.number_of_errors > 1 or "ERROR" in self.error.type:
+                self.display_line(self.screen.y_max - 2, 0, MSG_ERRORS, Color.IMPORTANT)
+            else:
+                self.display_line(self.screen.y_max - 2, 0, MSG_INPUT, Color.HINTS)
+
             self.error.clear_buffer()
 
 
