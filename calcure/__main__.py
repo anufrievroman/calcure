@@ -40,7 +40,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.9.2"
+__version__ = "2.9.3"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -159,7 +159,7 @@ class TaskView(View):
         name = self.task.name[self.indent:]
         if self.screen.privacy or self.task.privacy:
             return f'{cf.TODO_ICON} {cf.PRIVACY_ICON * len(name)}'
-        if self.task.status == Status.DONE and cf.STRIKETHROUGH_DONE_TASKS:
+        if self.task.status == Status.DONE and cf.STRIKETHROUGH_DONE:
             strike = "\u0336"
             return f'{self.icon} {strike}{strike.join(name)}{strike}'
         return f'{self.icon} {name}'
@@ -276,7 +276,7 @@ class EventView(View):
 
     def decorate_info(self):
         """Icon and name of the event, which is decorated if needed"""
-        if self.event.status == Status.DONE and cf.STRIKETHROUGH_DONE_TASKS:
+        if self.event.status == Status.DONE and cf.STRIKETHROUGH_DONE:
             strike = "\u0336"
             self.info = f'{self.icon} {strike}{strike.join(self.event.name)}{strike}'
 
