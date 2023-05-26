@@ -119,7 +119,7 @@ class Config:
                 "underlined_weekend_names": "No",
                 "underlined_title":         "No",
                 "underlined_active_pane":   "No",
-                "strikethrough_done_tasks": "Yes",
+                "strikethrough_done_tasks": "No",
                 }
 
         conf["Event icons"] = {
@@ -279,7 +279,7 @@ class Config:
             self.UNDERLINED_WEEKEND_NAMES = conf.getboolean("Styles", "underlined_weekend_names", fallback=False)
             self.UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
             self.UNDERLINED_ACTIVE_PANE   = conf.getboolean("Styles", "underlined_active_pane", fallback=False)
-            self.STRIKETHROUGH_DONE_TASKS = conf.getboolean("Styles", "strikethrough_done_tasks", fallback=True)
+            self.STRIKETHROUGH_DONE_TASKS = conf.getboolean("Styles", "strikethrough_done_tasks", fallback=False)
 
             # Icons:
             self.TODAY_ICON       = conf.get("Parameters", "today_icon", fallback="•") if self.DISPLAY_ICONS else "·"
