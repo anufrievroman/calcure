@@ -10,7 +10,7 @@ class Weather:
     def __init__(self, city, is_metric_units):
         self.city = city
         self.forcast = ""
-        self.max_load_time = 2  # seconds
+        self.max_load_time = 5  # seconds
         self.units = "?m" if is_metric_units else "?u"
 
     def load_from_wttr(self):

@@ -8,6 +8,7 @@ import getopt
 import sys
 import importlib
 import logging
+import threading
 
 from calcure.calendars import Calendar
 from calcure.errors import error
@@ -40,7 +41,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "2.9.3"
+__version__ = "2.9.4"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -938,11 +939,11 @@ class HelpScreenView(View):
 def main(stdscr) -> None:
     """Main function that runs and switches screens"""
 
-    # Load the data:
+    # Load the weather:
     weather = Weather(cf.WEATHER_CITY, cf.WEATHER_METRIC_UNITS)
     if cf.SHOW_WEATHER:
-        sys.stdout.write(f"\r{MSG_WEATHER}")
-        weather.load_from_wttr()
+        threading.Thread(target=weather.load_from_wttr).start()
+
     screen = Screen(stdscr, cf)
 
     # Initialise loaders:
