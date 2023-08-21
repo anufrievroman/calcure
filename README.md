@@ -24,12 +24,17 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Support for Persian calendar
 
 
-
 ## Installation
 
 ### Linux and Mac OS
 
-`pip install calcure`
+There are several ways to install it, for example:
+
+`pipx install calcure` - most up-to-date version from PyPi. You may need to install `pipx` first.
+
+`caclure` [AUR package](https://aur.archlinux.org/packages/calcure) for Arch-based distributions.
+
+`calcure` is also available as NixOS package.
 
 ### Windows
 
@@ -44,8 +49,8 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ### Dependencies
 
-- `python` 3.7 and higher
-- `holidays`, `jdatetime`, and `ics` python libraries.
+- `python` 3.7 and higher (usually already installed)
+- `holidays`, `jdatetime`, and `ics` python libraries (should be installed automatically with the calcure).
 
 ## Usage
 
