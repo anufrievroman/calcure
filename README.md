@@ -32,7 +32,7 @@ There are several ways to install it, for example:
 
 `pipx install calcure` - most up-to-date version from PyPi. You may need to install `pipx` first.
 
-`caclure` [AUR package](https://aur.archlinux.org/packages/calcure) for Arch-based distributions.
+`yay -S calcure` - [AUR package](https://aur.archlinux.org/packages/calcure) for Arch-based distributions.
 
 `calcure` is also available as NixOS package.
 
