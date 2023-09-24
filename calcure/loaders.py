@@ -5,6 +5,7 @@ import pathlib
 import csv
 import os
 import datetime
+import time
 import ics
 import urllib.request
 import io
@@ -372,6 +373,10 @@ class EventLoaderICS(LoaderICS):
         status = Status.NORMAL
         is_private = False
 
+        # Calculate offset of local timezone from UTC:
+        utc_offset_sec = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
+        utc_offset_hours = -1 * utc_offset_sec / 3600
+
         # Parameters of the event from ics file, if they exist:
         name = event.name if event.name is not None else ""
         all_day = event.all_day if event.all_day is not None else True
@@ -381,7 +386,34 @@ class EventLoaderICS(LoaderICS):
 
         # Add start time to the name of non-all-day events:
         if not all_day:
-            hour = event.begin.hour if event.begin else 0
+            hour = int(event.begin.hour) if event.begin else 0
+
+            # Convert to local timezone, and add or remove a day:
+            hour += int(utc_offset_hours)
+            if hour >= 24:
+                hour -= 24
+                days_in_this_month = Calendar(0, self.use_persian_calendar).last_day(year, month)
+                if day < days_in_this_month:
+                    day += 1
+                else:
+                    day = 1
+                    if month < 12:
+                        month += 1
+                    else:
+                        month = 1
+                        year += 1
+            if hour < 0:
+                hour += 24
+                if day > 1:
+                    day -= 1
+                else:
+                    if month > 1:
+                        month -= 1
+                    else:
+                        month = 12
+                        year -= 1
+                    day = Calendar(0, self.use_persian_calendar).last_day(year, month)
+
             minute = event.begin.minute if event.begin else 0
             name = f"{hour:0=2}:{minute:0=2} {name}"
 

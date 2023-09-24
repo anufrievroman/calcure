@@ -1,0 +1,49 @@
+.TH CALCURE 2023-05-25
+.nh
+.SH NAME
+calcure \- TUI calendar and task manager
+.SH SYNOPSIS
+.B calcure
+[ \fIOPTION\fR ]
+.SH DESCRIPTION
+.B Calcure
+is a TUI calendar and task manager program with a customizable interface and ability to read cloud calendars. For more information, visit \fIhttps://anufrievroman.gitbook.com/calcure\fR
+.SH OPTIONS
+
+.TP
+\fB\-v \fP
+Print version.
+
+.TP
+\fB\-h \fP
+Start on help page.
+
+.TP
+\fB\-j \fP
+Start on journal view.
+
+.TP
+\fB\-i \fP
+Start using Iranian calendar.
+
+.TP
+\fB\-p \fP
+Start in the privacy mode.
+
+.TP
+\fB\-c \fP \fI<filename>\fR
+Use an alternative configuration file (default is \fI$HOME/.config/calcure/config.ini\fR).
+
+.TP
+\fB\-\-task "<task title>"\fP
+Add a new task (without starting TUI).
+
+.TP
+\fB\-\-event "<event date> <event title>"\fP
+Add a new event (without starting TUI).
+
+.SH COMMANDS DURING USE
+Press '\fB?\fP' during use to get a list of keybindings.
+.br
+.SH AUTHOR
+Written by Roman Anufriev. For more information, visit \fIhttps://anufrievroman.gitbook.com/calcure\fR
