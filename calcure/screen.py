@@ -2,6 +2,7 @@
 
 import datetime
 import jdatetime
+import logging
 
 from calcure.data import Events, AppState, CalState
 from calcure.calendars import Calendar

@@ -34,7 +34,7 @@ class Calendar:
         if self.use_persian_calendar:
             isleap = jdatetime.date(year, 1, 1).isleap()
             mdays = [0, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]
-            ndays = mdays[month] + (month == 2 and isleap)
+            ndays = mdays[month] + (month == 12 and isleap)
             return ndays
         else:
             isleap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
