@@ -7,6 +7,24 @@ from calcure.data import Frequency
 from calcure.colors import Color
 
 
+
+def safe_run(func):
+    """Decorator preventing crashes on keyboard interruption and no input"""
+
+    def inner(stdscr, screen, *args, **kwargs):
+        try:
+            func(stdscr, screen, *args, **kwargs)
+
+        # Handle keyboard interruption with ctr+c:
+        except KeyboardInterrupt:
+            pass
+
+        # Prevent crash if no input:
+        except curses.error:
+            pass
+    return inner
+
+
 def display_question(stdscr, y, x, question, color):
     """Display the line of text respecting the styling and available space"""
     y_max, x_max = stdscr.getmaxyx()
@@ -30,7 +48,7 @@ def input_string(stdscr, y, x, question, answer_length):
     stdscr.refresh()
     try:
         answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
-    except UnicodeDecodeError:
+    except (UnicodeDecodeError, KeyboardInterrupt):
         answer = ""
         logging.warning("Incorrect characters in user input.")
     curses.noecho()
@@ -43,7 +61,7 @@ def input_integer(stdscr, y, x, question):
     number = input_string(stdscr, y, x, question, 3)
     try:
         number = int(number) - 1
-    except ValueError:
+    except (ValueError, KeyboardInterrupt):
         logging.warning("Incorrect number input.")
         return None
     return number
@@ -54,7 +72,7 @@ def input_day(stdscr, y, x, prompt_string):
     number = input_string(stdscr, y, x, prompt_string, 2)
     try:
         number = int(number)
-    except ValueError:
+    except (ValueError, KeyboardInterrupt):
         logging.warning("Incorrect day input.")
         return None
     return number
@@ -68,7 +86,7 @@ def input_date(stdscr, y, x, prompt_string):
         month = int(date_unformated.split("/")[1])
         day = int(date_unformated.split("/")[2])
         return year, month, day
-    except (ValueError, IndexError):
+    except (ValueError, IndexError, KeyboardInterrupt):
         logging.warning("Incorrect date input.")
         return None, None, None
 
