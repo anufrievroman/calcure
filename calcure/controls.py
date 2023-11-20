@@ -121,7 +121,8 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']:
+        selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
+        if screen.key in selection_keys and user_events.filter_events_that_month(screen).items:
             screen.selection_mode = True
 
         # Navigation:
@@ -279,7 +280,8 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select an event, change to selection mode:
-        if screen.key in ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']:
+        selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
+        if screen.key in selection_keys and user_events.filter_events_that_day(screen).items:
             screen.selection_mode = True
 
         # Navigation:
@@ -460,7 +462,8 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
         screen.key = stdscr.getkey()
 
         # If we need to select a task, change to selection mode:
-        if screen.key in ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']:
+        selection_keys = ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']
+        if screen.key in selection_keys and user_tasks.items:
             screen.selection_mode = True
 
         # Add single task:
