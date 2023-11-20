@@ -211,9 +211,15 @@ class Config:
             self.DEFAULT_CALENDAR_VIEW     = conf.get("Parameters", "default_calendar_view", fallback="monthly")
 
             # Journal settings:
-            self.CALCURSE_TODO_FILE    = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
-            self.CALCURSE_EVENTS_FILE  = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
-            self.TASKWARRIOR_FOLDER    = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
+            self.CALCURSE_TODO_FILE = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
+            self.CALCURSE_TODO_FILE = os.path.expanduser(self.CALCURSE_TODO_FILE)
+
+            self.CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
+            self.CALCURSE_EVENTS_FILE = os.path.expanduser(self.CALCURSE_EVENTS_FILE)
+
+            self.TASKWARRIOR_FOLDER = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
+            self.TASKWARRIOR_FOLDER = os.path.expanduser(self.TASKWARRIOR_FOLDER)
+
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)
             self.DONE_ICON             = conf.get("Parameters", "done_icon", fallback="✔") if self.DISPLAY_ICONS else "×"
@@ -296,6 +302,7 @@ class Config:
                 self.ICONS = {}
 
             self.data_folder = conf.get("Parameters", "folder_with_datafiles", fallback=self.config_folder)
+            self.data_folder = os.path.expanduser(self.data_folder)
             self.EVENTS_FILE = self.data_folder + "/events.csv"
             self.TASKS_FILE = self.data_folder + "/tasks.csv"
 

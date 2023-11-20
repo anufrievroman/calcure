@@ -267,6 +267,7 @@ class LoaderICS:
     def read_resource(self, path):
         """Determine type of the resourse, parse it, and return list of strings for each file"""
         ics_files = []
+        path = os.path.expanduser(path)
 
         # If it's a URL, try to load it:
         if path.startswith('http'):
