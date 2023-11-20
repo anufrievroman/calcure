@@ -227,16 +227,16 @@ class LoaderICS:
     def read_lines(self, file):
         """Read the file line-by-line and remove multiple PRODID lines"""
         already_has_prodid = False
-        text = ""
+        text = io.StringIO()
         for line in file:
             # If there is more than one PRODID line or a TZUNTIL line, skip them:
             if ((not (already_has_prodid and "PRODID:" in line)) and
                 (not "TZUNTIL" in line)):
-                text += line
+                text.write(line)
 
             if "PRODID:" in line:
                 already_has_prodid = True
-        return text
+        return text.getvalue()
 
     def read_file(self, path):
         """Parse an ics file if it exists"""
