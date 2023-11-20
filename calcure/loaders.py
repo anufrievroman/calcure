@@ -191,11 +191,16 @@ class BirthdayLoader:
 
     def __init__(self, cf):
         self.birthdays = Birthdays()
-        self.abook_file = str(pathlib.Path.home())+"/.abook/addressbook"
+        self.abook_file = str(pathlib.Path.home() / ".abook" / "addressbook")
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+        self.load_birthdays = cf.BIRTHDAYS_FROM_ABOOK
 
     def load(self):
         """Loading birthdays from abook contacts"""
+
+        # Quit if birthdays do not need to be loaded:
+        if not self.load_birthdays:
+            return self.birthdays
 
         # Quit if file does not exists:
         if not os.path.exists(self.abook_file):
