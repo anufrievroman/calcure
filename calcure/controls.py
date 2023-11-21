@@ -475,13 +475,21 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
 
         # Bulk operations:
         if screen.key in ["V", "D"]:
-            user_tasks.change_all_statuses(Status.DONE)
+            confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
+            if confirmed:
+                user_tasks.change_all_statuses(Status.DONE)
         if screen.key == "U":
-            user_tasks.change_all_statuses(Status.NORMAL)
+            confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
+            if confirmed:
+                user_tasks.change_all_statuses(Status.NORMAL)
         if screen.key == "L":
-            user_tasks.change_all_statuses(Status.UNIMPORTANT)
+            confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
+            if confirmed:
+                user_tasks.change_all_statuses(Status.UNIMPORTANT)
         if screen.key in ["I", "H"]:
-            user_tasks.change_all_statuses(Status.IMPORTANT)
+            confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
+            if confirmed:
+                user_tasks.change_all_statuses(Status.IMPORTANT)
         if screen.key in ["X"]:
             confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
