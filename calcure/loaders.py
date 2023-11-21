@@ -35,7 +35,7 @@ class LoaderCSV:
                 lines = csv.reader(file, delimiter = ',')
                 return list(lines)
         except IOError: # File does not exist
-            logging.info("Creating %s.", filename)
+            # logging.info("Creating %s.", filename)
             return self.create_file(filename)
 
 
@@ -91,6 +91,7 @@ class TaskLoaderCSV(LoaderCSV):
             # Add task:
             new_task = Task(task_id, name, status, timer, is_private, year, month, day)
             self.user_tasks.add_item(new_task)
+        self.user_tasks.changed = False
         return self.user_tasks
 
 
@@ -148,6 +149,7 @@ class EventLoaderCSV(LoaderCSV):
             # Add event:
             new_event = UserEvent(event_id, year, month, day, name, repetition, frequency, status, is_private)
             self.user_events.add_item(new_event)
+        self.user_events.changed = False
         return self.user_events
 
 

@@ -1,11 +1,11 @@
 """This module creates and loads user config file"""
 
 import os
-import pathlib
 import configparser
 import sys
 import getopt
 import logging
+from pathlib import Path
 
 from calcure.data import AppState
 
@@ -13,26 +13,26 @@ from calcure.data import AppState
 class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
-        self.taskwarrior_folder   = str(pathlib.Path.home()) + "/.task"
-        self.calcurse_todo_file   = str(pathlib.Path.home()) + "/.local/share/calcurse/todo"
-        self.calcurse_events_file = str(pathlib.Path.home()) + "/.local/share/calcurse/apts"
-        self.config_folder        = str(pathlib.Path.home()) + "/.config/calcure"
-        self.config_file          = self.config_folder + "/config.ini"
+        self.taskwarrior_folder   = Path.home() / ".task"
+        self.calcurse_todo_file   = Path.home() / ".local" / "share" / "calcurse" / "todo"
+        self.calcurse_events_file = Path.home() / ".local" / "share" / "calcurse" / "apts"
+        self.config_folder        = Path.home() / ".config" / "calcure"
+        self.config_file          = self.config_folder / "config.ini"
         self.is_first_run         = True
 
     def create_config_file(self):
         """Create config.ini file if it does not exist"""
 
-        if os.path.exists(self.config_file):
+        if self.config_file.exists():
             self.is_first_run = False
             return
 
         conf = configparser.ConfigParser()
         conf["Parameters"] = {
-                "folder_with_datafiles":     str(self.config_folder),
-                "calcurse_todo_file":        str(self.calcurse_todo_file),
-                "calcurse_events_file":      str(self.calcurse_events_file),
-                "taskwarrior_folder":        str(self.taskwarrior_folder),
+                "folder_with_datafiles":     self.config_folder,
+                "calcurse_todo_file":        self.calcurse_todo_file,
+                "calcurse_events_file":      self.calcurse_events_file,
+                "taskwarrior_folder":        self.taskwarrior_folder,
                 "language":                  "en",
                 "default_view":              "calendar",
                 "default_calendar_view":     "monthly",
@@ -214,13 +214,13 @@ class Config:
 
             # Journal settings:
             self.CALCURSE_TODO_FILE = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
-            self.CALCURSE_TODO_FILE = os.path.expanduser(self.CALCURSE_TODO_FILE)
+            self.CALCURSE_TODO_FILE = Path(os.path.expanduser(self.CALCURSE_TODO_FILE))
 
             self.CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
-            self.CALCURSE_EVENTS_FILE = os.path.expanduser(self.CALCURSE_EVENTS_FILE)
+            self.CALCURSE_EVENTS_FILE = Path(os.path.expanduser(self.CALCURSE_EVENTS_FILE))
 
             self.TASKWARRIOR_FOLDER = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
-            self.TASKWARRIOR_FOLDER = os.path.expanduser(self.TASKWARRIOR_FOLDER)
+            self.TASKWARRIOR_FOLDER = Path(os.path.expanduser(self.TASKWARRIOR_FOLDER))
 
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)
@@ -304,9 +304,9 @@ class Config:
                 self.ICONS = {}
 
             self.data_folder = conf.get("Parameters", "folder_with_datafiles", fallback=self.config_folder)
-            self.data_folder = os.path.expanduser(self.data_folder)
-            self.EVENTS_FILE = self.data_folder + "/events.csv"
-            self.TASKS_FILE = self.data_folder + "/tasks.csv"
+            self.data_folder = Path(os.path.expanduser(self.data_folder))
+            self.EVENTS_FILE = self.data_folder / "events.csv"
+            self.TASKS_FILE = self.data_folder / "tasks.csv"
 
         except Exception:
             ERR_FILE1 = "Looks like there is a problem in your config.ini file. Perhaps you edited it and entered a wrong line. "
@@ -320,8 +320,8 @@ class Config:
             opts, _ = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
             for opt, arg in opts:
                 if opt in "--config":
-                    self.config_file = arg
-                    if not os.path.exists(self.config_file):
+                    self.config_file = Path(os.path.expanduser(arg))
+                    if not self.config_file.exists():
                         self.create_config_file()
         except getopt.GetoptError:
             pass
@@ -332,11 +332,11 @@ class Config:
             opts, _ = getopt.getopt(sys.argv[1:],"pjhvid",["folder=", "config=", "task=", "event="])
             for opt, arg in opts:
                 if opt in '--folder':
-                    self.data_folder = arg
-                    if not os.path.exists(self.data_folder):
+                    self.data_folder = Path(os.path.expanduser(arg))
+                    if not self.data_folder.exists():
                         os.makedirs(self.data_folder)
-                    self.EVENTS_FILE = self.data_folder + "/events.csv"
-                    self.TASKS_FILE = self.data_folder + "/tasks.csv"
+                    self.EVENTS_FILE = self.data_folder / "events.csv"
+                    self.TASKS_FILE = self.data_folder / "tasks.csv"
                 elif opt == '-p':
                     self.PRIVACY_MODE = True
                 elif opt == '-j':
@@ -347,7 +347,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 2.9.5')
+                    print ('Calcure - version 2.9.6')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError as e_message:
@@ -359,7 +359,7 @@ class Config:
 cf = Config()
 
 # Create config folder:
-if not os.path.exists(cf.config_folder):
+if not cf.config_folder.exists():
     os.makedirs(cf.config_folder)
 
 # Read config file:

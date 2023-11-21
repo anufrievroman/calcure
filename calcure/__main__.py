@@ -867,7 +867,7 @@ class WelcomeScreenView(View):
         self.display_line(d_y, d_x - len(MSG_WELCOME_1+__version__+" ")//2, f"{MSG_WELCOME_1} {__version__}", Color.ACTIVE_PANE)
         self.display_line(d_y + 1, d_x - len(MSG_WELCOME_2)//2, MSG_WELCOME_2, Color.TODO)
         self.display_line(d_y + 3, d_x - len(MSG_WELCOME_3)//2, MSG_WELCOME_3, Color.TODO)
-        self.display_line(d_y + 4, d_x - len(cf.config_folder)//2, cf.config_folder, Color.TITLE)
+        self.display_line(d_y + 4, d_x - len(str(cf.config_folder))//2, str(cf.config_folder), Color.TITLE)
         self.display_line(d_y + 6, d_x - len(MSG_WELCOME_4)//2, MSG_WELCOME_4, Color.TODO)
         self.display_line(d_y + 7, d_x - len(MSG_SITE)//2, MSG_SITE, Color.TITLE)
         self.display_line(d_y + 9, d_x - len(MSG_WELCOME_5)//2, MSG_WELCOME_5, Color.TODO)

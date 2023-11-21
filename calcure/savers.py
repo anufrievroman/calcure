@@ -17,7 +17,7 @@ class TaskSaverCSV:
     def save(self):
         """Rewrite CSV file with changed tasks"""
         original_file = self.tasks_file
-        dummy_file = self.tasks_file + '.bak'
+        dummy_file = f"{self.tasks_file}.bak"
         with open(dummy_file, "w", encoding="utf-8") as f:
             for task in self.user_tasks.items:
 
@@ -48,7 +48,7 @@ class EventSaverCSV:
     def save(self):
         """Rewrite the data file with changed events"""
         original_file = self.events_file
-        dummy_file = self.events_file + '.bak'
+        dummy_file = f"{self.events_file}.bak"
         with open(dummy_file, "w", encoding="utf-8") as file:
             for ev in self.user_events.items:
 
