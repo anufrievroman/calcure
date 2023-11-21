@@ -166,7 +166,7 @@ class HolidayLoader:
         try:
             import holidays as hl
             year = datetime.date.today().year
-            holiday_events = eval("hl."+self.country+"(years=[year-2, year-1, year, year+1, year+2, year+3, year+4])")
+            holiday_events = (getattr(hl, self.country))(years=[year+x for x in range(-2, 5)])
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
