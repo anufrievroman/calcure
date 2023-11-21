@@ -36,7 +36,7 @@ def safe_run(func):
 
         # Handle keyboard interruption with ctr+c:
         except KeyboardInterrupt:
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
 
         # Prevent crash if no input:
@@ -189,7 +189,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
 
         # Other actions:
         if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
@@ -198,7 +198,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         if screen.key == "?":
             screen.state = AppState.HELP
         if screen.key in ["q", "\b", "\x7f"]:
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
@@ -338,7 +338,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
         # Other actions:
         if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
@@ -347,7 +347,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         if screen.key == "?":
             screen.state = AppState.HELP
         if screen.key == "q":
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
@@ -509,7 +509,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
 
         # Other actions:
         if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
@@ -518,7 +518,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
         if screen.key == "?":
             screen.state = AppState.HELP
         if screen.key == "q":
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
@@ -533,7 +533,7 @@ def control_help_screen(stdscr, screen):
 
     # Handle vim-style exit on "ZZ" and "ZQ":
     if vim_style_exit(stdscr, screen):
-        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATIONS)
+        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
         screen.state = AppState.EXIT if confirmed else screen.state
 
     # Handle keys to exit the help screen:

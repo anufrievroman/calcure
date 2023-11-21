@@ -48,6 +48,7 @@ class Config:
                 "show_calendar_boarders":    "No",
                 "cut_titles_by_cell_length": "No",
                 "ask_confirmations":         "Yes",
+                "ask_confirmation_to_quit":  "Yes",
                 "use_unicode_icons":         "Yes",
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
@@ -190,6 +191,7 @@ class Config:
             self.MINIMAL_DAYS_INDICATOR    = conf.getboolean("Parameters", "minimal_days_indicator", fallback=True)
             self.MINIMAL_WEEKEND_INDICATOR = conf.getboolean("Parameters", "minimal_weekend_indicator", fallback=True)
             self.ASK_CONFIRMATIONS         = conf.getboolean("Parameters", "ask_confirmations", fallback=True)
+            self.ASK_CONFIRMATION_TO_QUIT  = conf.getboolean("Parameters", "ask_confirmation_to_quit", fallback=True)
             self.SHOW_WEATHER              = conf.getboolean("Parameters", "show_weather", fallback=False)
             self.SHOW_CURRENT_TIME         = conf.getboolean("Parameters", "show_current_time", fallback=False)
             self.DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
