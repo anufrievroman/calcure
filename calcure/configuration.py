@@ -13,7 +13,6 @@ class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
         self.home_path = Path.home()
-        self.taskwarrior_folder = self.home_path / ".task"
         self.calcurse_todo_file = self.home_path / ".local" / "share" / "calcurse" / "todo"
         self.calcurse_events_file = self.home_path / ".local" / "share" / "calcurse" / "apts"
         self.config_folder = self.home_path / ".config" / "calcure"
@@ -41,7 +40,6 @@ class Config:
                 "folder_with_datafiles":     self.shorten_path(self.config_folder),
                 "calcurse_todo_file":        self.shorten_path(self.calcurse_todo_file),
                 "calcurse_events_file":      self.shorten_path(self.calcurse_events_file),
-                "taskwarrior_folder":        self.shorten_path(self.taskwarrior_folder),
                 "language":                  "en",
                 "default_view":              "calendar",
                 "default_calendar_view":     "monthly",
@@ -228,9 +226,6 @@ class Config:
 
             self.CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
             self.CALCURSE_EVENTS_FILE = Path(self.CALCURSE_EVENTS_FILE).expanduser()
-
-            self.TASKWARRIOR_FOLDER = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
-            self.TASKWARRIOR_FOLDER = Path(self.TASKWARRIOR_FOLDER).expanduser()
 
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)

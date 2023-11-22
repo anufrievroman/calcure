@@ -424,7 +424,6 @@ class EventLoaderICS(LoaderICS):
                     day = Calendar(0, self.use_persian_calendar).last_day(year, month)
 
             minute = event.begin.minute if event.begin else 0
-            # name = f"{hour:0=2}:{minute:0=2} {name}"
         else:
             hour = None
             minute = None
