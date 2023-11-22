@@ -1,6 +1,5 @@
 """This module creates and loads user config file"""
 
-import os
 import configparser
 import sys
 import getopt
@@ -214,13 +213,13 @@ class Config:
 
             # Journal settings:
             self.CALCURSE_TODO_FILE = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
-            self.CALCURSE_TODO_FILE = Path(os.path.expanduser(self.CALCURSE_TODO_FILE))
+            self.CALCURSE_TODO_FILE = Path(self.CALCURSE_TODO_FILE).expanduser()
 
             self.CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
-            self.CALCURSE_EVENTS_FILE = Path(os.path.expanduser(self.CALCURSE_EVENTS_FILE))
+            self.CALCURSE_EVENTS_FILE = Path(self.CALCURSE_EVENTS_FILE).expanduser()
 
             self.TASKWARRIOR_FOLDER = conf.get("Parameters", "taskwarrior_folder", fallback=self.taskwarrior_folder)
-            self.TASKWARRIOR_FOLDER = Path(os.path.expanduser(self.TASKWARRIOR_FOLDER))
+            self.TASKWARRIOR_FOLDER = Path(self.TASKWARRIOR_FOLDER).expanduser()
 
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)
@@ -304,7 +303,7 @@ class Config:
                 self.ICONS = {}
 
             self.data_folder = conf.get("Parameters", "folder_with_datafiles", fallback=self.config_folder)
-            self.data_folder = Path(os.path.expanduser(self.data_folder))
+            self.data_folder = Path(self.data_folder).expanduser()
             self.EVENTS_FILE = self.data_folder / "events.csv"
             self.TASKS_FILE = self.data_folder / "tasks.csv"
 
@@ -320,7 +319,7 @@ class Config:
             opts, _ = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
             for opt, arg in opts:
                 if opt in "--config":
-                    self.config_file = Path(os.path.expanduser(arg))
+                    self.config_file = Path(arg).expanduser()
                     if not self.config_file.exists():
                         self.create_config_file()
         except getopt.GetoptError:
@@ -332,9 +331,8 @@ class Config:
             opts, _ = getopt.getopt(sys.argv[1:],"pjhvid",["folder=", "config=", "task=", "event="])
             for opt, arg in opts:
                 if opt in '--folder':
-                    self.data_folder = Path(os.path.expanduser(arg))
-                    if not self.data_folder.exists():
-                        os.makedirs(self.data_folder)
+                    self.data_folder = Path(arg).expanduser()
+                    self.data_folder.mkdir(exist_ok=True)
                     self.EVENTS_FILE = self.data_folder / "events.csv"
                     self.TASKS_FILE = self.data_folder / "tasks.csv"
                 elif opt == '-p':
@@ -359,8 +357,7 @@ class Config:
 cf = Config()
 
 # Create config folder:
-if not cf.config_folder.exists():
-    os.makedirs(cf.config_folder)
+cf.config_folder.mkdir(exist_ok=True)
 
 # Read config file:
 cf.create_config_file()

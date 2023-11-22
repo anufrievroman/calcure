@@ -1,4 +1,5 @@
 """Module that provides methods to import data from other programs"""
+
 import logging
 
 from calcure.data import *

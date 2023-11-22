@@ -1,7 +1,6 @@
 """Module that controls loading data from files and libraries"""
 
 import configparser
-import pathlib
 import csv
 import os
 import datetime
@@ -10,6 +9,8 @@ import ics
 import urllib.request
 import io
 import logging
+
+from pathlib import Path
 
 from calcure.data import *
 from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
@@ -193,7 +194,7 @@ class BirthdayLoader:
 
     def __init__(self, cf):
         self.birthdays = Birthdays()
-        self.abook_file = str(pathlib.Path.home() / ".abook" / "addressbook")
+        self.abook_file = Path.home() / ".abook" / "addressbook"
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.load_birthdays = cf.BIRTHDAYS_FROM_ABOOK
 
@@ -205,8 +206,8 @@ class BirthdayLoader:
             return self.birthdays
 
         # Quit if file does not exists:
-        if not os.path.exists(self.abook_file):
-            logging.warning("Couldn't load birthdays. File. %s does not exist.", self.abook_file)
+        if not self.abook_file.exists():
+            logging.warning("Couldn't load birthdays. File. %s does not exist.", str(self.abook_file))
             return self.birthdays
 
         abook = configparser.ConfigParser()
@@ -442,6 +443,7 @@ class EventLoaderICS(LoaderICS):
             return self.user_ics_events
 
         for calendar_number, filename in enumerate(self.ics_event_files):
+
             # For each resourse from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
