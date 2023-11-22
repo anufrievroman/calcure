@@ -67,7 +67,8 @@ class Event:
 class UserEvent(Event):
     """Events crated by the user"""
 
-    def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy, calendar_number=None):
+    def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy,
+                                                    calendar_number=None, hour=None, minute=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.repetition = repetition
@@ -75,6 +76,8 @@ class UserEvent(Event):
         self.status = status
         self.privacy = privacy
         self.calendar_number = calendar_number
+        self.hour = hour
+        self.minute = minute
 
 
 class UserRepeatedEvent(Event):

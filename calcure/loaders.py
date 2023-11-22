@@ -424,15 +424,18 @@ class EventLoaderICS(LoaderICS):
                     day = Calendar(0, self.use_persian_calendar).last_day(year, month)
 
             minute = event.begin.minute if event.begin else 0
-            name = f"{hour:0=2}:{minute:0=2} {name}"
+            # name = f"{hour:0=2}:{minute:0=2} {name}"
+        else:
+            hour = None
+            minute = None
 
         # Convert to persian date if needed:
         if self.use_persian_calendar:
             year, month, day = convert_to_persian_date(year, month, day)
 
         # Add event:
-        new_event = UserEvent(event_id, year, month, day, name, repetition,
-                              frequency, status, is_private, calendar_number)
+        new_event = UserEvent(event_id, year, month, day, name, repetition, frequency,
+                                    status, is_private, calendar_number, hour, minute)
         self.user_ics_events.add_item(new_event)
 
     def load(self):
