@@ -12,12 +12,22 @@ from calcure.data import AppState
 class Config:
     """User configuration loaded from the config.ini file"""
     def __init__(self):
-        self.taskwarrior_folder   = Path.home() / ".task"
-        self.calcurse_todo_file   = Path.home() / ".local" / "share" / "calcurse" / "todo"
-        self.calcurse_events_file = Path.home() / ".local" / "share" / "calcurse" / "apts"
-        self.config_folder        = Path.home() / ".config" / "calcure"
-        self.config_file          = self.config_folder / "config.ini"
-        self.is_first_run         = True
+        self.home_path = Path.home()
+        self.taskwarrior_folder = self.home_path / ".task"
+        self.calcurse_todo_file = self.home_path / ".local" / "share" / "calcurse" / "todo"
+        self.calcurse_events_file = self.home_path / ".local" / "share" / "calcurse" / "apts"
+        self.config_folder = self.home_path / ".config" / "calcure"
+        self.config_file = self.config_folder / "config.ini"
+        self.is_first_run= True
+
+
+    def shorten_path(self, path):
+        """Replace home part of paths with tilde"""
+        if str(path).startswith(str(self.home_path)):
+            return str(path).replace(str(self.home_path), "~", 1)
+        else:
+            return str(path)
+
 
     def create_config_file(self):
         """Create config.ini file if it does not exist"""
@@ -28,10 +38,10 @@ class Config:
 
         conf = configparser.ConfigParser()
         conf["Parameters"] = {
-                "folder_with_datafiles":     self.config_folder,
-                "calcurse_todo_file":        self.calcurse_todo_file,
-                "calcurse_events_file":      self.calcurse_events_file,
-                "taskwarrior_folder":        self.taskwarrior_folder,
+                "folder_with_datafiles":     self.shorten_path(self.config_folder),
+                "calcurse_todo_file":        self.shorten_path(self.calcurse_todo_file),
+                "calcurse_events_file":      self.shorten_path(self.calcurse_events_file),
+                "taskwarrior_folder":        self.shorten_path(self.taskwarrior_folder),
                 "language":                  "en",
                 "default_view":              "calendar",
                 "default_calendar_view":     "monthly",
@@ -170,6 +180,7 @@ class Config:
 
         with open(self.config_file, 'w', encoding="utf-8") as f:
             conf.write(f)
+
 
     def read_config_file(self):
         """Read user config.ini file and assign values to all the global variables"""
@@ -313,6 +324,7 @@ class Config:
             logging.error(ERR_FILE1 + ERR_FILE2)
             exit()
 
+
     def read_config_file_from_user_arguments(self):
         """Read user config.ini location from user arguments"""
         try:
@@ -324,6 +336,7 @@ class Config:
                         self.create_config_file()
         except getopt.GetoptError:
             pass
+
 
     def read_parameters_from_user_arguments(self):
         """Read user arguments that were provided at the run. This values take priority over config.ini"""
