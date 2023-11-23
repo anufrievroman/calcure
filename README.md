@@ -50,7 +50,7 @@ There are several ways to install it, for example:
 ### Dependencies
 
 - `python` 3.7 and higher (usually already installed)
-- `holidays`, `jdatetime`, and `ics` python libraries (should be installed automatically with the calcure).
+- `holidays`, `jdatetime`, `icalendar`, and `taskw` python libraries (should be installed automatically with the calcure).
 
 ## Usage
 
