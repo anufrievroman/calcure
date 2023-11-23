@@ -5,7 +5,7 @@ import csv
 import os
 import datetime
 import time
-import ics
+import icalendar
 import urllib.request
 import io
 import logging
@@ -315,33 +315,34 @@ class TaskLoaderICS(LoaderICS):
         self.ics_task_files = cf.ICS_TASK_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
-    def parse_task(self, task, calendar_number):
+    def parse_task(self, component, calendar_number):
         """Parse single task and add it to the user_ics_tasks"""
+        task_status = component.get('status')
 
-        if task.status == "CANCELLED":
+        if task_status == "CANCELLED":
             return
 
+        task_priority = component.get('priority')
+        task_name = str(component.get('summary'))
         task_id = self.user_ics_tasks.generate_id()
 
         # Assign status from priority:
         status = Status.NORMAL
-        if task.priority is not None:
-            if task.priority > 5:
+        if task_priority is not None:
+            if task_priority > 5:
                 status = Status.UNIMPORTANT
-            if task.priority < 5:
+            if task_priority < 5:
                 status = Status.IMPORTANT
 
         # Correct according to status:
-        if task.status == "COMPLETED":
+        if task_status == "COMPLETED":
             status = Status.DONE
 
-        name = task.name
-
         # Try reading task due date:
+        due_dt = None
         try:
-            year = task.due.year
-            month = task.due.month
-            day = task.due.day
+            due_dt = component.get('due').dt
+            year, month, day = due_dt.year, due_dt.month, due_dt.day
         except AttributeError:
             year, month, day = 0, 0, 0
 
@@ -349,7 +350,7 @@ class TaskLoaderICS(LoaderICS):
         is_private = False
 
         # Add task:
-        new_task = Task(task_id, name, status, timer, is_private,
+        new_task = Task(task_id, task_name, status, timer, is_private,
                         year, month, day, calendar_number)
         self.user_ics_tasks.add_item(new_task)
 
@@ -366,9 +367,10 @@ class TaskLoaderICS(LoaderICS):
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
                 try:
-                    cal = ics.Calendar(ics_file)
-                    for task in cal.todos:
-                        self.parse_task(task, calendar_number)
+                    cal = icalendar.Calendar.from_ical(ics_file)
+                    for component in cal.walk():
+                        if component.name == 'VTODO':
+                            self.parse_task(component, calendar_number)
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)
 
@@ -383,8 +385,8 @@ class EventLoaderICS(LoaderICS):
         self.ics_event_files = cf.ICS_EVENT_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
-    def parse_event(self, event, index, calendar_number):
-        """Parse singe event and add it to user_ics_events"""
+    def parse_event(self, component, index, calendar_number):
+        """Parse single event and add it to user_ics_events"""
 
         # Default parameters:
         event_id = index
@@ -398,15 +400,18 @@ class EventLoaderICS(LoaderICS):
         utc_offset_hours = -1 * utc_offset_sec / 3600
 
         # Parameters of the event from ics file, if they exist:
-        name = event.name if event.name is not None else ""
-        all_day = event.all_day if event.all_day is not None else True
-        year = event.begin.year if event.begin else 0
-        month = event.begin.month if event.begin else 1
-        day = event.begin.day if event.begin else 1
+        name = str(component.get('summary', ''))
+        all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
+        dt = None
+        try:
+            dt = component.get('dtstart').dt
+            year, month, day = dt.year, dt.month, dt.day
+        except AttributeError:
+            year, month, day = 0, 1, 1
 
         # Add start time to the name of non-all-day events:
         if not all_day:
-            hour = int(event.begin.hour) if event.begin else 0
+            hour = dt.hour if dt else 0
 
             # Convert to local timezone, and add or remove a day:
             hour += int(utc_offset_hours)
@@ -434,7 +439,7 @@ class EventLoaderICS(LoaderICS):
                         year -= 1
                     day = Calendar(0, self.use_persian_calendar).last_day(year, month)
 
-            minute = event.begin.minute if event.begin else 0
+            minute = dt.minute if dt else 0
         else:
             hour = None
             minute = None
@@ -461,9 +466,13 @@ class EventLoaderICS(LoaderICS):
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
                 try:
-                    cal = ics.Calendar(ics_file)
-                    for index, event in enumerate(cal.events):
-                        self.parse_event(event, index, calendar_number)
+                    cal = icalendar.Calendar.from_ical(ics_file)
+                    index = 0
+                    for component in cal.walk():
+                        if component.name == 'VEVENT':
+                            index += 1
+                            self.parse_event(component, index, calendar_number)
+                   
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)
         return self.user_ics_events
