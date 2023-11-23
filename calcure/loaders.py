@@ -159,15 +159,26 @@ class HolidayLoader:
 
     def __init__(self, cf):
         self.holidays = Events()
-        self.country = cf.HOLIDAY_COUNTRY
+        self.countries = cf.HOLIDAY_COUNTRY.split(',')
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
     def load(self):
+        """Run and collect holidays for each country"""
+        holidays = Events()
+        for country in self.countries:
+            self.load_country(country)
+        return self.holidays
+
+    def load_country(self, country):
         """Load list of holidays from 'holidays' module"""
         try:
             import holidays as hl
+            from holidays import registry
+
+            country_codes = {x[0]: x[2] for x in registry.COUNTRIES.values()}
+            country_code = country_codes.get(country)
             year = datetime.date.today().year
-            holiday_events = (getattr(hl, self.country))(years=[year+x for x in range(-2, 5)])
+            holiday_events = (getattr(hl, country))(years=[year+x for x in range(-2, 5)])
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
@@ -177,11 +188,11 @@ class HolidayLoader:
                     year, month, day = date.year, date.month, date.day
 
                 # Add holiday:
-                holiday = Event(year, month, day, name)
+                holiday = Event(year, month, day, f'{name} ({country_code})' if len(self.countries) > 1 else name)
                 self.holidays.add_item(holiday)
 
         except ModuleNotFoundError:
-            logging.error("Couldn't load holidays. Module holydays is not installed. Try 'pip install holydays'")
+            logging.error("Couldn't load holidays. Module holidays is not installed. Try 'pip install holidays'")
             pass
         except (SyntaxError, AttributeError) as e_message:
             logging.error("Couldn't load holidays. Country might be incorrect. %s", e_message)
