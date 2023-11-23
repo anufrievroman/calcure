@@ -1,4 +1,5 @@
 """Module that provides methods to import data from other programs"""
+
 import logging
 
 from calcure.data import *
@@ -15,7 +16,6 @@ class Importer:
         self.events_file = cf.EVENTS_FILE
         self.calcurse_todo_file = cf.CALCURSE_TODO_FILE
         self.calcurse_events_file = cf.CALCURSE_EVENTS_FILE
-        self.taskwarrior_folder = cf.TASKWARRIOR_FOLDER
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
     def read_file(self, filename):
@@ -47,18 +47,17 @@ class Importer:
                 self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
 
     def import_tasks_from_taskwarrior(self):
-        """Import tasks from taskwarrior database"""
-        lines = self.read_file(self.taskwarrior_folder+"/pending.data")
-        for line in lines:
-            if len(line) > 0:
-                name = line.split('description:"', 1)[1]
-                name = name.split('"', 1)[0]
-                if not self.user_tasks.item_exists(name):
-                    task_id = self.user_tasks.generate_id()
-                    is_private = False
-                    timer = Timer([])
-                    status = Status.NORMAL
-                    self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
+        """Import tasks from taskwarrior database via taskw library"""
+        from taskw import TaskWarrior
+        tasks = TaskWarrior().load_tasks()
+        for task in tasks["pending"]:
+            name = task["description"]
+            if not self.user_tasks.item_exists(name):
+                task_id = self.user_tasks.generate_id()
+                is_private = False
+                timer = Timer([])
+                status = Status.NORMAL
+                self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
 
     def import_events_from_calcurse(self):
         """Importing events from calcurse apt file into our events file"""

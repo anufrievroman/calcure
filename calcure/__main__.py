@@ -253,7 +253,14 @@ class EventView(View):
         super().__init__(stdscr, y, x)
         self.event = event
         self.screen = screen
-        self.info = f"{self.icon} {self.event.name}"
+        self.start_time = ""
+
+        # Show time for ICS events if it set:
+        if hasattr(self.event, 'hour'):
+            if self.event.hour:
+                self.start_time = f"{self.event.hour:0=2}:{self.event.minute:0=2} "
+
+        self.info = f"{self.icon} {self.start_time}{self.event.name}"
 
     @property
     def icon(self):
@@ -410,6 +417,7 @@ class DailyView(View):
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
         self.user_ics_events = user_ics_events.filter_events_that_day(screen)
+        self.user_ics_events.items = sorted(self.user_ics_events.items, key=lambda x: (x.hour is None, x.hour))
         self.holidays = holidays.filter_events_that_day(screen)
         self.birthdays = birthdays.filter_events_that_day(screen)
         self.deadlines = user_tasks.filter_events_that_day(screen)

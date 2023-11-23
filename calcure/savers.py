@@ -1,6 +1,6 @@
 """Module that controls saving data files"""
 
-import os
+from pathlib import Path
 
 from calcure.data import *
 from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
@@ -17,7 +17,7 @@ class TaskSaverCSV:
     def save(self):
         """Rewrite CSV file with changed tasks"""
         original_file = self.tasks_file
-        dummy_file = f"{self.tasks_file}.bak"
+        dummy_file = Path(f"{self.tasks_file}.bak")
         with open(dummy_file, "w", encoding="utf-8") as f:
             for task in self.user_tasks.items:
 
@@ -32,8 +32,7 @@ class TaskSaverCSV:
                 for stamp in task.timer.stamps:
                     f.write(f',{str(stamp)}')
                 f.write("\n")
-        os.remove(original_file)
-        os.rename(dummy_file, original_file)
+        dummy_file.replace(original_file)
         self.user_tasks.changed = False
 
 
@@ -48,7 +47,7 @@ class EventSaverCSV:
     def save(self):
         """Rewrite the data file with changed events"""
         original_file = self.events_file
-        dummy_file = f"{self.events_file}.bak"
+        dummy_file = Path(f"{self.events_file}.bak")
         with open(dummy_file, "w", encoding="utf-8") as file:
             for ev in self.user_events.items:
 
@@ -60,6 +59,5 @@ class EventSaverCSV:
 
                 name = f'{"."*ev.privacy}{ev.name}'
                 file.write(f'{ev.item_id},{year},{month},{day},"{name}",{ev.repetition},{ev.frequency.name.lower()},{ev.status.name.lower()}\n')
-        os.remove(original_file)
-        os.rename(dummy_file, original_file)
+        dummy_file.replace(original_file)
         self.user_events.changed = False

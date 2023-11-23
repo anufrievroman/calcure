@@ -1,7 +1,6 @@
 """Module that controls loading data from files and libraries"""
 
 import configparser
-import pathlib
 import csv
 import os
 import datetime
@@ -10,6 +9,8 @@ import icalendar
 import urllib.request
 import io
 import logging
+
+from pathlib import Path
 
 from calcure.data import *
 from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
@@ -158,15 +159,26 @@ class HolidayLoader:
 
     def __init__(self, cf):
         self.holidays = Events()
-        self.country = cf.HOLIDAY_COUNTRY
+        self.countries = cf.HOLIDAY_COUNTRY.split(',')
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
     def load(self):
+        """Run and collect holidays for each country"""
+        holidays = Events()
+        for country in self.countries:
+            self.load_country(country)
+        return self.holidays
+
+    def load_country(self, country):
         """Load list of holidays from 'holidays' module"""
         try:
             import holidays as hl
+            from holidays import registry
+
+            country_codes = {x[0]: x[2] for x in registry.COUNTRIES.values()}
+            country_code = country_codes.get(country)
             year = datetime.date.today().year
-            holiday_events = eval("hl."+self.country+"(years=[year-2, year-1, year, year+1, year+2, year+3, year+4])")
+            holiday_events = (getattr(hl, country))(years=[year+x for x in range(-2, 5)])
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
@@ -176,11 +188,11 @@ class HolidayLoader:
                     year, month, day = date.year, date.month, date.day
 
                 # Add holiday:
-                holiday = Event(year, month, day, name)
+                holiday = Event(year, month, day, f'{name} ({country_code})' if len(self.countries) > 1 else name)
                 self.holidays.add_item(holiday)
 
         except ModuleNotFoundError:
-            logging.error("Couldn't load holidays. Module holydays is not installed. Try 'pip install holydays'")
+            logging.error("Couldn't load holidays. Module holidays is not installed. Try 'pip install holidays'")
             pass
         except (SyntaxError, AttributeError) as e_message:
             logging.error("Couldn't load holidays. Country might be incorrect. %s", e_message)
@@ -193,7 +205,7 @@ class BirthdayLoader:
 
     def __init__(self, cf):
         self.birthdays = Birthdays()
-        self.abook_file = str(pathlib.Path.home() / ".abook" / "addressbook")
+        self.abook_file = Path.home() / ".abook" / "addressbook"
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.load_birthdays = cf.BIRTHDAYS_FROM_ABOOK
 
@@ -205,8 +217,8 @@ class BirthdayLoader:
             return self.birthdays
 
         # Quit if file does not exists:
-        if not os.path.exists(self.abook_file):
-            logging.warning("Couldn't load birthdays. File. %s does not exist.", self.abook_file)
+        if not self.abook_file.exists():
+            logging.warning("Couldn't load birthdays. File. %s does not exist.", str(self.abook_file))
             return self.birthdays
 
         abook = configparser.ConfigParser()
@@ -428,15 +440,17 @@ class EventLoaderICS(LoaderICS):
                     day = Calendar(0, self.use_persian_calendar).last_day(year, month)
 
             minute = dt.minute if dt else 0
-            name = f"{hour:0=2}:{minute:0=2} {name}"
+        else:
+            hour = None
+            minute = None
 
         # Convert to persian date if needed:
         if self.use_persian_calendar:
             year, month, day = convert_to_persian_date(year, month, day)
 
         # Add event:
-        new_event = UserEvent(event_id, year, month, day, name, repetition,
-                              frequency, status, is_private, calendar_number)
+        new_event = UserEvent(event_id, year, month, day, name, repetition, frequency,
+                                    status, is_private, calendar_number, hour, minute)
         self.user_ics_events.add_item(new_event)
 
     def load(self):
@@ -447,6 +461,7 @@ class EventLoaderICS(LoaderICS):
             return self.user_ics_events
 
         for calendar_number, filename in enumerate(self.ics_event_files):
+
             # For each resourse from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
