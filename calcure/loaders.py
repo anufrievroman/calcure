@@ -389,6 +389,8 @@ class EventLoaderICS(LoaderICS):
         """Parse single event and add it to user_ics_events"""
 
         # Default parameters:
+        hour = None
+        minute = None
         event_id = index
         repetition = '1'
         frequency = Frequency.ONCE
@@ -409,7 +411,18 @@ class EventLoaderICS(LoaderICS):
         except AttributeError:
             year, month, day = 0, 1, 1
 
-        # Add start time to the name of non-all-day events:
+        # See if this event takes multiple days:
+        try:
+            dt_end = component.get('dtend').dt
+            year_end, month_end, day_end = dt.year, dt.month, dt.day
+            dt_difference = dt_end - dt
+            if dt_difference.days > 0:
+                repetition = str(dt_difference.days + 1)
+                frequency = Frequency.DAILY
+        except AttributeError:
+            pass
+
+        # Add start time to non-all-day events:
         if not all_day:
             hour = dt.hour if dt else 0
 
@@ -440,9 +453,6 @@ class EventLoaderICS(LoaderICS):
                     day = Calendar(0, self.use_persian_calendar).last_day(year, month)
 
             minute = dt.minute if dt else 0
-        else:
-            hour = None
-            minute = None
 
         # Convert to persian date if needed:
         if self.use_persian_calendar:
