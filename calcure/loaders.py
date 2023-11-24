@@ -9,6 +9,7 @@ import icalendar
 import urllib.request
 import io
 import logging
+from tzlocal import get_localzone
 
 from pathlib import Path
 
@@ -397,16 +398,12 @@ class EventLoaderICS(LoaderICS):
         status = Status.NORMAL
         is_private = False
 
-        # Calculate offset of local timezone from UTC:
-        utc_offset_sec = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
-        utc_offset_hours = -1 * utc_offset_sec / 3600
-
         # Parameters of the event from ics file, if they exist:
         name = str(component.get('summary', ''))
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
         dt = None
         try:
-            dt = component.get('dtstart').dt
+            dt = component.get('dtstart').dt.astimezone(get_localzone())
             year, month, day = dt.year, dt.month, dt.day
         except AttributeError:
             year, month, day = 0, 1, 1
@@ -414,6 +411,7 @@ class EventLoaderICS(LoaderICS):
         # See if this event takes multiple days:
         try:
             dt_end = component.get('dtend').dt
+            dt_end = dt_end.astimezone(get_localzone())
             year_end, month_end, day_end = dt.year, dt.month, dt.day
             dt_difference = dt_end - dt
             if dt_difference.days > 0:
@@ -425,33 +423,6 @@ class EventLoaderICS(LoaderICS):
         # Add start time to non-all-day events:
         if not all_day:
             hour = dt.hour if dt else 0
-
-            # Convert to local timezone, and add or remove a day:
-            hour += int(utc_offset_hours)
-            if hour >= 24:
-                hour -= 24
-                days_in_this_month = Calendar(0, self.use_persian_calendar).last_day(year, month)
-                if day < days_in_this_month:
-                    day += 1
-                else:
-                    day = 1
-                    if month < 12:
-                        month += 1
-                    else:
-                        month = 1
-                        year += 1
-            if hour < 0:
-                hour += 24
-                if day > 1:
-                    day -= 1
-                else:
-                    if month > 1:
-                        month -= 1
-                    else:
-                        month = 12
-                        year -= 1
-                    day = Calendar(0, self.use_persian_calendar).last_day(year, month)
-
             minute = dt.minute if dt else 0
 
         # Convert to persian date if needed:
