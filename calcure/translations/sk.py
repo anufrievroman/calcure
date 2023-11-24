@@ -20,8 +20,8 @@ KEYS_GENERAL = {
 
 KEYS_CALENDAR = {
         "  a(A) ": "Pridať (opakujúcu sa) udalosť",
-        "  n,🠒  ": "Nasledujúci mesiac (deň)",
-        "  p,🠐  ": "Predchádzajúci mesiac (deň)",
+        "   n   ": "Nasledujúci mesiac (deň)",
+        "   p   ": "Predchádzajúci mesiac (deň)",
         "   x   ": "Odstrániť udalosť",
         "   r   ": "Premenovať udalosť",
         "  m(M) ": "Presunúť udalosť (v rámci mesiaca)",

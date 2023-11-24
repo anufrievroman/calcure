@@ -20,8 +20,8 @@ KEYS_GENERAL = {
 
 KEYS_CALENDAR = {
         "  a(A) ": "Add a (recurring) event",
-        "  n,🠒  ": "Next month (day)",
-        "  p,🠐  ": "Previous month (day)",
+        "   n   ": "Next month (day)",
+        "   p   ": "Previous month (day)",
         "   x   ": "Delete an event",
         "   r   ": "Rename an event",
         "  m(M) ": "Move event (in this month)",
@@ -52,7 +52,7 @@ KEYS_TODO = {
         }
 
 MSG_NAME          = "CALCURE"
-MSG_VIM           = "Vim keys (j, k, ZZ, ZQ) work as well!"
+MSG_VIM           = "Arrow and Vim keys (j, k, ZZ, ZQ) work as well!"
 MSG_INFO          = "For more information, visit:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_EXIT          = "Really exit? (y/n) "

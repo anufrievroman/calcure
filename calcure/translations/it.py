@@ -20,8 +20,8 @@ KEYS_GENERAL = {
 
 KEYS_CALENDAR = {
         "  a(A) ": "Aggiungi un evento (ricorrente)",
-        "  n,🠒  ": "Mese successivo (giorno)",
-        "  p,🠐  ": "Mese precedente (giorno)",
+        "   n   ": "Mese successivo (giorno)",
+        "   p   ": "Mese precedente (giorno)",
         "   x   ": "Cancella un evento",
         "   r   ": "Modifica un evento",
         "  m(M) ": "Sposta un evento",

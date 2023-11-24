@@ -20,8 +20,8 @@ KEYS_GENERAL = {
 
 KEYS_CALENDAR = {
         "  a(A) ": "Etkinlik (yinelenen) ekleme",
-        "  n,🠒  ": "Gelecek ay (gün)",
-        "  p,🠐  ": "Önceki ay (gün)",
+        "   n   ": "Gelecek ay (gün)",
+        "   p   ": "Önceki ay (gün)",
         "   x   ": "Etkinlik silme",
         "  e,r  ": "Etkinlik düzenleme",
         "  m(M) ": "Etkinlik taşıma",
