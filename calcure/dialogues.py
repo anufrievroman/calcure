@@ -15,7 +15,7 @@ def safe_run(func):
         try:
             func(stdscr, screen, *args, **kwargs)
 
-        # Handle keyboard interruption with ctr+c:
+        # Handle keyboard interruption with ctrl+c:
         except KeyboardInterrupt:
             pass
 
@@ -79,7 +79,7 @@ def input_day(stdscr, y, x, prompt_string):
 
 
 def input_date(stdscr, y, x, prompt_string):
-    """Ask user to input date in YYYY/MM/DD format and check if it was valid entry"""
+    """Ask user to input date in YYYY/MM/DD format and check if it was a valid entry"""
     date_unformated = input_string(stdscr, y, x, prompt_string, 10)
     try:
         year = int(date_unformated.split("/")[0])
