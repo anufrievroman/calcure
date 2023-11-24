@@ -9,7 +9,6 @@ import icalendar
 import urllib.request
 import io
 import logging
-from tzlocal import get_localzone
 
 from pathlib import Path
 
@@ -402,8 +401,9 @@ class EventLoaderICS(LoaderICS):
         name = str(component.get('summary', ''))
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
         dt = None
+        local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
         try:
-            dt = component.get('dtstart').dt.astimezone(get_localzone())
+            dt = component.get('dtstart').dt.astimezone(local_timezone)
             year, month, day = dt.year, dt.month, dt.day
         except AttributeError:
             year, month, day = 0, 1, 1
@@ -411,7 +411,7 @@ class EventLoaderICS(LoaderICS):
         # See if this event takes multiple days:
         try:
             dt_end = component.get('dtend').dt
-            dt_end = dt_end.astimezone(get_localzone())
+            dt_end = dt_end.astimezone(local_timezone)
             year_end, month_end, day_end = dt.year, dt.month, dt.day
             dt_difference = dt_end - dt
             if dt_difference.days > 0:
@@ -453,7 +453,7 @@ class EventLoaderICS(LoaderICS):
                         if component.name == 'VEVENT':
                             index += 1
                             self.parse_event(component, index, calendar_number)
-                   
+
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)
         return self.user_ics_events
