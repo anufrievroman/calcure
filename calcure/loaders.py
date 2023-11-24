@@ -403,22 +403,26 @@ class EventLoaderICS(LoaderICS):
         dt = None
         local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
         try:
-            dt = component.get('dtstart').dt.astimezone(local_timezone)
+            dt = component.get('dtstart').dt
+            if hasattr(dt, "tzinfo"):
+                dt = dt.astimezone(local_timezone)
             year, month, day = dt.year, dt.month, dt.day
         except AttributeError:
             year, month, day = 0, 1, 1
 
         # See if this event takes multiple days:
-        try:
-            dt_end = component.get('dtend').dt
-            dt_end = dt_end.astimezone(local_timezone)
-            year_end, month_end, day_end = dt.year, dt.month, dt.day
-            dt_difference = dt_end - dt
-            if dt_difference.days > 0:
-                repetition = str(dt_difference.days + 1)
-                frequency = Frequency.DAILY
-        except AttributeError:
-            pass
+        # try:
+            # dt_end = component.get('dtend').dt
+
+            # if dt_end.tzinfo is not None and dt_end.tzinfo.utcoffset(dt_end) is not None:
+                # dt_end = dt_end.astimezone(local_timezone)
+            # year_end, month_end, day_end = dt.year, dt.month, dt.day
+            # dt_difference = dt_end - dt
+            # if dt_difference.days > 0:
+                # repetition = str(dt_difference.days + 1)
+                # frequency = Frequency.DAILY
+        # except AttributeError:
+            # pass
 
         # Add start time to non-all-day events:
         if not all_day:
