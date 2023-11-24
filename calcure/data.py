@@ -40,7 +40,7 @@ class Frequency(enum.Enum):
 
 
 class Task:
-    """Tasks crated by the user"""
+    """Tasks created by the user"""
 
     def __init__(self, item_id, name, status, timer, privacy, year=0, month=0, day=0, calendar_number=None):
         self.item_id = item_id
@@ -65,7 +65,7 @@ class Event:
 
 
 class UserEvent(Event):
-    """Events crated by the user"""
+    """Events created by the user"""
 
     def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy,
                                                     calendar_number=None, hour=None, minute=None):

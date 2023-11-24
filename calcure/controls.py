@@ -34,7 +34,7 @@ def safe_run(func):
         try:
             func(stdscr, screen, *args, **kwargs)
 
-        # Handle keyboard interruption with ctr+c:
+        # Handle keyboard interruption with ctrl+c:
         except KeyboardInterrupt:
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
@@ -212,7 +212,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
     if screen.selection_mode:
         screen.selection_mode = False
 
-        # Chance event status:
+        # Change event status:
         if screen.key in ['i', 'h']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
             if user_events.filter_events_that_day(screen).is_valid_number(number):
@@ -248,7 +248,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 item_id = user_events.filter_events_that_day(screen).items[number].item_id
                 user_events.delete_item(item_id)
 
-        # Remane event:
+        # Rename event:
         if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if user_events.filter_events_that_day(screen).is_valid_number(number):

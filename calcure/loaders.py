@@ -279,7 +279,7 @@ class LoaderICS:
             return ""
 
     def read_resource(self, path):
-        """Determine type of the resourse, parse it, and return list of strings for each file"""
+        """Determine type of the resource, parse it, and return list of strings for each file"""
         ics_files = []
         path = os.path.expanduser(path)
 
@@ -363,7 +363,7 @@ class TaskLoaderICS(LoaderICS):
             return self.user_ics_tasks
 
         for calendar_number, filename in enumerate(self.ics_task_files):
-            # For each resourse from config, load a list that has one or more ics files:
+            # For each resource from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
                 try:
@@ -443,7 +443,7 @@ class EventLoaderICS(LoaderICS):
 
         for calendar_number, filename in enumerate(self.ics_event_files):
 
-            # For each resourse from config, load a list that has one or more ics files:
+            # For each resource from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
             for ics_file in ics_files:
                 try:
