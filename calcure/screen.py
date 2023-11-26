@@ -81,6 +81,11 @@ class Screen:
         else:
             return datetime.date.today()
 
+    @property
+    def number_of_weeks(self) -> int:
+        """Calculate how many weeks are in this month"""
+        return len(Calendar(0, self.use_persian_calendar).monthdayscalendar(self.year, self.month))
+
     def next_month(self):
         """Switches to the next month"""
         if self.month < 12:
@@ -133,7 +138,6 @@ class Screen:
         if number is None:
             return False
         return 0 < number <= Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
-
 
     def is_valid_date(self, year, month, day) -> bool:
         """Check if a date corresponds to any actually existing date"""

@@ -618,14 +618,14 @@ class SeparatorView(View):
         _, x_max = self.stdscr.getmaxyx()
         x_separator = x_max - self.screen.journal_pane_width
         y_cell = (self.screen.y_max - 3) // 6
-        height = 6*y_cell + 2 if cf.SHOW_CALENDAR_BORDERS else self.screen.y_max
+        height = self.screen.number_of_weeks * y_cell + 2 if cf.SHOW_CALENDAR_BORDERS else self.screen.y_max
         for row in range(height):
             self.display_line(row, x_separator, cf.SEPARATOR_ICON, Color.SEPARATOR)
 
         if cf.SHOW_CALENDAR_BORDERS and self.screen.calendar_state == CalState.MONTHLY:
-            for row in range(1, 7):
-                self.display_line(row*y_cell + 1, x_separator, "┤", Color.CALENDAR_BORDER)
-            self.display_line(6*y_cell + 1, x_separator, "┘", Color.CALENDAR_BORDER)
+            for row in range(1, self.screen.number_of_weeks):
+                self.display_line(row * y_cell + 1, x_separator, "┤", Color.CALENDAR_BORDER)
+            self.display_line(self.screen.number_of_weeks * y_cell + 1, x_separator, "┘", Color.CALENDAR_BORDER)
 
 
 class CalenarBorderView(View):
@@ -634,6 +634,7 @@ class CalenarBorderView(View):
     def __init__(self, stdscr, y, x, screen):
         super().__init__(stdscr, y, x)
         self.screen = screen
+        self.rows = self.screen.number_of_weeks
 
     def render(self):
         """Render this view on the screen"""
@@ -642,20 +643,20 @@ class CalenarBorderView(View):
 
         # Vertical lines:
         for column in range(1, 7):
-            for row in range(y_cell*6):
-                self.display_line(row + 2, column*x_cell - 1, "│", Color.CALENDAR_BORDER)
+            for row in range(y_cell * self.rows):
+                self.display_line(row + 2, column * x_cell - 1, "│", Color.CALENDAR_BORDER)
 
         # Horizontal lines:
-        for row in range(1, 7):
+        for row in range(1, self.rows + 1):
             for column in range(0, self.screen.x_max):
-                self.display_line(row*y_cell + 1, column, "─", Color.CALENDAR_BORDER)
+                self.display_line(row * y_cell + 1, column, "─", Color.CALENDAR_BORDER)
 
         # Connectors:
-        for row in range(1, 6):
+        for row in range(1, self.rows):
             for column in range(1, 7):
-                self.display_line(row*y_cell + 1, column*x_cell - 1, "┼", Color.CALENDAR_BORDER)
+                self.display_line(row * y_cell + 1, column*x_cell - 1, "┼", Color.CALENDAR_BORDER)
         for column in range(1, 7):
-            self.display_line(6*y_cell + 1, column*x_cell - 1, "┴", Color.CALENDAR_BORDER)
+            self.display_line(self.rows * y_cell + 1, column*x_cell - 1, "┴", Color.CALENDAR_BORDER)
 
 
 class DaysNameView(View):
