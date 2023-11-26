@@ -31,7 +31,7 @@ class Color(Enum):
     ACTIVE_PANE = auto()
     SEPARATOR = auto()
     EMPTY = auto()
-    CALENDAR_BOARDER = auto()
+    CALENDAR_BORDER = auto()
     DEADLINES = auto()
     ICS_CALENDARS0 = auto()
     ICS_CALENDARS1 = auto()
@@ -73,7 +73,7 @@ def initialize_colors(cf):
     curses.init_pair(Color.ACTIVE_PANE.value, cf.COLOR_ACTIVE_PANE, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.SEPARATOR.value, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.EMPTY.value, cf.COLOR_BACKGROUND, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.CALENDAR_BOARDER.value, cf.COLOR_CALENDAR_BOARDER, cf.COLOR_BACKGROUND)
+    curses.init_pair(Color.CALENDAR_BORDER.value, cf.COLOR_CALENDAR_BORDER, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.DEADLINES.value, cf.COLOR_DEADLINES, cf.COLOR_BACKGROUND)
 
     if not cf.MINIMAL_WEEKEND_INDICATOR:

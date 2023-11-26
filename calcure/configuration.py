@@ -52,7 +52,7 @@ class Config:
                 "minimal_today_indicator":   "Yes",
                 "minimal_days_indicator":    "Yes",
                 "minimal_weekend_indicator": "Yes",
-                "show_calendar_boarders":    "No",
+                "show_calendar_borders":     "No",
                 "cut_titles_by_cell_length": "No",
                 "ask_confirmations":         "Yes",
                 "ask_confirmation_to_quit":  "Yes",
@@ -209,7 +209,7 @@ class Config:
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
-            self.SHOW_CALENDAR_BOARDERS    = conf.getboolean("Parameters", "show_calendar_boarders", fallback=False)
+            self.SHOW_CALENDAR_BORDERS     = conf.getboolean("Parameters", "show_calendar_borders", fallback=False)
             self.USE_PERSIAN_CALENDAR      = conf.getboolean("Parameters", "use_persian_calendar", fallback=False)
             self.LANG                      = conf.get("Parameters", "language", fallback="en")
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
@@ -266,7 +266,7 @@ class Config:
             self.COLOR_CALENDAR_HEADER = int(conf.get("Colors", "color_calendar_header", fallback=4))
             self.COLOR_ACTIVE_PANE     = int(conf.get("Colors", "color_active_pane", fallback=2))
             self.COLOR_SEPARATOR       = int(conf.get("Colors", "color_separator", fallback=7))
-            self.COLOR_CALENDAR_BOARDER= int(conf.get("Colors", "color_calendar_border", fallback=7))
+            self.COLOR_CALENDAR_BORDER = int(conf.get("Colors", "color_calendar_border", fallback=7))
             self.COLOR_ICS_CALENDARS   = conf.get("Colors", "color_ics_calendars", fallback="2,3,1,7")
             self.COLOR_ICS_CALENDARS   = [int(number) for number in self.COLOR_ICS_CALENDARS.split(",")]
 

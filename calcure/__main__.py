@@ -302,7 +302,7 @@ class EventView(View):
         number_of_special += 2 if number_of_special > 2 else 0
         self.info = self.info[:self.screen.x_max - self.x + number_of_special]
         x_cell = self.screen.x_max // 7
-        if (cf.CUT_TITLES or cf.SHOW_CALENDAR_BOARDERS) and self.screen.calendar_state == CalState.MONTHLY:
+        if (cf.CUT_TITLES or cf.SHOW_CALENDAR_BORDERS) and self.screen.calendar_state == CalState.MONTHLY:
             self.info = self.info[:(x_cell - 1)]
 
     def minimize_info(self):
@@ -618,18 +618,18 @@ class SeparatorView(View):
         _, x_max = self.stdscr.getmaxyx()
         x_separator = x_max - self.screen.journal_pane_width
         y_cell = (self.screen.y_max - 3) // 6
-        height = 6*y_cell + 2 if cf.SHOW_CALENDAR_BOARDERS else self.screen.y_max
+        height = 6*y_cell + 2 if cf.SHOW_CALENDAR_BORDERS else self.screen.y_max
         for row in range(height):
             self.display_line(row, x_separator, cf.SEPARATOR_ICON, Color.SEPARATOR)
 
-        if cf.SHOW_CALENDAR_BOARDERS and self.screen.calendar_state == CalState.MONTHLY:
+        if cf.SHOW_CALENDAR_BORDERS and self.screen.calendar_state == CalState.MONTHLY:
             for row in range(1, 7):
-                self.display_line(row*y_cell + 1, x_separator, "┤", Color.CALENDAR_BOARDER)
-            self.display_line(6*y_cell + 1, x_separator, "┘", Color.CALENDAR_BOARDER)
+                self.display_line(row*y_cell + 1, x_separator, "┤", Color.CALENDAR_BORDER)
+            self.display_line(6*y_cell + 1, x_separator, "┘", Color.CALENDAR_BORDER)
 
 
-class CalenarBoarderView(View):
-    """Display the boarders in the monthly view"""
+class CalenarBorderView(View):
+    """Display the borders in the monthly view"""
 
     def __init__(self, stdscr, y, x, screen):
         super().__init__(stdscr, y, x)
@@ -643,19 +643,19 @@ class CalenarBoarderView(View):
         # Vertical lines:
         for column in range(1, 7):
             for row in range(y_cell*6):
-                self.display_line(row + 2, column*x_cell - 1, "│", Color.CALENDAR_BOARDER)
+                self.display_line(row + 2, column*x_cell - 1, "│", Color.CALENDAR_BORDER)
 
         # Horizontal lines:
         for row in range(1, 7):
             for column in range(0, self.screen.x_max):
-                self.display_line(row*y_cell + 1, column, "─", Color.CALENDAR_BOARDER)
+                self.display_line(row*y_cell + 1, column, "─", Color.CALENDAR_BORDER)
 
         # Connectors:
         for row in range(1, 6):
             for column in range(1, 7):
-                self.display_line(row*y_cell + 1, column*x_cell - 1, "┼", Color.CALENDAR_BOARDER)
+                self.display_line(row*y_cell + 1, column*x_cell - 1, "┼", Color.CALENDAR_BORDER)
         for column in range(1, 7):
-            self.display_line(6*y_cell + 1, column*x_cell - 1, "┴", Color.CALENDAR_BOARDER)
+            self.display_line(6*y_cell + 1, column*x_cell - 1, "┴", Color.CALENDAR_BORDER)
 
 
 class DaysNameView(View):
@@ -820,9 +820,9 @@ class MonthlyScreenView(View):
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
-        if cf.SHOW_CALENDAR_BOARDERS:
-            calendar_boarder_view = CalenarBoarderView(self.stdscr, 0, 0, self.screen)
-            calendar_boarder_view.render()
+        if cf.SHOW_CALENDAR_BORDERS:
+            calendar_border_view = CalenarBorderView(self.stdscr, 0, 0, self.screen)
+            calendar_border_view.render()
 
 
 class JournalScreenView(View):
