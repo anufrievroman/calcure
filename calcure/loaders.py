@@ -384,6 +384,7 @@ class EventLoaderICS(LoaderICS):
         self.user_ics_events = Events()
         self.ics_event_files = cf.ICS_EVENT_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
+        self.local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
     def parse_event(self, component, index, calendar_number):
         """Parse single event and add it to user_ics_events"""
@@ -401,28 +402,31 @@ class EventLoaderICS(LoaderICS):
         name = str(component.get('summary', ''))
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
         dt = None
-        local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
         try:
             dt = component.get('dtstart').dt
+
+            # Convert to local timezone if it's provided:
             if hasattr(dt, "tzinfo"):
-                dt = dt.astimezone(local_timezone)
+                dt = dt.astimezone(self.local_timezone)
+
             year, month, day = dt.year, dt.month, dt.day
         except AttributeError:
             year, month, day = 0, 1, 1
 
         # See if this event takes multiple days:
-        # try:
-            # dt_end = component.get('dtend').dt
+        try:
+            dt_end = component.get('dtend').dt
 
-            # if dt_end.tzinfo is not None and dt_end.tzinfo.utcoffset(dt_end) is not None:
-                # dt_end = dt_end.astimezone(local_timezone)
-            # year_end, month_end, day_end = dt.year, dt.month, dt.day
-            # dt_difference = dt_end - dt
-            # if dt_difference.days > 0:
-                # repetition = str(dt_difference.days + 1)
-                # frequency = Frequency.DAILY
-        # except AttributeError:
-            # pass
+            # Convert to local timezone if it's provided:
+            if hasattr(dt_end, "tzinfo"):
+                dt_end = dt_end.astimezone(self.local_timezone)
+
+            dt_difference = dt_end.date() - dt.date()
+            if dt_difference.days > 0:
+                repetition = str(dt_difference.days + 1)
+                frequency = Frequency.DAILY
+        except AttributeError:
+            pass
 
         # Add start time to non-all-day events:
         if not all_day:
