@@ -393,7 +393,7 @@ class EventLoaderICS(LoaderICS):
         hour = None
         minute = None
         event_id = index
-        repetition = '1'
+        repetition = 1
         frequency = Frequency.ONCE
         status = Status.NORMAL
         is_private = False
@@ -423,7 +423,7 @@ class EventLoaderICS(LoaderICS):
 
             dt_difference = dt_end.date() - dt.date()
             if dt_difference.days > 0:
-                repetition = str(dt_difference.days + 1)
+                repetition = dt_difference.days + 1
                 frequency = Frequency.DAILY
         except AttributeError:
             pass

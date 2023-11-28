@@ -411,10 +411,13 @@ class DeadlineView(EventView):
 class DailyView(View):
     """Display all events occurring on this days"""
 
-    def __init__(self, stdscr, y, x, repeated_user_events, user_events, user_ics_events, holidays,
-                                birthdays, user_tasks, user_ics_tasks, screen, index_offset, is_selection_day=True):
+    def __init__(self, stdscr, y, x, repeated_user_events, repeated_ics_events, user_events,
+                 user_ics_events, holidays, birthdays, user_tasks, user_ics_tasks, screen,
+                 index_offset, is_selection_day=True):
+
         super().__init__(stdscr, y, x)
         self.repeated_user_events = repeated_user_events.filter_events_that_day(screen)
+        self.repeated_ics_events = repeated_ics_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
         self.user_ics_events = user_ics_events.filter_events_that_day(screen)
         self.user_ics_events.items = sorted(self.user_ics_events.items, key=lambda x: (x.hour is None, x.hour))
@@ -447,7 +450,7 @@ class DailyView(View):
             index += 1
 
         # Show repeated user events and events from ics:
-        for event_list in [self.repeated_user_events.items, self.user_ics_events.items]:
+        for event_list in [self.repeated_user_events.items, self.user_ics_events.items, self.repeated_ics_events.items]:
             for event in event_list:
                 if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
                     self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
@@ -748,6 +751,7 @@ class DailyScreenView(View):
 
         # Display the events from current day to as many as possible days:
         repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
+        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR)
         max_num_days = (self.screen.y_max - 5)//2
         vertical_shift = 0
 
@@ -758,8 +762,9 @@ class DailyScreenView(View):
             self.display_line(self.y + 2 + vertical_shift, self.x, day_string, self.color)
 
             daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
-                                   self.user_events, self.user_ics_events, self.holidays, self.birthdays,
-                                   self.user_tasks, self.user_ics_tasks, self.screen, 0, is_selection_day)
+                                   repeated_ics_events, self.user_events, self.user_ics_events, self.holidays,
+                                   self.birthdays, self.user_tasks, self.user_ics_tasks, self.screen, 0,
+                                   is_selection_day)
             daily_view.render()
             vertical_shift += daily_view.num_events_this_day + 3
             self.screen.next_day()
@@ -804,6 +809,7 @@ class MonthlyScreenView(View):
 
         # Displaying the dates and events:
         repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR)
+        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR)
         num_events_this_month = 0
         for row, week in enumerate(dates):
             for col, day in enumerate(week):
@@ -816,8 +822,9 @@ class MonthlyScreenView(View):
                     # Display the events:
                     self.screen.day = day
                     daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events,
-                                           self.user_events, self.user_ics_events, self.holidays, self.birthdays,
-                                           self.user_tasks, self.user_ics_tasks, self.screen, num_events_this_month)
+                                           repeated_ics_events, self.user_events, self.user_ics_events,
+                                           self.holidays, self.birthdays, self.user_tasks, self.user_ics_tasks,
+                                           self.screen, num_events_this_month)
                     daily_view.render()
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
