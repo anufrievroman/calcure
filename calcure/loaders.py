@@ -400,7 +400,6 @@ class EventLoaderICS(LoaderICS):
 
         # Parameters of the event from ics file, if they exist:
         name = str(component.get('summary', ''))
-        all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
         dt = None
         try:
             dt = component.get('dtstart').dt
@@ -421,14 +420,22 @@ class EventLoaderICS(LoaderICS):
             if hasattr(dt_end, "tzinfo"):
                 dt_end = dt_end.astimezone(self.local_timezone)
 
-            dt_difference = dt_end.date() - dt.date()
+            # Depending on the date type, difference is calculated differently:
+            try:
+                dt_difference = dt_end.date() - dt.date()
+            except:
+                dt_difference = dt_end - dt
+
             if dt_difference.days > 0:
                 repetition = dt_difference.days + 1
                 frequency = Frequency.DAILY
+
         except AttributeError:
+            logging.error("Failed to parse event %s on %s.", name, dt)
             pass
 
         # Add start time to non-all-day events:
+        all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
         if not all_day:
             hour = dt.hour if dt else 0
             minute = dt.minute if dt else 0

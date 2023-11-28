@@ -363,7 +363,8 @@ class RepeatedEvents(Events):
                     temp_month = event.month + rep*(event.frequency == Frequency.MONTHLY)
                     temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + 7*rep*(event.frequency == Frequency.WEEKLY)
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
-                    self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status, event.privacy))
+                    self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status,
+                                                    event.privacy, event.calendar_number))
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""
