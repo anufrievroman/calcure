@@ -420,15 +420,20 @@ class EventLoaderICS(LoaderICS):
             if hasattr(dt_end, "tzinfo"):
                 dt_end = dt_end.astimezone(self.local_timezone)
 
-            # Depending on the date type, difference is calculated differently:
+            # For events with time:
             try:
                 dt_difference = dt_end.date() - dt.date()
+                if dt_difference.days > 0:
+                    repetition = dt_difference.days + 1
+                    frequency = Frequency.DAILY
+
+            # For all day events, last day does not count:
             except:
                 dt_difference = dt_end - dt
+                if dt_difference.days > 0:
+                    repetition = dt_difference.days
+                    frequency = Frequency.DAILY
 
-            if dt_difference.days > 0:
-                repetition = dt_difference.days + 1
-                frequency = Frequency.DAILY
 
         except AttributeError:
             logging.error("Failed to parse event %s on %s.", name, dt)
