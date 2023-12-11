@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Toggle split screen",
         "   *   ": "Toggle global privacy",
         "   ?   ": "Toggle this help",
+        "   Q   ": "Reload",
         "   q   ": "Quit",
         }
 

@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Bölünmüş ekranı aç / kapat",
         "   *   ": "Genel gizliliği aç / kapat",
         "   ?   ": "Bu yardımı aç / kapat",
+        "   Q   ": "Reload",
         "   q   ": "Çıkış",
         }
 

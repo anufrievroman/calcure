@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Vypnúť/zapnúť rozdelenie obrazovky",
         "   *   ": "Vypnúť/zapnúť globálne súkromie",
         "   ?   ": "Vypnúť/zapnúť tohto pomocníka",
+        "   Q   ": "Reload",
         "   q   ": "Ukončiť",
         }
 

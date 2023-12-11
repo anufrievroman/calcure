@@ -83,7 +83,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 user_events.toggle_item_privacy(event_id)
 
         # Delete event:
-        if screen.key in ['x']:
+        if screen.key == 'x':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
@@ -180,6 +180,11 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                     reps = 1 if reps == 0 else reps
                     user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps+1, freq, Status.NORMAL, False))
 
+        # Reload:
+        if screen.key in ["Q"]:
+            screen.reload_data = True
+            screen.refresh_now = True
+
         # Imports:
         if screen.key == "C":
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
@@ -197,7 +202,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.JOURNAL
         if screen.key == "?":
             screen.state = AppState.HELP
-        if screen.key in ["q", "\b", "\x7f"]:
+        if screen.key == "q":
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
@@ -331,6 +336,11 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             if screen.is_valid_date(screen.year, screen.month, day):
                 screen.day = day
                 screen.calendar_state = CalState.DAILY
+
+        # Reload:
+        if screen.key == "Q":
+            screen.reload_data = True
+            screen.refresh_now = True
 
         # Change the view to monthly:
         if screen.key == "v":
@@ -507,6 +517,11 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                 importer.import_tasks_from_taskwarrior()
                 screen.refresh_now = True
 
+        # Reload:
+        if screen.key in ["Q"]:
+            screen.reload_data = True
+            screen.refresh_now = True
+
         # Other actions:
         if vim_style_exit(stdscr, screen):
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
@@ -537,7 +552,7 @@ def control_help_screen(stdscr, screen):
         screen.state = AppState.EXIT if confirmed else screen.state
 
     # Handle keys to exit the help screen:
-    if screen.key in [" ", "?", "q", "KEY_BACKSPACE", "^[", "\x7f"]:
+    if screen.key in [" ", "?", "q", "^[", "\x7f"]:
         screen.state = AppState.CALENDAR
 
 

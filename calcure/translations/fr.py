@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Basculer l'écran partagé",
         "   *   ": "Basculer la confidentialité globale",
         "   ?   ": "Basculer cette aide",
+        "   Q   ": "Rafraîchir",
         "   q   ": "Quitter",
         }
 

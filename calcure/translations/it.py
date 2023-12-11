@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Attiva la divisione dello schermo",
         "   *   ": "Attiva la privacy globale",
         "   ?   ": "Aiuto",
+        "   Q   ": "Reload",
         "   q   ": "Esci",
         }
 

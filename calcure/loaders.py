@@ -362,6 +362,7 @@ class TaskLoaderICS(LoaderICS):
         if self.ics_task_files is None:
             return self.user_ics_tasks
 
+        self.user_ics_tasks.delete_all_items()
         for calendar_number, filename in enumerate(self.ics_task_files):
             # For each resource from config, load a list that has one or more ics files:
             ics_files = self.read_resource(filename)
@@ -461,6 +462,7 @@ class EventLoaderICS(LoaderICS):
         if self.ics_event_files is None:
             return self.user_ics_events
 
+        self.user_ics_events.delete_all_items()
         for calendar_number, filename in enumerate(self.ics_event_files):
 
             # For each resource from config, load a list that has one or more ics files:

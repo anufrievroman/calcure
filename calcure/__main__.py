@@ -910,7 +910,7 @@ class HelpScreenView(View):
             self.shift_y = 2
 
         if self.y_max > 20 and self.x_max >= 102:
-            self.global_shift_y = (self.y_max - 20) // 2
+            self.global_shift_y = (self.y_max - 25) // 2
         else:
             self.global_shift_y = 0
 
@@ -1070,6 +1070,10 @@ def main(stdscr) -> None:
         if user_tasks.changed:
             task_saver_csv.save()
             screen.refresh_now = True
+        if screen.reload_data:
+            user_ics_events = event_loader_ics.load()
+            user_ics_tasks = task_loader_ics.load()
+            screen.reload_data = False
 
     # Cleaning up before quitting:
     curses.echo()

@@ -15,6 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Alternar tela dividida",
         "   *   ": "Alternar privacidade global",
         "   ?   ": "Alternar essa ajuda",
+        "   Q   ": "Reload",
         "   q   ": "Sair",
         }
 
