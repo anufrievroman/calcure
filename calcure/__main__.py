@@ -43,7 +43,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "3.0"
+__version__ = "3.0.1"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -470,26 +470,24 @@ class DailyView(View):
                 index += 1
 
         # Show holidays:
-        if not cf.DISPLAY_HOLIDAYS:
-            return
-        for event in self.holidays.items:
-            if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.HOLIDAYS)
-            else:
-                holiday_view = HolidayView(self.stdscr, self.y + index, self.x, event, self.screen)
-                holiday_view.render()
-            index += 1
+        if cf.DISPLAY_HOLIDAYS:
+            for event in self.holidays.items:
+                if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.HOLIDAYS)
+                else:
+                    holiday_view = HolidayView(self.stdscr, self.y + index, self.x, event, self.screen)
+                    holiday_view.render()
+                index += 1
 
         # Show birthdays:
-        if not cf.BIRTHDAYS_FROM_ABOOK:
-            return
-        for event in self.birthdays.items:
-            if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
-                self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
-            else:
-                birthday_view = BirthdayView(self.stdscr, self.y + index, self.x, event, self.screen)
-                birthday_view.render()
-            index += 1
+        if cf.BIRTHDAYS_FROM_ABOOK:
+            for event in self.birthdays.items:
+                if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
+                    self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.BIRTHDAYS)
+                else:
+                    birthday_view = BirthdayView(self.stdscr, self.y + index, self.x, event, self.screen)
+                    birthday_view.render()
+                index += 1
 
         self.num_events_this_day = index
 
@@ -742,7 +740,6 @@ class DailyScreenView(View):
         # Form a string with month, year, and day with today icon:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
         month_string = str(month_names[self.screen.month-1])
-        # date_string = f'{month_string} {self.screen.day}, {self.screen.year} {icon}'
         date_string = f'{month_string} {self.screen.year}'
 
         # Display header and footer:
@@ -757,16 +754,21 @@ class DailyScreenView(View):
 
         is_selection_day = True
         for _ in range(max_num_days):
+
+            # Display day name:
             day_string = f"{self.screen.day} {DAYS[self.week_day]} {self.icon}"
             day_string += " " * (max([len(day_name) for day_name in DAYS]) + 3 + len(self.icon) - len(day_string))
             self.display_line(self.y + 2 + vertical_shift, self.x, day_string, self.color)
 
+            # Display events of the day:
             daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
                                    repeated_ics_events, self.user_events, self.user_ics_events, self.holidays,
                                    self.birthdays, self.user_tasks, self.user_ics_tasks, self.screen, 0,
                                    is_selection_day)
             daily_view.render()
-            vertical_shift += daily_view.num_events_this_day + 3
+
+            # Move to the next day:
+            vertical_shift += daily_view.num_events_this_day + 2
             self.screen.next_day()
             is_selection_day = False
 
