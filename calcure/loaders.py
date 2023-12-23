@@ -57,6 +57,8 @@ class TaskLoaderCSV(LoaderCSV):
 
     def load(self):
         """Reads from CSV file"""
+
+        self.user_tasks.delete_all_items()
         lines = self.read_file(self.tasks_file)
 
         for index, row in enumerate(lines):
@@ -106,6 +108,7 @@ class EventLoaderCSV(LoaderCSV):
 
     def load(self):
         """Read from CSV file"""
+        self.user_events.delete_all_items()
         lines = self.read_file(self.events_file)
         for index, row in enumerate(lines):
             event_id = index

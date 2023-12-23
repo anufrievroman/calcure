@@ -1071,6 +1071,8 @@ def main(stdscr) -> None:
             task_saver_csv.save()
             screen.refresh_now = True
         if screen.reload_data:
+            user_events = event_loader_csv.load()
+            user_tasks = task_loader_csv.load()
             user_ics_events = event_loader_ics.load()
             user_ics_tasks = task_loader_ics.load()
             screen.reload_data = False
