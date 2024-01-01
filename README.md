@@ -28,13 +28,13 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 
 ### Linux and Mac OS
 
-There are several ways to install it, for example:
+There are several ways to install:
 
-`pipx install calcure` - most up-to-date version from PyPi. You may need to install `pipx` first.
+`pipx install calcure` - the up-to-date version from PyPi. You may need to install `pipx` first.
 
-`yay -S calcure` - [AUR package](https://aur.archlinux.org/packages/calcure) for Arch-based distributions.
+`yay -S calcure` - [AUR package](https://aur.archlinux.org/packages/calcure) is available. Upvote to support the project!
 
-`calcure` is also available as NixOS package.
+`calcure` is also available as NixOS package (outdated).
 
 ### Windows
 
@@ -45,12 +45,13 @@ There are several ways to install it, for example:
 
 ### Upgrade to the most recent version
 
-`pip install --upgrade calcure`
+`pipx upgrade calcure`
 
 ### Dependencies
 
 - `python` 3.7 and higher (usually already installed)
 - `holidays`, `jdatetime`, `icalendar`, and `taskw` python libraries (should be installed automatically with the calcure).
+- `windows-curses` on Windows
 
 ## Usage
 
