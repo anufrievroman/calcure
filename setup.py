@@ -40,4 +40,9 @@ setuptools.setup(
     ],
     packages=["calcure", "calcure.translations"],
     include_package_data=True,
+    data_files=[
+        ('share/man/man1',
+         ['calcure.1.gz']
+         ),
+    ],
 )
