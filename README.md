@@ -79,9 +79,15 @@ On the first run, program will create a `config.ini` file where you can edit par
 [Typical problems and solutions](https://anufrievroman.gitbook.io/calcure/troubleshooting) are described in documentation. If you faced a new problem, don't hesitate to open an issue.
 
 
-## Contribution, translations, donations
+## Contribution
 
 [Full information about contribution](https://anufrievroman.gitbook.io/calcure/contribution) is available in the documentation.
 
-If you'd like to support the development, consider [donations](https://www.buymeacoffee.com/angryprofessor).
+## Support
 
+I am not a professional developer and work on open-source projects in my free time. If you'd like to support the development, consider donations via [buymeacoffee](https://www.buymeacoffee.com/angryprofessor) or cryptocurrencies:
+
+- BTC `bc1qpkzmutdqfxkce34skt09vll97s5smpa0r2tyzj`
+- ETH `0x6f1Ce9cA181458Fc153a5f7cBF88044736C3b00C`
+- BNB `0x40f22c372758E35C905458cAF8BB17f51ac133d1`
+- LTC `ltc1qtu33qyv2xlzxda5mmrmk943zpksq8q75tuh85p`
