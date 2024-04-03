@@ -26,6 +26,8 @@ class Screen:
         self.day = self.today.day
         self.month = self.today.month
         self.year = self.today.year
+        self.reload_interval = cf.DATA_RELOAD_INTERVAL
+        self.last_data_reload_time = datetime.datetime.now()
 
     @property
     def is_active_pane(self):
@@ -86,6 +88,21 @@ class Screen:
     def number_of_weeks(self) -> int:
         """Calculate how many weeks are in this month"""
         return len(Calendar(0, self.use_persian_calendar).monthdayscalendar(self.year, self.month))
+
+    @property
+    def is_time_to_reload(self):
+        """Check if enough time passed since last data reload or it was requested"""
+        if self.reload_data:
+            self.reload_data = False
+            return True
+        if self.reload_interval == 0:
+            return False
+        reload_interval = datetime.timedelta(minutes=self.reload_interval)
+        if datetime.datetime.now() - self.last_data_reload_time > reload_interval:
+            self.last_data_reload_time = datetime.datetime.now()
+            return True
+        else:
+            return False
 
     def next_month(self):
         """Switches to the next month"""

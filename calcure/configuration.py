@@ -4,6 +4,7 @@ import configparser
 import sys
 import getopt
 import logging
+import datetime
 from pathlib import Path
 
 from calcure.data import AppState
@@ -18,6 +19,15 @@ class Config:
         self.config_folder = self.home_path / ".config" / "calcure"
         self.config_file = self.config_folder / "config.ini"
         self.is_first_run= True
+
+        # Create config folder:
+        self.config_folder.mkdir(exist_ok=True)
+
+        # Read config file:
+        self.create_config_file()
+        self.read_config_file_from_user_arguments()
+        self.read_config_file()
+        self.read_parameters_from_user_arguments()
 
 
     def shorten_path(self, path):
@@ -66,6 +76,7 @@ class Config:
                 "start_week_day":            "1",
                 "weekend_days":              "6,7",
                 "refresh_interval":          "1",
+                "data_reload_interval":      "0",
                 "split_screen":              "Yes",
                 "right_pane_percentage":     "25",
                 "journal_header":            "JOURNAL",
@@ -233,6 +244,7 @@ class Config:
             self.TODO_ICON             = conf.get("Parameters", "todo_icon", fallback="•") if self.DISPLAY_ICONS else "·"
             self.IMPORTANT_ICON        = conf.get("Parameters", "important_icon", fallback="‣") if self.DISPLAY_ICONS else "!"
             self.REFRESH_INTERVAL      = int(conf.get("Parameters", "refresh_interval", fallback=1))
+            self.DATA_RELOAD_INTERVAL  = int(conf.get("Parameters", "data_reload_interval", fallback=0))
             self.RIGHT_PANE_PERCENTAGE = int(conf.get("Parameters", "right_pane_percentage", fallback=25))
             self.ONE_TIMER_AT_A_TIME   = conf.getboolean("Parameters", "one_timer_at_a_time", fallback=False)
 
@@ -360,15 +372,3 @@ class Config:
             logging.error("Invalid user arguments. %s", e_message)
             pass
 
-
-# Initialise config:
-cf = Config()
-
-# Create config folder:
-cf.config_folder.mkdir(exist_ok=True)
-
-# Read config file:
-cf.create_config_file()
-cf.read_config_file_from_user_arguments()
-cf.read_config_file()
-cf.read_parameters_from_user_arguments()

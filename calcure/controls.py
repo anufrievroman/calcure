@@ -4,9 +4,11 @@ import curses
 import importlib
 
 # Modules:
-from calcure.configuration import cf
 from calcure.data import *
 from calcure.dialogues import *
+from calcure.configuration import Config
+
+cf = Config()
 
 # Language:
 if cf.LANG == "fr":

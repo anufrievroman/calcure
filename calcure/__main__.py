@@ -7,12 +7,11 @@ import time
 import getopt
 import sys
 import importlib
-import logging
 import threading
 
 from calcure.calendars import Calendar
-from calcure.errors import error
-from calcure.configuration import cf
+from calcure.errors import Error
+from calcure.configuration import Config
 from calcure.weather import Weather
 from calcure.importers import Importer
 from calcure.dialogues import clear_line
@@ -23,6 +22,10 @@ from calcure.loaders import *
 from calcure.data import *
 from calcure.controls import *
 
+
+# Initialise config:
+cf = Config()
+error = Error(cf.config_folder / "info.log")
 
 # Language:
 if cf.LANG == "fr":
@@ -593,6 +596,7 @@ class ErrorView(View):
         self.screen = screen
         self.error = error
 
+
     def render(self):
         """Render this view on the screen"""
         if self.error.has_occured:
@@ -1072,12 +1076,13 @@ def main(stdscr) -> None:
         if user_tasks.changed:
             task_saver_csv.save()
             screen.refresh_now = True
-        if screen.reload_data:
+
+        # If needed, reload the data:
+        if screen.is_time_to_reload:
             user_events = event_loader_csv.load()
             user_tasks = task_loader_csv.load()
             user_ics_events = event_loader_ics.load()
             user_ics_tasks = task_loader_ics.load()
-            screen.reload_data = False
 
     # Cleaning up before quitting:
     curses.echo()

@@ -3,8 +3,6 @@
 import logging
 import io
 
-from calcure.configuration import cf
-
 
 class Error():
     """Error messages displayed to the user.
@@ -12,10 +10,18 @@ class Error():
     ERROR type is reserved for loading errors;
     WARNING type is reserved for incorrect user input;"""
 
-    def __init__(self):
+    def __init__(self, file):
         self.buffer = io.StringIO()
-        self.file = f"{cf.config_folder}/info.log"
+        self.file = file
 
+        # Start logging errors:
+        logging.basicConfig(level=logging.INFO,
+                            format="[%(levelname)s] %(message)s",
+                            # encoding='utf-8',
+                            handlers=[logging.FileHandler(self.file, 'w'),
+                                      #logging.StreamHandler(),
+                                      logging.StreamHandler(self.buffer),
+                                      ])
     @property
     def has_occured(self):
         """Has any errors occured?"""
@@ -41,15 +47,3 @@ class Error():
         self.buffer.seek(0)
         self.buffer.truncate(0)
 
-
-# Initialise error:
-error = Error()
-
-# Start logging:
-logging.basicConfig(level=logging.INFO,
-                    format="[%(levelname)s] %(message)s",
-                    # encoding='utf-8',
-                    handlers=[logging.FileHandler(error.file, 'w'),
-                              logging.StreamHandler(),
-                              logging.StreamHandler(error.buffer),
-                              ])
