@@ -713,12 +713,11 @@ class DailyScreenView(View):
 
     @property
     def week_day(self):
-        """Number of the day in week"""
+        """Number of the day in week, from 0 to 6"""
         for week in self.dates:
-            try:
-                weekday = week.index(self.screen.day)
-            except ValueError:
-                pass
+            if self.screen.day not in week:
+                continue
+            weekday = (week.index(self.screen.day) + (cf.START_WEEK_DAY - 1)) % 7
         return weekday
 
     @property
@@ -1093,7 +1092,7 @@ def main(stdscr) -> None:
 def cli() -> None:
     try:
         curses.wrapper(main)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, curses.error): # Hides strange curses quitting error
         pass
 
 
