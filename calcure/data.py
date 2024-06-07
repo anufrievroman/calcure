@@ -145,7 +145,7 @@ class Collection:
 
     def add_item(self, item):
         """Add an item to the collection"""
-        if 1000 > len(item.name) > 0 and item.name != "\[":
+        if 1000 > len(item.name) > 0 and item.name != r"\[":
             self.items.append(item)
             self.changed = True
 
