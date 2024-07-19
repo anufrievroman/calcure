@@ -384,9 +384,12 @@ class RepeatedEvents(Events):
                 rset.rrule(rule)
 
                 if event.exdate:
-                    for exdate in event.exdate.dts:
-                        exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
-                        rset.exdate(exdate_dt)
+                    exdates_list = [event.exdate] if not isinstance(event.exdate, list) else event.exdate
+
+                    for exdates in exdates_list:
+                        for exdate in exdates.dts:
+                            exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
+                            rset.exdate(exdate_dt)
 
                 for date in list(rset)[1:]:
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
