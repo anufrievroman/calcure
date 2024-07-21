@@ -1,8 +1,10 @@
 """Module provides datatypes used in the program"""
 
+import datetime
 import time
 import enum
 
+from dateutil.rrule import rruleset, rrulestr
 from calcure.calendars import Calendar
 
 
@@ -67,7 +69,7 @@ class UserEvent(Event):
     """Events created by the user"""
 
     def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy,
-                                                    calendar_number=None, hour=None, minute=None):
+                                                    calendar_number=None, hour=None, minute=None, rrule=None, exdate=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.repetition = repetition
@@ -77,6 +79,12 @@ class UserEvent(Event):
         self.calendar_number = calendar_number
         self.hour = hour
         self.minute = minute
+        self.rrule = rrule
+        self.exdate = exdate
+
+    def getDatetime(self):
+        local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+        return datetime.datetime(self.year, self.month, self.day, self.hour or 0, self.minute or 0, tzinfo=local_timezone)
 
 
 class UserRepeatedEvent(Event):
@@ -350,7 +358,7 @@ class Birthdays(Events):
 class RepeatedEvents(Events):
     """List of events that are repetitions of main events"""
 
-    def __init__(self, user_events, use_persian_calendar):
+    def __init__(self, user_events, use_persian_calendar, until_year, until_month):
         super().__init__()
         self.user_events = user_events
         self.use_persian_calendar = use_persian_calendar
@@ -364,6 +372,28 @@ class RepeatedEvents(Events):
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
                     self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status,
                                                     event.privacy, event.calendar_number))
+
+            elif event.rrule:
+                dtstart = event.getDatetime()
+
+                if 'COUNT' not in event.rrule and 'UNTIL' not in event.rrule:
+                    event.rrule += ';UNTIL=' + datetime.datetime(until_year + 1, until_month, 1).strftime('%Y%m%dT%H%M%SZ')
+
+                rule = rrulestr(event.rrule, dtstart=dtstart)
+                rset = rruleset()
+                rset.rrule(rule)
+
+                if event.exdate:
+                    exdates_list = [event.exdate] if not isinstance(event.exdate, list) else event.exdate
+
+                    for exdates in exdates_list:
+                        for exdate in exdates.dts:
+                            exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
+                            rset.exdate(exdate_dt)
+
+                for date in list(rset)[1:]:
+                    self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
+                                                    event.status, event.privacy, event.calendar_number))
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""

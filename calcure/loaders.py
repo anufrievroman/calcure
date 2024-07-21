@@ -4,7 +4,6 @@ import configparser
 import csv
 import os
 import datetime
-import time
 import icalendar
 import urllib.request
 import io
@@ -13,7 +12,7 @@ import logging
 from pathlib import Path
 
 from calcure.data import *
-from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
+from calcure.calendars import convert_to_persian_date
 
 
 class LoaderCSV:
@@ -401,6 +400,8 @@ class EventLoaderICS(LoaderICS):
         frequency = Frequency.ONCE
         status = Status.NORMAL
         is_private = False
+        rrule = None
+        exdate = None
 
         # Parameters of the event from ics file, if they exist:
         name = str(component.get('summary', ''))
@@ -438,10 +439,14 @@ class EventLoaderICS(LoaderICS):
                     repetition = dt_difference.days
                     frequency = Frequency.DAILY
 
-
         except AttributeError:
             logging.error("Failed to parse event %s on %s.", name, dt)
             pass
+
+        if 'rrule' in component:
+            rrule = component.get('rrule').to_ical().decode('utf-8')
+            exdate = component.get('exdate')
+            repetition = 0
 
         # Add start time to non-all-day events:
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
@@ -455,7 +460,7 @@ class EventLoaderICS(LoaderICS):
 
         # Add event:
         new_event = UserEvent(event_id, year, month, day, name, repetition, frequency,
-                                    status, is_private, calendar_number, hour, minute)
+                              status, is_private, calendar_number, hour, minute, rrule, exdate)
         self.user_ics_events.add_item(new_event)
 
     def load(self):
