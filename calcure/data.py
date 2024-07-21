@@ -358,7 +358,7 @@ class Birthdays(Events):
 class RepeatedEvents(Events):
     """List of events that are repetitions of main events"""
 
-    def __init__(self, user_events, use_persian_calendar, until_year, until_month):
+    def __init__(self, user_events, use_persian_calendar, current_year):
         super().__init__()
         self.user_events = user_events
         self.use_persian_calendar = use_persian_calendar
@@ -375,10 +375,14 @@ class RepeatedEvents(Events):
 
             elif event.rrule:
                 dtstart = event.getDatetime()
-
+                
+                # For infinitely repeated events, we limit them by end of the next year:
                 if 'COUNT' not in event.rrule and 'UNTIL' not in event.rrule:
-                    event.rrule += ';UNTIL=' + datetime.datetime(until_year + 1, until_month, 1).strftime('%Y%m%dT%H%M%SZ')
-
+                    until_year = current_year + 1
+                    until_month = 12
+                    event.rrule += ';UNTIL=' + datetime.datetime(until_year, until_month, 1).strftime('%Y%m%dT%H%M%SZ')
+                
+                # Create a list of dates of repeated events:
                 rule = rrulestr(event.rrule, dtstart=dtstart)
                 rset = rruleset()
                 rset.rrule(rule)
@@ -390,7 +394,8 @@ class RepeatedEvents(Events):
                         for exdate in exdates.dts:
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
-
+                
+                # Create an event for each repetition and add to the list:
                 for date in list(rset)[1:]:
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
                                                     event.status, event.privacy, event.calendar_number))

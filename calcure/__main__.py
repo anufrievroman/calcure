@@ -46,7 +46,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "3.0.2"
+__version__ = "3.0.3"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -750,8 +750,8 @@ class DailyScreenView(View):
         header_view.render()
 
         # Display the events from current day to as many as possible days:
-        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, self.screen.year, self.screen.month)
-        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR, self.screen.year, self.screen.month)
+        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, self.screen.year)
+        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR, self.screen.year)
         max_num_days = (self.screen.y_max - 5)//2
         vertical_shift = 0
 
@@ -813,8 +813,8 @@ class MonthlyScreenView(View):
         days_name_view.render()
 
         # Displaying the dates and events:
-        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, self.screen.year, self.screen.month)
-        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR, self.screen.year, self.screen.month)
+        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, self.screen.year)
+        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR, self.screen.year)
         num_events_this_month = 0
         for row, week in enumerate(dates):
             for col, day in enumerate(week):

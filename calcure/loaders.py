@@ -438,15 +438,16 @@ class EventLoaderICS(LoaderICS):
                 if dt_difference.days > 0:
                     repetition = dt_difference.days
                     frequency = Frequency.DAILY
+            
+            # Parsing recuring rules:
+            if 'rrule' in component:
+                rrule = component.get('rrule').to_ical().decode('utf-8')
+                exdate = component.get('exdate')
+                repetition = 0
 
         except AttributeError:
             logging.error("Failed to parse event %s on %s.", name, dt)
             pass
-
-        if 'rrule' in component:
-            rrule = component.get('rrule').to_ical().decode('utf-8')
-            exdate = component.get('exdate')
-            repetition = 0
 
         # Add start time to non-all-day events:
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
