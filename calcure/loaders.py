@@ -173,14 +173,23 @@ class HolidayLoader:
 
     def load_country(self, country):
         """Load list of holidays from 'holidays' module"""
+
+        def get_country_and_subdivision(country):
+            """Get country and subdivision, where encoded."""
+            if ":" in country:
+                return tuple(country.split(":"))
+            else:
+                return (country, None)
+
         try:
             import holidays as hl
             from holidays import registry
 
+            (country, subdivision) = get_country_and_subdivision(country)
             country_codes = {x[0]: x[2] for x in registry.COUNTRIES.values()}
             country_code = country_codes.get(country)
             year = datetime.date.today().year
-            holiday_events = (getattr(hl, country))(years=[year+x for x in range(-2, 5)])
+            holiday_events = (getattr(hl, country))(subdiv=subdivision, years=[year+x for x in range(-2, 5)])
             for date, name in holiday_events.items():
 
                 # Convert to persian date if needed:
