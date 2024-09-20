@@ -513,11 +513,11 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             if confirmed:
                 importer.import_tasks_from_calcurse()
                 screen.refresh_now = True
-        if screen.key == "W":
-            confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
-            if confirmed:
-                importer.import_tasks_from_taskwarrior()
-                screen.refresh_now = True
+        # if screen.key == "W":
+            # confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
+            # if confirmed:
+                # importer.import_tasks_from_taskwarrior()
+                # screen.refresh_now = True
 
         # Reload:
         if screen.key in ["Q"]:

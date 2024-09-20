@@ -34,7 +34,7 @@ There are several ways to install:
 
 `yay -S calcure` - [AUR package](https://aur.archlinux.org/packages/calcure) is available. Upvote to support the project!
 
-`calcure` is also available as NixOS package (outdated).
+`calcure` is also available as NixOS package.
 
 ### Windows
 
