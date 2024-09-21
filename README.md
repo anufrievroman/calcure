@@ -21,7 +21,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
 - Current weather ⛅
-- Support for Persian calendar
+- Support for [Persian calendar](https://en.wikipedia.org/wiki/Iranian_calendars)
 
 
 ## Installation
