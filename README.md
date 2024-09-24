@@ -21,7 +21,7 @@ Modern TUI calendar and task manager with customizable interface. Manages your e
 - Customizable colors, icons, and other features
 - Resize and mobile friendly
 - Current weather ⛅
-- Support for Persian calendar
+- Support for [Persian calendar](https://en.wikipedia.org/wiki/Iranian_calendars)
 
 
 ## Installation
@@ -38,8 +38,8 @@ There are several ways to install:
 
 ### Windows
 
-1. Install `Windows Terminal` app from the app store
-2. Install `python 3.x` also from the app store (if you just type `python` in the Windows Terminal app it will offer you to install)
+1. Install [Windows Terminal](https://apps.microsoft.com/detail/9n0dx20hk701?hl=en-US&gl=US) app from the Microsoft Store.
+2. Install [Python 3.x](https://apps.microsoft.com/search/publisher?name=Python+Software+Foundation&hl=en-us&gl=US) also from the Microsoft Store (if you just type `python` in the Windows Terminal app it will offer you to install)
 3. Install the program and libraries by typing in the Windows Terminal `pip install windows-curses calcure`
 4. Now you can finally run it by typing in the Windows Terminal `python -m calcure`
 
