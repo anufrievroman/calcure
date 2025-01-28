@@ -130,9 +130,9 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.selection_mode = True
 
         # Navigation:
-        if screen.key in ["n", "j", "KEY_UP", "KEY_RIGHT"]:
+        if screen.key in ["n", "j", "KEY_DOWN", "KEY_RIGHT"]:
             screen.next_month()
-        if screen.key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
+        if screen.key in ["p", "k", "KEY_UP", "KEY_LEFT"]:
             screen.previous_month()
         if screen.key in ["KEY_HOME", "R"]:
             screen.reset_to_today()
