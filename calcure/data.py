@@ -1,6 +1,7 @@
 """Module provides datatypes used in the program"""
 
 import datetime
+import logging
 import time
 import enum
 
@@ -386,6 +387,7 @@ class RepeatedEvents(Events):
                 try:
                     rule = rrulestr(event.rrule, dtstart=dtstart)
                 except ValueError as e:
+                    logging.error("Problem occurred with event: '%s'.", event.name)
                     continue
                 rset = rruleset()
                 rset.rrule(rule)
