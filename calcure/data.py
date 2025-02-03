@@ -375,15 +375,18 @@ class RepeatedEvents(Events):
 
             elif event.rrule:
                 dtstart = event.getDatetime()
-                
+
                 # For infinitely repeated events, we limit them by end of the next year:
                 if 'COUNT' not in event.rrule and 'UNTIL' not in event.rrule:
                     until_year = current_year + 1
                     until_month = 12
                     event.rrule += ';UNTIL=' + datetime.datetime(until_year, until_month, 1).strftime('%Y%m%dT%H%M%SZ')
-                
+
                 # Create a list of dates of repeated events:
-                rule = rrulestr(event.rrule, dtstart=dtstart)
+                try:
+                    rule = rrulestr(event.rrule, dtstart=dtstart)
+                except ValueError as e:
+                    print(e)
                 rset = rruleset()
                 rset.rrule(rule)
 
