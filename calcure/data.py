@@ -386,7 +386,7 @@ class RepeatedEvents(Events):
                 try:
                     rule = rrulestr(event.rrule, dtstart=dtstart)
                 except ValueError as e:
-                    print(e)
+                    continue
                 rset = rruleset()
                 rset.rrule(rule)
 
@@ -397,7 +397,7 @@ class RepeatedEvents(Events):
                         for exdate in exdates.dts:
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
-                
+
                 # Create an event for each repetition and add to the list:
                 for date in list(rset)[1:]:
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
