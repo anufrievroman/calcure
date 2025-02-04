@@ -51,6 +51,7 @@ class Config:
                 "folder_with_datafiles":     self.shorten_path(self.config_folder),
                 "calcurse_todo_file":        self.shorten_path(self.calcurse_todo_file),
                 "calcurse_events_file":      self.shorten_path(self.calcurse_events_file),
+                "log_file":                  self.shorten_path(self.log_file),
                 "language":                  "en",
                 "default_view":              "calendar",
                 "default_calendar_view":     "monthly",
