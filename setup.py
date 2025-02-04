@@ -23,7 +23,7 @@ setuptools.setup(
             "calcure = calcure.__main__:cli"
         ]
     },
-    install_requires=['holidays', 'jdatetime', 'icalendar', 'astral'],
+    install_requires=['holidays', 'jdatetime', 'icalendar'],
     version=version,
     python_requires='~=3.9',
     classifiers=[
