@@ -46,18 +46,18 @@ class Importer:
                 timer = Timer([])
                 self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
 
-    def import_tasks_from_taskwarrior(self):
-        """Import tasks from taskwarrior database via taskw library"""
-        from taskw import TaskWarrior
-        tasks = TaskWarrior().load_tasks()
-        for task in tasks["pending"]:
-            name = task["description"]
-            if not self.user_tasks.item_exists(name):
-                task_id = self.user_tasks.generate_id()
-                is_private = False
-                timer = Timer([])
-                status = Status.NORMAL
-                self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
+    # def import_tasks_from_taskwarrior(self):
+        # """Import tasks from taskwarrior database via taskw library"""
+        # from taskw import TaskWarrior
+        # tasks = TaskWarrior().load_tasks()
+        # for task in tasks["pending"]:
+            # name = task["description"]
+            # if not self.user_tasks.item_exists(name):
+                # task_id = self.user_tasks.generate_id()
+                # is_private = False
+                # timer = Timer([])
+                # status = Status.NORMAL
+                # self.user_tasks.add_item(Task(task_id, name, status, timer, is_private))
 
     def import_events_from_calcurse(self):
         """Importing events from calcurse apt file into our events file"""
