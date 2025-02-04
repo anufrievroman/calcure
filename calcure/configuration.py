@@ -18,6 +18,7 @@ class Config:
         self.calcurse_events_file = self.home_path / ".local" / "share" / "calcurse" / "apts"
         self.config_folder = self.home_path / ".config" / "calcure"
         self.config_file = self.config_folder / "config.ini"
+        self.log_file = self.config_folder / "info2.log"
         self.is_first_run= True
 
         # Create config folder:
@@ -232,10 +233,13 @@ class Config:
             self.WEATHER_CITY              = conf.get("Parameters", "weather_city", fallback="")
             self.WEATHER_METRIC_UNITS      = conf.getboolean("Parameters", "weather_metric_units", fallback=True)
             self.DEFAULT_CALENDAR_VIEW     = conf.get("Parameters", "default_calendar_view", fallback="monthly")
+            self.LOG_FILE                  = conf.get("Parameters", "log_file", fallback=self.log_file)
+            self.LOG_FILE                  = Path(self.LOG_FILE).expanduser()
 
             # Journal settings:
             self.CALCURSE_TODO_FILE = conf.get("Parameters", "calcurse_todo_file", fallback=self.calcurse_todo_file)
             self.CALCURSE_TODO_FILE = Path(self.CALCURSE_TODO_FILE).expanduser()
+
 
             self.CALCURSE_EVENTS_FILE = conf.get("Parameters", "calcurse_events_file", fallback=self.calcurse_events_file)
             self.CALCURSE_EVENTS_FILE = Path(self.CALCURSE_EVENTS_FILE).expanduser()

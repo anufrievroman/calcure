@@ -26,7 +26,7 @@ from calcure.moon import get_moon_phase
 
 # Initialise config:
 cf = Config()
-error = Error(cf.config_folder / "info.log")
+error = Error(cf.LOG_FILE)
 
 # Language:
 if cf.LANG == "fr":
@@ -49,7 +49,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "3.1"
+__version__ = "3.2"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
