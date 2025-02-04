@@ -1,6 +1,7 @@
 """Module provides datatypes used in the program"""
 
 import datetime
+import logging
 import time
 import enum
 
@@ -375,15 +376,19 @@ class RepeatedEvents(Events):
 
             elif event.rrule:
                 dtstart = event.getDatetime()
-                
+
                 # For infinitely repeated events, we limit them by end of the next year:
                 if 'COUNT' not in event.rrule and 'UNTIL' not in event.rrule:
                     until_year = current_year + 1
                     until_month = 12
                     event.rrule += ';UNTIL=' + datetime.datetime(until_year, until_month, 1).strftime('%Y%m%dT%H%M%SZ')
-                
+
                 # Create a list of dates of repeated events:
-                rule = rrulestr(event.rrule, dtstart=dtstart)
+                try:
+                    rule = rrulestr(event.rrule, dtstart=dtstart)
+                except ValueError as e:
+                    logging.error("Problem occurred with event: '%s'.", event.name)
+                    continue
                 rset = rruleset()
                 rset.rrule(rule)
 
@@ -394,7 +399,7 @@ class RepeatedEvents(Events):
                         for exdate in exdates.dts:
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
-                
+
                 # Create an event for each repetition and add to the list:
                 for date in list(rset)[1:]:
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
