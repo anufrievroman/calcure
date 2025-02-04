@@ -21,6 +21,7 @@ from calcure.colors import Color, initialize_colors
 from calcure.loaders import *
 from calcure.data import *
 from calcure.controls import *
+from calcure.moon import get_moon_phase
 
 
 # Initialise config:
@@ -508,16 +509,24 @@ class DayNumberView(View):
         self.x_cell = x_cell
         self.screen.day = self.day
 
+    @property
+    def moon_icon(self):
+        """Get moon icon if needed"""
+        if cf.SHOW_MOON_PHASES:
+            return get_moon_phase(self.screen.year, self.screen.month, self.screen.day)
+        else:
+            return ""
+
     def render(self):
         """Render this view on the screen"""
         if self.screen.date == self.screen.today:
-            today = f"{self.day}{cf.TODAY_ICON}{' '*(self.x_cell - len(str(self.day)) - 2)}"
+            today = f"{self.day}{cf.TODAY_ICON}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 2)} "
             self.display_line(self.y, self.x, today, Color.TODAY, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
         elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
-            weekend = f"{self.day}{' '*(self.x_cell - len(str(self.day)) - 1)}"
+            weekend = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekend, Color.WEEKENDS, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
         else:
-            weekday = f"{self.day}{' '*(self.x_cell - len(str(self.day)) - 1)}"
+            weekday = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekday, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
 

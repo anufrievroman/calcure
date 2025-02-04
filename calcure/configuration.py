@@ -63,6 +63,7 @@ class Config:
                 "minimal_days_indicator":    "Yes",
                 "minimal_weekend_indicator": "Yes",
                 "show_calendar_borders":     "No",
+                "show_moon_phases":          "No",
                 "cut_titles_by_cell_length": "No",
                 "ask_confirmations":         "Yes",
                 "ask_confirmation_to_quit":  "Yes",
@@ -221,6 +222,7 @@ class Config:
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
             self.SHOW_CALENDAR_BORDERS     = conf.getboolean("Parameters", "show_calendar_borders", fallback=False)
+            self.SHOW_MOON_PHASES          = conf.getboolean("Parameters", "show_moon_phases", fallback=False)
             self.USE_PERSIAN_CALENDAR      = conf.getboolean("Parameters", "use_persian_calendar", fallback=False)
             self.LANG                      = conf.get("Parameters", "language", fallback="en")
             self.START_WEEK_DAY            = int(conf.get("Parameters", "start_week_day", fallback=1))
