@@ -1,7 +1,6 @@
 """Module that controls display of the moon phases"""
 
 from datetime import datetime
-from astral import moon
 
 
 # Dictionary of moon phases taken from:

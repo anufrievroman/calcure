@@ -40,6 +40,46 @@ def clear_line(stdscr, y, x=0):
     stdscr.addstr(y, x, " " * (x_max - x - 1), curses.color_pair(Color.EMPTY.value))
 
 
+def input_field(stdscr, y, x, field_length):
+    """Input field that gets characters entered by user"""
+    curses.curs_set(1)
+    input_str = ""
+    cursor_pos = 0
+
+    while True:
+        stdscr.move(y, x + cursor_pos)
+        key = stdscr.getch()
+
+        # Esc, Return, and Backspace keys:
+        if key == 27:
+            return ""
+        if key in (curses.KEY_ENTER, 10, 13):
+            return input_str
+        if key in (curses.KEY_BACKSPACE, 127):
+            if cursor_pos > 0:
+                input_str = input_str[:cursor_pos-1] + input_str[cursor_pos:]
+                cursor_pos -= 1
+
+        # Left and Right arrows:
+        elif key == curses.KEY_LEFT:
+            if cursor_pos > 0:
+                cursor_pos -= 1
+        elif key == curses.KEY_RIGHT:
+            if cursor_pos < len(input_str):
+                cursor_pos += 1
+
+        # Regular ASCII characters:
+        elif 32 <= key <= 126 and cursor_pos < field_length:
+            input_str = input_str[:cursor_pos] + chr(key) + input_str[cursor_pos:]
+            cursor_pos += 1
+        else:
+            pass
+
+        # Redraw input field:
+        stdscr.addstr(y, x, input_str + " ")
+        stdscr.refresh()
+
+
 def input_string(stdscr, y, x, question, answer_length):
     """Ask user to input something and return it as a string"""
     curses.echo()
@@ -47,7 +87,8 @@ def input_string(stdscr, y, x, question, answer_length):
     display_question(stdscr, y, x, question, Color.PROMPTS)
     stdscr.refresh()
     try:
-        answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
+        # answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
+        answer = input_field(stdscr, y, len(question) + x, answer_length)
     except (UnicodeDecodeError, KeyboardInterrupt):
         answer = ""
         logging.warning("Incorrect characters in user input.")
