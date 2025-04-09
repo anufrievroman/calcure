@@ -101,11 +101,11 @@ class View:
         # Cut the text if it does not fit the screen:
         real_text = text.replace('\u0336', "")
         number_of_characters = len(real_text)
-        avaliable_space = x_max - x
+        available_space = x_max - x
         number_of_special = text.count('\u0336')
-        if number_of_characters > avaliable_space:
+        if number_of_characters > available_space:
             coefficient = 2 if number_of_special > 0 else 1
-            text = f"{text[:(avaliable_space - 1)*coefficient]}"
+            text = f"{text[:(available_space - 1)*coefficient]}"
 
         try:
             if bold and underlined:
@@ -303,8 +303,8 @@ class EventView(View):
 
     def cut_info(self):
         """Cut the name to fit into the cell of the calendar"""
-        avaliable_space = self.screen.x_max - self.x
-        number_of_special = self.info[:avaliable_space].count('\u0336')
+        available_space = self.screen.x_max - self.x
+        number_of_special = self.info[:available_space].count('\u0336')
         number_of_special += 2 if number_of_special > 2 else 0
         self.info = self.info[:self.screen.x_max - self.x + number_of_special]
         x_cell = self.screen.x_max // 7
@@ -567,13 +567,13 @@ class HeaderView(View):
             return
 
         # Show weather is space allows and it is loaded:
-        size_allows = len(self.weather.forcast) < self.screen.x_max - len(self.title)
+        size_allows = len(self.weather.forecast) < self.screen.x_max - len(self.title)
         if cf.SHOW_WEATHER and size_allows:
-            self.display_line(0, self.screen.x_max - len(self.weather.forcast) - 1, self.weather.forcast, Color.WEATHER)
+            self.display_line(0, self.screen.x_max - len(self.weather.forecast) - 1, self.weather.forecast, Color.WEATHER)
 
         # Show time:
         time_string = time.strftime("%H:%M", time.localtime())
-        size_allows = len(self.weather.forcast) < self.screen.x_max - len(self.title) - len(time_string)
+        size_allows = len(self.weather.forecast) < self.screen.x_max - len(self.title) - len(time_string)
         if cf.SHOW_CURRENT_TIME and size_allows:
             self.display_line(0, (self.screen.x_max // 2 - 2), time_string, Color.TIME)
 
@@ -610,7 +610,7 @@ class ErrorView(View):
 
     def render(self):
         """Render this view on the screen"""
-        if self.error.has_occured:
+        if self.error.has_occurred:
             clear_line(self.stdscr, self.screen.y_max - 2)
 
             # Depending on error type, display different messages:
@@ -1034,7 +1034,7 @@ def main(stdscr) -> None:
         stdscr.clear()
         app_view.fill_background()
 
-        # Calculate screen refreh rate:
+        # Calculate screen refresh rate:
         curses.halfdelay(200)
         if user_tasks.has_active_timer and screen.state == AppState.JOURNAL:
             curses.halfdelay(cf.REFRESH_INTERVAL * 10)

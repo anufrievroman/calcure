@@ -121,11 +121,11 @@ def input_day(stdscr, y, x, prompt_string):
 
 def input_date(stdscr, y, x, prompt_string):
     """Ask user to input date in YYYY/MM/DD format and check if it was a valid entry"""
-    date_unformated = input_string(stdscr, y, x, prompt_string, 10)
+    date_unformatted = input_string(stdscr, y, x, prompt_string, 10)
     try:
-        year = int(date_unformated.split("/")[0])
-        month = int(date_unformated.split("/")[1])
-        day = int(date_unformated.split("/")[2])
+        year = int(date_unformatted.split("/")[0])
+        month = int(date_unformatted.split("/")[1])
+        day = int(date_unformatted.split("/")[2])
         return year, month, day
     except (ValueError, IndexError, KeyboardInterrupt):
         logging.warning("Incorrect date input.")

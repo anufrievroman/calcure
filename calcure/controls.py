@@ -51,7 +51,7 @@ def safe_run(func):
 
 @safe_run
 def control_monthly_screen(stdscr, screen, user_events, importer):
-    """Handle user input on the montly screen"""
+    """Handle user input on the monthly screen"""
 
     # If we previously entered the selection mode, now we perform the action:
     if screen.selection_mode:
