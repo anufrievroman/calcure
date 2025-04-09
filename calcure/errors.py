@@ -23,8 +23,8 @@ class Error():
                                       logging.StreamHandler(self.buffer),
                                       ])
     @property
-    def has_occured(self):
-        """Has any errors occured?"""
+    def has_occurred(self):
+        """Has any errors occurred?"""
         return self.buffer.getvalue() != ""
 
     @property

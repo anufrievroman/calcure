@@ -25,7 +25,7 @@ class LoaderCSV:
                 pass
             return []
         except (FileNotFoundError, NameError) as e_message:
-            logging.error("Problem occured trying to create %s. %s", filename, e_message)
+            logging.error("Problem occurred trying to create %s. %s", filename, e_message)
             return []
 
     def read_file(self, filename):
@@ -448,7 +448,7 @@ class EventLoaderICS(LoaderICS):
                     repetition = dt_difference.days
                     frequency = Frequency.DAILY
             
-            # Parsing recuring rules:
+            # Parsing recurring rules:
             if 'rrule' in component:
                 rrule = component.get('rrule').to_ical().decode('utf-8')
                 exdate = component.get('exdate')

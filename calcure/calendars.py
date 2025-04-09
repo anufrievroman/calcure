@@ -22,7 +22,7 @@ class Calendar:
     """
     Calendar class, but in contrast to native calendar library, here
     the type of the calendar (Gregorian or Persian) is passed as argument
-    and all menthods change accordingly.
+    and all methods change accordingly.
     """
 
     def __init__(self, firstweekday, use_persian_calendar):
