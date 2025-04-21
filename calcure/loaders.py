@@ -447,7 +447,7 @@ class EventLoaderICS(LoaderICS):
                 if dt_difference.days > 0:
                     repetition = dt_difference.days
                     frequency = Frequency.DAILY
-            
+
             # Parsing recurring rules:
             if 'rrule' in component:
                 rrule = component.get('rrule').to_ical().decode('utf-8')
