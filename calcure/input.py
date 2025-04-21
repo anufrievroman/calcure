@@ -40,15 +40,15 @@ def main(stdscr):
     stdscr.clear()
     stdscr.addstr("Press Enter after typing, or Esc to exit.\n")
     stdscr.refresh()
-    
+
     user_input = input_field(stdscr)
-    
+
     stdscr.clear()
     if user_input is None:
         stdscr.addstr("Input cancelled.\n")
     else:
         stdscr.addstr(f"You entered: {user_input}\n")
-    
+
     stdscr.addstr("Press any key to exit.")
     stdscr.getch()
 

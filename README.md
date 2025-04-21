@@ -59,7 +59,7 @@ Run `calcure` in your terminal. You may need to restart your terminal after the 
 
 ### Syncing with cloud calendars
 
-[This page in documentation](https://anufrievroman.gitbook.io/calcure/syncing-with-clouds) shows examples how to sync and display in read-only mode events and tasks from Nextcloud, Google, and other calendars. 
+[This page in documentation](https://anufrievroman.gitbook.io/calcure/syncing-with-clouds) shows examples how to sync and display in read-only mode events and tasks from Nextcloud, Google, and other calendars.
 
 ### User arguments
 
