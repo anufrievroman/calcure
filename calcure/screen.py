@@ -1,7 +1,6 @@
 """Module that controls the overall state of the program screen"""
 
 import datetime
-import jdatetime
 import logging
 
 from calcure.data import Events, AppState, CalState
@@ -72,6 +71,7 @@ class Screen:
     def date(self) -> datetime:
         """Return displayed date in datetime format"""
         if self.use_persian_calendar:
+            import jdatetime
             return jdatetime.date(self.year, self.month, self.day)
         else:
             return datetime.date(self.year, self.month, self.day)
@@ -80,6 +80,7 @@ class Screen:
     def today(self) -> datetime:
         """Return todays's date in datetime format"""
         if self.use_persian_calendar:
+            import jdatetime
             return jdatetime.date.today()
         else:
             return datetime.date.today()

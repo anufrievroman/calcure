@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from calcure.data import *
-from calcure.calendars import convert_to_persian_date, convert_to_gregorian_date
+from calcure.calendars import convert_to_gregorian_date
 
 
 class TaskSaverCSV:

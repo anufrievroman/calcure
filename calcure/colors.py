@@ -1,7 +1,6 @@
 """Module that provides few converter functions"""
 
 import curses
-import jdatetime
 from enum import Enum, auto
 
 
