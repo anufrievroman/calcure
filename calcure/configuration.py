@@ -18,7 +18,7 @@ class Config:
         self.calcurse_events_file = self.home_path / ".local" / "share" / "calcurse" / "apts"
         self.config_folder = self.home_path / ".config" / "calcure"
         self.config_file = self.config_folder / "config.ini"
-        self.log_file = self.config_folder / "info2.log"
+        self.log_file = self.config_folder / "info.log"
         self.is_first_run= True
 
         # Create config folder:
@@ -372,7 +372,7 @@ class Config:
                     self.DEFAULT_VIEW = AppState.HELP
                 elif opt in ('-v'):
                     self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 3.1')
+                    print ('Calcure - version 3.2.1')
                 elif opt in ('-i'):
                     self.USE_PERSIAN_CALENDAR = True
         except getopt.GetoptError as e_message:

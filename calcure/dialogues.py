@@ -48,32 +48,37 @@ def input_field(stdscr, y, x, field_length):
 
     while True:
         stdscr.move(y, x + cursor_pos)
-        key = stdscr.getch()
+        key = stdscr.get_wch()
 
-        # Esc, Return, and Backspace keys:
-        if key == 27:
-            return ""
-        if key in (curses.KEY_ENTER, 10, 13):
-            return input_str
-        if key in (curses.KEY_BACKSPACE, 127):
-            if cursor_pos > 0:
+        # Regular Unicode characters:
+        if isinstance(key, str):
+            if ord(key) == 27: # Esc
+                return ""
+            elif ord(key) in (10, 13): # Enter
+                return input_str
+            elif ord(key) == 127 and cursor_pos > 0: # Backspace
                 input_str = input_str[:cursor_pos-1] + input_str[cursor_pos:]
                 cursor_pos -= 1
-
-        # Left and Right arrows:
-        elif key == curses.KEY_LEFT:
-            if cursor_pos > 0:
-                cursor_pos -= 1
-        elif key == curses.KEY_RIGHT:
-            if cursor_pos < len(input_str):
+            elif cursor_pos < field_length: # Other characters:
+                input_str = input_str[:cursor_pos] + chr(ord(key)) + input_str[cursor_pos:]
                 cursor_pos += 1
+            else:
+                pass
 
-        # Regular ASCII characters:
-        elif 32 <= key <= 126 and cursor_pos < field_length:
-            input_str = input_str[:cursor_pos] + chr(key) + input_str[cursor_pos:]
-            cursor_pos += 1
+        # Various keys:
         else:
-            pass
+            if key == curses.KEY_ENTER:
+                return input_str
+            elif key == curses.KEY_BACKSPACE and cursor_pos > 0:
+                input_str = input_str[:cursor_pos-1] + input_str[cursor_pos:]
+                cursor_pos -= 1
+            elif key == curses.KEY_LEFT and cursor_pos > 0:
+                cursor_pos -= 1
+            elif key == curses.KEY_RIGHT and cursor_pos < len(input_str):
+                cursor_pos += 1
+            else:
+                pass
+
 
         # Redraw input field:
         stdscr.addstr(y, x, input_str + " ")
