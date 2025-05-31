@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Prepnúť viditeľnosť úlohy",
         "  f(F) ": "Zmeniť (odstrániť) hraničný termín úlohy",
         "   m   ": "Odstrániť úlohu",
-        "  C(W) ": "Importovať úlohy z calcurse",
+        "   C   ": "Importovať úlohy z calcurse",
         }
 
 MSG_NAME          = "CALCURE"

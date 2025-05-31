@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "切换任务隐私模式",
         "  f(F) ": "更改（删除）任务截止日期",
         "   m   ": "移动任务",
-        "  C(W) ": "从 Calcurse (Taskwarrior) 导入任务",
+        "   C   ": "从 Calcurse 导入任务",
         }
 
 MSG_NAME          = "CALCURE"

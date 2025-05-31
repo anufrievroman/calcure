@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Toggle task privacy",
         "  f(F) ": "Change (remove) task deadline",
         "   m   ": "Move a task",
-        "  C(W) ": "Import tasks from calcurse",
+        "   C   ": "Import tasks from calcurse",
         }
 
 MSG_NAME          = "CALCURE"

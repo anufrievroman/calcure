@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Basculer la confidentialité des tâches",
         "  f(F) ": "Modifier (supprimer) l'échéance de la tâche",
         "   m   ": "Déplacer une tâche",
-        "  C(W) ": "Importer des tâches de calcurse",
+        "   C   ": "Importer des tâches de calcurse",
         }
 
 MSG_NAME          = "CALCURE"

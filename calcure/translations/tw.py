@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "切換任務隱私設定",
         "  f(F) ": "修改（移除）任務期限",
         "   m   ": "移動任務",
-        "  C(W) ": "從 Calcurse (Taskwarrior) 匯入任務",
+        "   C   ": "從 Calcurse 匯入任務",
         }
 
 MSG_NAME          = "CALCURE"
