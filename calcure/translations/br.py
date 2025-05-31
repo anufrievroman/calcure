@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Alternar privacidade da tarefa",
         "  f(F) ": "Mudar (remover) data limite da tarefa",
         "   m   ": "Mover tarefa",
-        "  C(W) ": "Importar tarefas do calcurse (taskwarrior)",
+        "  C(W) ": "Importar tarefas do calcurse",
         }
 
 MSG_NAME          = "CALCURE"

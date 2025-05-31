@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Görev gizliliğini aç / kapat",
         "  f(F) ": "Görev son tarihini değiştir (kaldır)",
         "   m   ": "Görev taşıma",
-        "  C(W) ": "Calcurse'den görevleri içe aktarma (taskwarrior)",
+        "  C(W) ": "Calcurse'den görevleri içe aktarma",
         }
 
 MSG_NAME          = "CALCURE"
