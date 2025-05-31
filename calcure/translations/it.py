@@ -49,7 +49,7 @@ KEYS_TODO = {
         "   .   ": "Imposta la privacy dell'attività",
         "  f(F) ": "Cambia (o rimuovi) la scadenza per una attività",
         "   m   ": "Sposta una attività",
-        "  C(W) ": "Importa le attività da calcurse (taskwarrior)",
+        "   C   ": "Importa le attività da calcurse",
         }
 
 MSG_NAME          = "CALCURE"
