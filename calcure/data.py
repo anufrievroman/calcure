@@ -59,10 +59,12 @@ class Task:
 class Event:
     """Parent class of all events"""
 
-    def __init__(self, year, month, day, name):
+    def __init__(self, year, month, day, name, hour=None, minute=None):
         self.year = year
         self.month = month
         self.day = day
+        self.hour = hour
+        self.minute = minute
         self.name = name
 
 
@@ -91,8 +93,8 @@ class UserEvent(Event):
 class UserRepeatedEvent(Event):
     """Events that are repetitions of the original user events"""
 
-    def __init__(self, item_id, year, month, day, name, status, privacy, calendar_number=None):
-        super().__init__(year, month, day, name)
+    def __init__(self, item_id, year, month, day, name, status, privacy, calendar_number=None, hour=None, minute=None):
+        super().__init__(year, month, day, name, hour, minute)
         self.item_id = item_id
         self.status = status
         self.privacy = privacy
@@ -399,11 +401,17 @@ class RepeatedEvents(Events):
                         for exdate in exdates.dts:
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
-
+                            logging.info("exdate ", exdate_dt)
+                            
                 # Create an event for each repetition and add to the list:
                 for date in list(rset)[1:]:
+                    #self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, date.hour, f"{date.hour:0=2}:{date.minute:0=2} {event.name}",
+                    #                                event.status, event.privacy, event.calendar_number))
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
-                                                    event.status, event.privacy, event.calendar_number))
+                                                    event.status, event.privacy, event.calendar_number, date.hour, date.minute))
+                    # We can log the datetime of each event, which means we should be able to extract the hour and minute...
+                    #logging.info(date)
+
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""
