@@ -264,7 +264,11 @@ class EventView(View):
         # Show time for ICS events if it set:
         if hasattr(self.event, 'hour'):
             if self.event.hour is not None:
-                self.start_time = f"{self.event.hour:0=2}:{self.event.minute:0=2} "
+                # put a switch here to convert to 12-hour time
+                if self.event.hour <= 12:
+                    self.start_time = f"{self.event.hour:0=2}:{self.event.minute:0=2} "
+                else:
+                    self.start_time = f"{self.event.hour-12:0=2}:{self.event.minute:0=2} "
 
         self.info = f"{self.icon} {self.start_time}{self.event.name}"
 
@@ -455,8 +459,12 @@ class DailyView(View):
                     self.display_line(self.y + index, self.x, str(index + self.index_offset + 1), Color.ACTIVE_PANE)
             index += 1
 
-        # Show repeated user events and events from ics:
-        for event_list in [self.repeated_user_events.items, self.user_ics_events.items, self.repeated_ics_events.items]:
+        # Show repeated user events and events from ics:         
+        event_list_plus = self.repeated_user_events.items + self.user_ics_events.items + self.repeated_ics_events.items
+        event_list_sorted = [sorted(event_list_plus, key=lambda x: ((x.hour is None, x.hour), (x.minute is None, x.minute)), reverse=False)]
+
+        for event_list in event_list_sorted:
+            
             for event in event_list:
                 if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
                     self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
