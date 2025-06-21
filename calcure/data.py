@@ -401,7 +401,7 @@ class RepeatedEvents(Events):
                         for exdate in exdates.dts:
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
-                            logging.info("exdate ", exdate_dt)
+                            #logging.info("exdate ", exdate_dt)
                             
                 # Create an event for each repetition and add to the list:
                 for date in list(rset)[1:]:

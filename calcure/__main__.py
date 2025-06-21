@@ -460,8 +460,45 @@ class DailyView(View):
             index += 1
 
         # Show repeated user events and events from ics:
-        for event_list in [self.repeated_user_events.items, self.user_ics_events.items, self.repeated_ics_events.items]:
+        
+        
+        # This list needs to be organized better before it is used
+        #a_list = [self.repeated_user_events.items, self.user_ics_events.items, self.repeated_ics_events.items]
+        #logging.info(a_list)
+        #attrs = [getattr(o, 'name', 'NA') for o in a_list]
+        #attrs = [o.hour for o in a_list]
+        #logging.info(attrs)
+        
+        #attrs = [getattr(o, 'name', 'NA') for o in self.repeated_user_events.items]
+        #for item in self.repeated_ics_events.items:
+        #    logging.info(item.hour)
+         
+        event_list_plus = self.repeated_user_events.items + self.user_ics_events.items + self.repeated_ics_events.items
+        #attrs = [getattr(o, 'name', 'NA') for o in b_list]
+        event_list_sorted = [sorted(event_list_plus, key=lambda x: ((x.hour is None, x.hour), (x.minute is None, x.minute)), reverse=False)]
+        #logging.info(b_list_sorted)
+            
+        #hours_rep_user = [o.hour for o in self.repeated_user_events.items]  
+        #hours_ics = [o.hour for o in self.user_ics_events.items]  
+        #hours_rep_ics = [o.hour for o in self.repeated_ics_events.items]
+        #logging.info(hours_rep_user)
+        #logging.info(hours_ics)
+        #logging.info(hours_rep_ics)
+        
+        #for event_list in [self.repeated_user_events.items, self.user_ics_events.items, self.repeated_ics_events.items]:
+        for event_list in event_list_sorted:
+        
+            # Attempt to sort together https://stackoverflow.com/a/48731059
+            #event_list_order = [c.hour for c in event_list]
+            # Hit an error below: "TypeError: '<' not supported between instances of 'UserRepeatedEvent' and 'UserRepeatedEvent'"
+            #event_list_sorted = sorted(event_list)
+            #event_list_sorted_order = [c.hour for c in event_list_sorted]
+
+            #event_list_sorted = sorted(event_list, key=lambda x: x.hour, reverse=False)
+            
             for event in event_list:
+                #logging.info(vars(event))
+                #logging.info(event.hour)
                 if index >= self.y_cell - 1 and self.screen.calendar_state == CalState.MONTHLY:
                     self.display_line(self.y + self.y_cell - 2, self.x, self.hidden_events_sign, Color.EVENTS)
                 else:
