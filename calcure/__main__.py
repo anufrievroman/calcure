@@ -1039,7 +1039,7 @@ def main(stdscr) -> None:
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
-        stdscr.clear()
+        stdscr.refresh()
         app_view.fill_background()
 
         # Calculate screen refresh rate:
