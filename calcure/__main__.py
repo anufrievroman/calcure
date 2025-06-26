@@ -815,6 +815,7 @@ class MonthlyScreenView(View):
 
     def render(self):
         """Render this view on the screen"""
+        self.stdscr.clear()
         self.screen.currently_drawn = AppState.CALENDAR
         if self.screen.x_max < 6 or self.screen.y_max < 3: return
 
@@ -1039,7 +1040,7 @@ def main(stdscr) -> None:
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
-        stdscr.refresh()
+        stdscr.clear()
         app_view.fill_background()
 
         # Calculate screen refresh rate:
