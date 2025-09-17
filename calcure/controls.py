@@ -213,7 +213,8 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.split = not screen.split
             screen.refresh_now = True
         if screen.key == "w":
-            cf.SHOW_WEEK_NUMBERS = not cf.SHOW_WEEK_NUMBERS
+            from calcure.__main__ import cf as main_cf
+            main_cf.SHOW_WEEK_NUMBERS = not main_cf.SHOW_WEEK_NUMBERS
             screen.refresh_now = True
 
 
