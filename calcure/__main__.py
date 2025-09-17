@@ -627,9 +627,10 @@ class ErrorView(View):
 class SeparatorView(View):
     """Display the separator in the split screen"""
 
-    def __init__(self, stdscr, y, x, screen):
+    def __init__(self, stdscr, y, x, screen, week_column_width=4):
         super().__init__(stdscr, y, x)
         self.screen = screen
+        self.week_column_width = week_column_width
 
     def render(self):
         """Render this view on the screen"""
@@ -649,45 +650,70 @@ class SeparatorView(View):
 class CalenarBorderView(View):
     """Display the borders in the monthly view"""
 
-    def __init__(self, stdscr, y, x, screen):
+    def __init__(self, stdscr, y, x, screen, week_column_width=4):
         super().__init__(stdscr, y, x)
         self.screen = screen
         self.rows = self.screen.number_of_weeks
+        self.week_column_width = week_column_width
 
     def render(self):
         """Render this view on the screen"""
-        x_cell = self.screen.x_max // 7
+        calendar_start_x = self.week_column_width
+        x_cell = (self.screen.x_max - self.week_column_width) // 7
         y_cell = (self.screen.y_max - 3) // 6
 
         # Vertical lines:
         for column in range(1, 7):
             for row in range(y_cell * self.rows):
-                self.display_line(row + 2, column * x_cell - 1, "│", Color.CALENDAR_BORDER)
+                self.display_line(row + 2, calendar_start_x + column * x_cell - 1, "│", Color.CALENDAR_BORDER)
 
         # Horizontal lines:
         for row in range(1, self.rows + 1):
-            for column in range(0, self.screen.x_max):
+            for column in range(calendar_start_x, self.screen.x_max):
                 self.display_line(row * y_cell + 1, column, "─", Color.CALENDAR_BORDER)
 
         # Connectors:
         for row in range(1, self.rows):
             for column in range(1, 7):
-                self.display_line(row * y_cell + 1, column*x_cell - 1, "┼", Color.CALENDAR_BORDER)
+                self.display_line(row * y_cell + 1, calendar_start_x + column*x_cell - 1, "┼", Color.CALENDAR_BORDER)
         for column in range(1, 7):
-            self.display_line(self.rows * y_cell + 1, column*x_cell - 1, "┴", Color.CALENDAR_BORDER)
+            self.display_line(self.rows * y_cell + 1, calendar_start_x + column*x_cell - 1, "┴", Color.CALENDAR_BORDER)
+
+
+class WeekNumberView(View):
+    """Display week numbers in a column to the left of the calendar"""
+
+    def __init__(self, stdscr, y, x, screen, week_numbers):
+        super().__init__(stdscr, y, x)
+        self.screen = screen
+        self.week_numbers = week_numbers
+
+    def render(self):
+        """Render this view on the screen"""
+        y_cell = (self.screen.y_max - 3) // 6
+        
+        for row, week_num in enumerate(self.week_numbers):
+            # Position week number in the vertical middle of the cell
+            y_pos = 2 + row * y_cell + (y_cell // 2)
+            self.display_line(y_pos, self.x, str(week_num), Color.WEEK_NUMBERS, False, False)  # Use dedicated grey color
 
 
 class DaysNameView(View):
     """Display day name depending on the screen available and with right style"""
 
-    def __init__(self, stdscr, y, x, screen):
+    def __init__(self, stdscr, y, x, screen, x_cell=None):
         super().__init__(stdscr, y, x)
         self.screen = screen
+        self.x_cell = x_cell
 
     def render(self):
         """Render this view on the screen"""
         num = 2 if self.screen.x_max < 74 else 12
-        x_cell = int(self.screen.x_max // 7)
+        # Use provided x_cell if available, otherwise calculate as before
+        if self.x_cell is None:
+            x_cell = int(self.screen.x_max // 7)
+        else:
+            x_cell = self.x_cell
 
         # Depending on which day we start the week, weekends are shifted:
         for i in range(7):
@@ -815,15 +841,23 @@ class MonthlyScreenView(View):
         # Info about the month:
         month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
         month_year_string = month_names[self.screen.month-1] + " " + str(self.screen.year)
-        dates = Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR).monthdayscalendar(self.screen.year, self.screen.month)
+        calendar = Calendar(cf.START_WEEK_DAY - 1, cf.USE_PERSIAN_CALENDAR)
+        dates = calendar.monthdayscalendar(self.screen.year, self.screen.month)
 
+        # Calculate week numbers and adjust layout
+        week_numbers = calendar.month_week_numbers(self.screen.year, self.screen.month)
+        week_column_width = 4  # Space for week numbers (2 digits + 2 spaces for better separation)
+        calendar_start_x = week_column_width
+        
         y_cell = (self.screen.y_max - 3) // 6
-        x_cell = self.screen.x_max // 7
+        x_cell = (self.screen.x_max - week_column_width) // 7
 
         header_view = HeaderView(self.stdscr, 0, 0, month_year_string, self.weather, self.screen)
-        days_name_view = DaysNameView(self.stdscr, 1, 0, self.screen)
+        days_name_view = DaysNameView(self.stdscr, 1, calendar_start_x, self.screen, x_cell)
+        week_number_view = WeekNumberView(self.stdscr, 0, 0, self.screen, week_numbers)
         header_view.render()
         days_name_view.render()
+        week_number_view.render()
 
         # Displaying the dates and events:
         repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, self.screen.year)
@@ -834,12 +868,12 @@ class MonthlyScreenView(View):
                 if day != 0:
                     # Display dates of the month with proper styles:
                     day_in_week = col + (cf.START_WEEK_DAY - 1) - 7 * ((col + (cf.START_WEEK_DAY - 1)) > 6)
-                    day_number_view = DayNumberView(self.stdscr, 2 + row * y_cell, col * x_cell, self.screen, day, day_in_week, x_cell)
+                    day_number_view = DayNumberView(self.stdscr, 2 + row * y_cell, calendar_start_x + col * x_cell, self.screen, day, day_in_week, x_cell)
                     day_number_view.render()
 
                     # Display the events:
                     self.screen.day = day
-                    daily_view = DailyView(self.stdscr, 3 + row * y_cell, col * x_cell, repeated_user_events,
+                    daily_view = DailyView(self.stdscr, 3 + row * y_cell, calendar_start_x + col * x_cell, repeated_user_events,
                                            repeated_ics_events, self.user_events, self.user_ics_events,
                                            self.holidays, self.birthdays, self.user_tasks, self.user_ics_tasks,
                                            self.screen, num_events_this_month)
@@ -847,7 +881,7 @@ class MonthlyScreenView(View):
                     num_events_this_month += len(self.user_events.filter_events_that_day(self.screen).items)
 
         if cf.SHOW_CALENDAR_BORDERS:
-            calendar_border_view = CalenarBorderView(self.stdscr, 0, 0, self.screen)
+            calendar_border_view = CalenarBorderView(self.stdscr, 0, 0, self.screen, week_column_width)
             calendar_border_view.render()
 
 
