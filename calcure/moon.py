@@ -72,7 +72,7 @@ def is_divisible_by(dividend, divisor):
     """Determine if the given dividend is divisible (integer
     divivion) by the given divisor (without remainder).
     """
-    return dividend / divisor == int(dividend / divisor)
+    return dividend % divisor == 0
 
 
 def is_leap_year(year: int) -> bool:
