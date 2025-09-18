@@ -68,6 +68,13 @@ def delta_t(year: int) -> float:
     return delta_t
 
 
+def is_divisible_by(dividend, divisor):
+    """Determine if the given dividend is divisible (integer
+    divivion) by the given divisor (without remainder).
+    """
+    return dividend % divisor == 0
+
+
 def is_leap_year(year: int) -> bool:
     """Determine if the given year (Gregorian calendar)
     is a leap year or not.
@@ -76,15 +83,9 @@ def is_leap_year(year: int) -> bool:
     Astronomical Algorithms, in the box.  No equation
     numbers in text.
     """
-    if year / 100 == int(year / 100):
-        if year / 400 == int(year / 400):
-            return True
-        else:
-            return False
-    if year / 4 == int(year / 4):
-        return True
-    else:
-        return False
+    if is_divisible_by(year, 100):
+        return is_divisible_by(year, 400):
+    return is_divisible_by(year, 4):
 
 
 def major_correction(k: float, T: float, phase: str) -> float:
