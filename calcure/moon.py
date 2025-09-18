@@ -84,14 +84,8 @@ def is_leap_year(year: int) -> bool:
     numbers in text.
     """
     if is_divisible_by(year, 100):
-        if is_divisible_by(year, 400):
-            return True
-        else:
-            return False
-    if is_divisible_by(year, 4):
-        return True
-    else:
-        return False
+        return is_divisible_by(year, 400):
+    return is_divisible_by(year, 4):
 
 
 def major_correction(k: float, T: float, phase: str) -> float:
