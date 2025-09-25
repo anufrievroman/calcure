@@ -42,6 +42,7 @@ class Color(Enum):
     ICS_CALENDARS7 = auto()
     ICS_CALENDARS8 = auto()
     ICS_CALENDARS9 = auto()
+    WEEK_NUMBERS = auto()
 
 
 def initialize_colors(cf):
@@ -74,6 +75,14 @@ def initialize_colors(cf):
     curses.init_pair(Color.EMPTY.value, cf.COLOR_BACKGROUND, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.CALENDAR_BORDER.value, cf.COLOR_CALENDAR_BORDER, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.DEADLINES.value, cf.COLOR_DEADLINES, cf.COLOR_BACKGROUND)
+    # Initialize week numbers with a dim white/grey color
+    if curses.can_change_color():
+        # If terminal supports color changes, create a custom grey
+        curses.init_color(8, 500, 500, 500)  # Custom grey (RGB values 0-1000)
+        curses.init_pair(Color.WEEK_NUMBERS.value, 8, cf.COLOR_BACKGROUND)
+    else:
+        # Fallback to dimmed white for grey effect
+        curses.init_pair(Color.WEEK_NUMBERS.value, curses.COLOR_WHITE, cf.COLOR_BACKGROUND)
 
     if not cf.MINIMAL_WEEKEND_INDICATOR:
         curses.init_pair(Color.WEEKENDS.value, curses.COLOR_BLACK, cf.COLOR_WEEKENDS)

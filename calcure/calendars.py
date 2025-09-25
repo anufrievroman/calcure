@@ -64,3 +64,34 @@ class Calendar:
         """Return a matrix representing a month's calendar"""
         days = list(self.itermonthdays(year, month))
         return [days[i:i + 7] for i in range(0, len(days), 7)]
+
+    def week_number(self, year, month, day):
+        """Return the week number for a given date"""
+        if self.use_persian_calendar:
+            import jdatetime
+            date = jdatetime.date(year, month, day)
+            # For Persian calendar, calculate week number based on year start
+            year_start = jdatetime.date(year, 1, 1)
+            days_since_start = (date - year_start).days
+            week_num = (days_since_start // 7) + 1
+            return week_num
+        else:
+            import datetime
+            date = datetime.date(year, month, day)
+            # ISO week number (standard week numbering)
+            return date.isocalendar()[1]
+
+    def month_week_numbers(self, year, month):
+        """Return list of week numbers for each week in the month"""
+        weeks = self.monthdayscalendar(year, month)
+        week_numbers = []
+        for week in weeks:
+            # Find the first non-zero day in the week to get the week number
+            for day in week:
+                if day != 0:
+                    week_numbers.append(self.week_number(year, month, day))
+                    break
+            else:
+                # If all days are 0 (shouldn't happen), use previous week + 1
+                week_numbers.append(week_numbers[-1] + 1 if week_numbers else 1)
+        return week_numbers
