@@ -446,7 +446,8 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             if user_tasks.is_valid_number(number_from):
                 clear_line(stdscr, screen.y_max-2)
                 number_to = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE_TO)
-                user_tasks.move_task(number_from, number_to)
+                if user_tasks.is_valid_number(number_to):
+                    user_tasks.move_task(number_from, number_to)
         if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_EDIT)
             if user_tasks.is_valid_number(number):
