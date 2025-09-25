@@ -266,7 +266,10 @@ class EventView(View):
         # Show time for ICS events if it set:
         if hasattr(self.event, 'hour'):
             if self.event.hour is not None:
-                self.start_time = f"{self.event.hour:0=2}:{self.event.minute:0=2} "
+                if cf.USE_24_HOUR_FORMAT or self.event.hour <= 12:
+                    self.start_time = f"{self.event.hour:0=2}:{self.event.minute:0=2} "
+                else:
+                    self.start_time = f"{self.event.hour-12:0=2}:{self.event.minute:0=2} "
 
         self.info = f"{self.icon} {self.start_time}{self.event.name}"
 

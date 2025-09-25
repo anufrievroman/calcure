@@ -55,7 +55,7 @@ class Config:
                 "language":                  "en",
                 "default_view":              "calendar",
                 "default_calendar_view":     "monthly",
-                "birthdays_from_abook":      "Yes",
+                "birthdays_from_abook":      "No",
                 "show_keybindings":          "Yes",
                 "privacy_mode":              "No",
                 "show_weather":              "No",
@@ -70,6 +70,7 @@ class Config:
                 "ask_confirmations":         "Yes",
                 "ask_confirmation_to_quit":  "Yes",
                 "use_unicode_icons":         "Yes",
+                "use_24_hour_format":        "Yes",
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
                 "show_nothing_planned":      "Yes",
@@ -217,6 +218,7 @@ class Config:
             self.SHOW_WEATHER              = conf.getboolean("Parameters", "show_weather", fallback=False)
             self.SHOW_CURRENT_TIME         = conf.getboolean("Parameters", "show_current_time", fallback=False)
             self.DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
+            self.USE_24_HOUR_FORMAT        = conf.getboolean("Parameters", "use_24_hour_format", fallback=True)
             self.DISPLAY_HOLIDAYS          = conf.getboolean("Parameters", "show_holidays", fallback=True)
             self.PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
