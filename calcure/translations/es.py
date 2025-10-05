@@ -4,80 +4,81 @@ MSG_WELCOME_1 = "Bienvenido a Calcure"
 MSG_WELCOME_2 = "¡Tu calendario y administrador de tareas en la terminal!"
 MSG_WELCOME_3 = "Se han creados archivos de configuración en:"
 MSG_WELCOME_4 = "Para soporte, contribución e información adicional, visite:"
-MSG_WELCOME_5 = "Press ? to see all keybindings or any other key to continue."
-MSG_WELCOME_5 = "Presione ? para ver los atajos del teclado u otra tecla para continuar"
+MSG_WELCOME_5 = "Presione ? para ver los atajos u otra tecla para continuar"
 
-TITLE_KEYS_GENERAL = "GENERAL KEYBINDINGS"
-TITLE_KEYS_CALENDAR = "CALENDAR KEYBINDINGS"
-TITLE_KEYS_JOURNAL  = "JOURNAL KEYBINDINGS"
+TITLE_KEYS_GENERAL = "ATAJOS GENERALES"
+TITLE_KEYS_CALENDAR = "ATAJOS DEL CALENDARIO"
+TITLE_KEYS_JOURNAL  = "ATAJOS DEL DIARIO"
 
 KEYS_GENERAL = {
-        " Space ": "Switch between calendar and journal",
-        "   /   ": "Toggle split screen",
-        "   *   ": "Toggle global privacy",
-        "   ?   ": "Toggle this help",
-        "   Q   ": "Reload",
-        "   q   ": "Quit",
+        " Espacio ": "Cambiar entre el calendario y el diario",
+        "   /   ": "Alternar pantalla dividida",
+        "   *   ": "Alternar privacidad global",
+        "   ?   ": "Alternar para ayuda",
+        "   Q   ": "Recargar",
+        "   q   ": "Salir",
         }
 
 KEYS_CALENDAR = {
-        "  a(A) ": "Add a (recurring) event",
-        "   n   ": "Next month (day)",
-        "   p   ": "Previous month (day)",
-        "   x   ": "Delete an event",
-        "   r   ": "Rename an event",
-        "  m(M) ": "Move event (in this month)",
-        "  g(G) ": "Go to a certain day (in this month)",
-        "   v   ": "Toggle daily/monthly view",
-        "   h   ": "Toggle event as high priority",
-        "   l   ": "Toggle event as low priority",
-        "   d   ": "Toggle event as done",
-        "   .   ": "Toggle event privacy",
-        "   C   ": "Import events from calcurse",
-        "   R   ": "Return to current month (day)",
+        "  a(A) ": "Agregar un evento (recurrente)",
+        "   n   ": "Próximo mes (día)",
+        "   p   ": "Mes anterior (día)",
+        "   x   ": "Elimine un evento",
+        "   r   ": "Renombrar un evento",
+        "  m(M) ": "Mover evento (en este mes)",
+        "  g(G) ": "Ir a un día específico (en este mes)",
+        "   v   ": "Alternar vista diaria/mensual",
+        "   h   ": "Alternar evento como alta prioridad",
+        "   l   ": "Alternar evento como baja prioridad",
+        "   d   ": "Alternar evento como terminado",
+        "   .   ": "Alternar la privacidad del evento",
+        "   C   ": "Importar eventos desde calcurse",
+        "   R   ": "Regresar al mes actual",
         }
 
 KEYS_TODO = {
-        "  a(A) ": "Add new (sub)task",
-        "  h(H) ": "Toggle one (all) of the tasks as high priority",
-        "  l(L) ": "Toggle one (all) of the tasks as low priority",
-        "  d(D) ": "Toggle one (all) of the tasks as done",
-        "  u(U) ": "Unmark one (all) of the tasks",
-        "  x(X) ": "Delete one (all) of the tasks (with all subtasks)",
-        "  t(T) ": "Start/pause (remove) timer for a task",
-        "   r   ": "Rename a task",
-        "   s   ": "Toggle between task and subtask",
-        "   .   ": "Toggle task privacy",
-        "  f(F) ": "Change (remove) task deadline",
-        "   m   ": "Move a task",
-        "   C   ": "Import tasks from calcurse",
+        "  a(A) ": "Agregar nueva (sub)tarea",
+        "  h(H) ": "Alternar una (todas) de las tareas como alta prioridad",
+        "  l(L) ": "Alternar una (todas) de las tareas como baja prioridad",
+        "  d(D) ": "Alternar una (todas) de las tareas como terminadas",
+        "  u(U) ": "Desmarcar una (todas) de las tareas",
+        "  x(X) ": "Eliminar una (todas) de las tareas (con todas las subtareas)",
+        "  t(T) ": "Iniciar/pausar (remover) el temporizador de una tarea",
+        "   r   ": "Renombra una tarea",
+        "   s   ": "Alternar entre tarea y subtarea",
+        "   .   ": "Alternar la privacidad de la tarea",
+        "  f(F) ": "Cambiar (remover) el límite de la tarea",
+        "   m   ": "Mover una tarea",
+        "   C   ": "Importar tareas desde calcurse",
         }
 
 MSG_NAME          = "CALCURE"
-MSG_VIM           = "Arrow and Vim keys (j, k, ZZ, ZQ) work as well!"
-MSG_INFO          = "For more information, visit:"
+MSG_VIM           = "¡Flechas y atajos de Vim (j, k, ZZ, ZQ) también funcionan!"
+MSG_INFO          = "Para más información, visite:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
-MSG_EXIT          = "Really exit? (y/n) "
+MSG_EXIT          = "¿Realmente quire salir? (y/n) "
 
-MSG_EVENT_HIGH    = "Mark as high priority event number: "
-MSG_EVENT_LOW     = "Mark as low priority event number: "
-MSG_EVENT_DONE    = "Mark as done event number: "
-MSG_EVENT_RESET   = "Reset status for event number: "
-MSG_EVENT_DEL     = "Delete event number: "
-MSG_EVENT_REN     = "Rename event number: "
-MSG_NEW_TITLE     = "Enter new title: "
+MSG_EVENT_HIGH    = "Marcar como alta prioridad el evento número: ";
+MSG_EVENT_LOW     = "Marcar como baja prioridad el evento número: "
+MSG_EVENT_DONE    = "Marcar como terminado el evento número: "
+MSG_EVENT_RESET   = "Resetear el estatus para el evento número: "
+MSG_EVENT_DEL     = "Eliminar el evento número: "
+MSG_EVENT_REN     = "Renombrar el evento número: "
+MSG_NEW_TITLE     = "Ingrese un nuevo título: "
 MSG_EVENT_MV      = "Move event number: "
-MSG_EVENT_MV_TO   = "Move event to (YYYY/MM/DD): "
-MSG_EVENT_MV_TO_D = "Move event to: "
-MSG_EVENT_DATE    = "Enter date: "
-MSG_EVENT_TITLE   = "Enter title: "
-MSG_EVENT_REP     = "How many times repeat the event: "
-MSG_EVENT_FR      = "Repeat the event every (d)ay, (w)eek, (m)onth or (y)ear? "
-MSG_EVENT_IMP     = "Import events from Calcurse? (y/n)"
-MSG_EVENT_PRIVACY = "Toggle privacy of event number: "
-MSG_TM_ADD        = "Add/pause timer for task number: "
-MSG_TM_RESET      = "Remove timer for the task number: "
+MSG_EVENT_MV      = "Mover evento número: "
+MSG_EVENT_MV_TO   = "Mover evento a (YYYY/MM/DD): "
+MSG_EVENT_MV_TO_D = "Mover evento a: "
+MSG_EVENT_DATE    = "Ingrese la fecha: "
+MSG_EVENT_TITLE   = "Ingrese un titulo: "
+MSG_EVENT_REP     = "Cuantas veces quiere repetir el evento: "
+MSG_EVENT_FR      = "¿Repetir el evento cada (d)ía, (w)semana, (m)mes o (y)año? "
+MSG_EVENT_IMP     = "¿Importar eventos desde Calcurse? (y/n)"
+MSG_EVENT_PRIVACY = "Alternar privacidad del evento número: "
+MSG_TM_ADD        = "Agregar/pausar temporizador por número de tarea: "
+MSG_TM_RESET      = "Remover temporizador para la tarea número: "
 MSG_TS_HIGH       = "Mark as high priority the task number: "
+MSG_TS_HIGH       = "Marcar como alta prioridad el número de la tarea: "
 MSG_TS_LOW        = "Mark as low priority the task number: "
 MSG_TS_RES        = "Reset status for the task number: "
 MSG_TS_DONE       = "Mark as done the task number: "
