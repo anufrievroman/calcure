@@ -634,7 +634,7 @@ class SeparatorView(View):
     def render(self):
         """Render this view on the screen"""
         _, x_max = self.stdscr.getmaxyx()
-        week_column_width = 4 if cf.SHOW_WEEK_NUMBERS else 0
+        week_column_width = 4 if self.screen.show_week_numbers else 0
         x_separator = x_max - self.screen.journal_pane_width
         y_cell = (self.screen.y_max - 3) // 6
         height = self.screen.number_of_weeks * y_cell + 2 if cf.SHOW_CALENDAR_BORDERS else self.screen.y_max
@@ -657,7 +657,7 @@ class CalenarBorderView(View):
 
     def render(self):
         """Render this view on the screen"""
-        week_column_width = 4 if cf.SHOW_WEEK_NUMBERS else 0
+        week_column_width = 4 if self.screen.show_week_numbers else 0
         calendar_start_x = week_column_width
         x_cell = (self.screen.x_max - week_column_width) // 7
         y_cell = (self.screen.y_max - 3) // 6
@@ -845,7 +845,7 @@ class MonthlyScreenView(View):
         dates = calendar.monthdayscalendar(self.screen.year, self.screen.month)
 
         # Calculate week numbers and adjust layout if week numbers are enabled
-        if cf.SHOW_WEEK_NUMBERS:
+        if self.screen.show_week_numbers:
             week_numbers = calendar.month_week_numbers(self.screen.year, self.screen.month)
             week_column_width = 4  # Space for week numbers (2 digits + 2 spaces for better separation)
             calendar_start_x = week_column_width
@@ -862,7 +862,7 @@ class MonthlyScreenView(View):
         header_view.render()
         days_name_view.render()
 
-        if cf.SHOW_WEEK_NUMBERS:
+        if self.screen.show_week_numbers:
             week_number_view = WeekNumberView(self.stdscr, 0, 0, self.screen, week_numbers)
             week_number_view.render()
 

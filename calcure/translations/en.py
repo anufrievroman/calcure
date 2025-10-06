@@ -28,6 +28,7 @@ KEYS_CALENDAR = {
         "  m(M) ": "Move event (in this month)",
         "  g(G) ": "Go to a certain day (in this month)",
         "   v   ": "Toggle daily/monthly view",
+        "   w   ": "Toggle week numbers",
         "   h   ": "Toggle event as high priority",
         "   l   ": "Toggle event as low priority",
         "   d   ": "Toggle event as done",
