@@ -16,6 +16,7 @@ class Screen:
         self.calendar_state = CalState.DAILY if cf.DEFAULT_CALENDAR_VIEW == "daily" else CalState.MONTHLY
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.split = cf.SPLIT_SCREEN
+        self.show_week_numbers = cf.SHOW_WEEK_NUMBERS
         self.right_pane_percentage = cf.RIGHT_PANE_PERCENTAGE
         self.currently_drawn = self.state
         self.selection_mode = False
