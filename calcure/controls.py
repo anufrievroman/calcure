@@ -2,6 +2,7 @@
 
 import curses
 import importlib
+import logging
 
 # Modules:
 from calcure.data import *
@@ -214,6 +215,9 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         if screen.key in ["/"]:
             screen.split = not screen.split
             screen.refresh_now = True
+        if screen.key == "w":
+            screen.show_week_numbers = not screen.show_week_numbers
+            screen.refresh_now = True
 
 
 @safe_run
@@ -367,6 +371,9 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
+            screen.refresh_now = True
+        if screen.key == "w":
+            screen.show_week_numbers = not screen.show_week_numbers
             screen.refresh_now = True
 
 
