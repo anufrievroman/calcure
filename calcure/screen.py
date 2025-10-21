@@ -27,6 +27,22 @@ class Screen:
         self.year = self.today.year
         self.reload_interval = cf.DATA_RELOAD_INTERVAL
         self.last_data_reload_time = datetime.datetime.now()
+        self.holidays = None
+
+    @property
+    def holidays_this_month(self):
+        """Get cached set of holiday days for current month/year"""
+        if not hasattr(self, '_holidays_cache') or self._holidays_cache_key != (self.year, self.month):
+            self._holidays_cache_key = (self.year, self.month)
+            if not self.holidays:
+                self._holidays_cache = set()
+            else:
+                self._holidays_cache = {
+                    holiday.day
+                    for holiday in self.holidays.items
+                    if holiday.year == self.year and holiday.month == self.month
+                }
+        return self._holidays_cache
 
     @property
     def is_active_pane(self):
