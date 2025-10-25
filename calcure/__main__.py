@@ -541,7 +541,11 @@ class DayNumberView(View):
 
     def is_holiday(self):
         """Check if current day is a holiday"""
-        return self.day in self.screen.holidays_this_month
+        import holidays
+        from datetime import date
+        all_holidays = holidays.country_holidays(cf.HOLIDAY_COUNTRY)
+        if date(self.screen.year, self.screen.month, self.screen.day) in all_holidays:
+            return True
 
 class TitleView(View):
     """Show the title in the header"""
@@ -1008,8 +1012,6 @@ def main(stdscr) -> None:
     user_ics_tasks = task_loader_ics.load()
     holidays = holiday_loader.load()
     birthdays = birthday_loader.load()
-
-    screen.holidays = holidays
 
     # Initialise savers and importers:
     event_saver_csv = EventSaverCSV(user_events, cf)
