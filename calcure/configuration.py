@@ -110,6 +110,7 @@ class Config:
                 "color_confirmations":   "1",
                 "color_birthdays":       "1",
                 "color_holidays":        "2",
+                "color_holidays_date":   "2",
                 "color_todo":            "7",
                 "color_done":            "6",
                 "color_title":           "4",
@@ -134,6 +135,7 @@ class Config:
                 "bold_day_names":           "No",
                 "bold_weekends":            "No",
                 "bold_weekend_names":       "No",
+                "bold_holidays_date":       "No",
                 "bold_title":               "No",
                 "bold_active_pane":         "No",
                 "underlined_today":         "No",
@@ -141,6 +143,7 @@ class Config:
                 "underlined_day_names":     "No",
                 "underlined_weekends":      "No",
                 "underlined_weekend_names": "No",
+                "underlined_holidays_date": "No",
                 "underlined_title":         "No",
                 "underlined_active_pane":   "No",
                 "strikethrough_done":       "No",
@@ -221,6 +224,7 @@ class Config:
             self.DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
             self.USE_24_HOUR_FORMAT        = conf.getboolean("Parameters", "use_24_hour_format", fallback=True)
             self.DISPLAY_HOLIDAYS          = conf.getboolean("Parameters", "show_holidays", fallback=True)
+            self.COLOR_HOLIDAYS_DATE       = conf.getboolean("Parameters", "color_holidays_date", fallback=True)
             self.PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
@@ -306,6 +310,7 @@ class Config:
             self.BOLD_DAY_NAMES           = conf.getboolean("Styles", "bold_day_names", fallback=False)
             self.BOLD_WEEKENDS            = conf.getboolean("Styles", "bold_weekends", fallback=False)
             self.BOLD_WEEKEND_NAMES       = conf.getboolean("Styles", "bold_weekend_names", fallback=False)
+            self.BOLD_HOLIDAYS            = conf.getboolean("Styles", "bold_holidays", fallback=False)
             self.BOLD_TITLE               = conf.getboolean("Styles", "bold_title", fallback=False)
             self.BOLD_ACTIVE_PANE         = conf.getboolean("Styles", "bold_active_pane", fallback=False)
             self.UNDERLINED_TODAY         = conf.getboolean("Styles", "underlined_today", fallback=False)
@@ -313,6 +318,7 @@ class Config:
             self.UNDERLINED_DAY_NAMES     = conf.getboolean("Styles", "underlined_day_names", fallback=False)
             self.UNDERLINED_WEEKENDS      = conf.getboolean("Styles", "underlined_weekends", fallback=False)
             self.UNDERLINED_WEEKEND_NAMES = conf.getboolean("Styles", "underlined_weekend_names", fallback=False)
+            self.UNDERLINED_HOLIDAYS      = conf.getboolean("Styles", "underlined_holidays", fallback=False)
             self.UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
             self.UNDERLINED_ACTIVE_PANE   = conf.getboolean("Styles", "underlined_active_pane", fallback=False)
             self.STRIKETHROUGH_DONE       = conf.getboolean("Styles", "strikethrough_done", fallback=False)
