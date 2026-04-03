@@ -144,6 +144,8 @@ def input_frequency(stdscr, y, x, question):
         return Frequency.DAILY
     if freq == 'w':
         return Frequency.WEEKLY
+    if freq == 'b':
+        return Frequency.BIWEEKLY
     if freq == 'm':
         return Frequency.MONTHLY
     if freq == 'y':
