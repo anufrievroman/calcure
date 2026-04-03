@@ -128,8 +128,6 @@ class EventLoaderCSV(LoaderCSV):
                     frequency = Frequency.DAILY
                 elif row[6] == 'w':
                     frequency = Frequency.WEEKLY
-                elif row[6] == 'b':
-                    frequency = Frequency.BIWEEKLY
                 elif row[6] == 'm':
                     frequency = Frequency.MONTHLY
                 elif row[6] == 'y':
