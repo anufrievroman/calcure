@@ -37,8 +37,9 @@ class Frequency(enum.Enum):
     ONCE = 1
     DAILY = 2
     WEEKLY = 3
-    MONTHLY = 4
-    YEARLY = 5
+    BIWEEKLY = 4
+    MONTHLY = 5
+    YEARLY = 6
 
 
 class Task:
@@ -369,7 +370,7 @@ class RepeatedEvents(Events):
                 for rep in range(1, event.repetition):
                     temp_year = event.year + rep*(event.frequency == Frequency.YEARLY)
                     temp_month = event.month + rep*(event.frequency == Frequency.MONTHLY)
-                    temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + 7*rep*(event.frequency == Frequency.WEEKLY)
+                    temp_day = event.day + rep*(event.frequency == Frequency.DAILY) + (7*rep*(event.frequency == Frequency.WEEKLY)) + (14*rep*(event.frequency == Frequency.BIWEEKLY))
                     year, month, day = self.calculate_recurring_events(temp_year, temp_month, temp_day, event.frequency)
                     self.add_item(UserRepeatedEvent(event.item_id, year, month, day, event.name, event.status,
                                                     event.privacy, event.calendar_number))
@@ -413,7 +414,7 @@ class RepeatedEvents(Events):
         skip_days = 0
 
         # Weekly and daily recurrence:
-        if frequency in [Frequency.WEEKLY, Frequency.DAILY]:
+        if frequency in [Frequency.WEEKLY, Frequency.BIWEEKLY, Frequency.DAILY]:
 
             # Calculate how many days and month to skip to next event:
             for i in range(1000):
