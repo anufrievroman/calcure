@@ -74,6 +74,7 @@ class Config:
                 "use_24_hour_format":        "Yes",
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
+                "colorize_holidays_date":    "Yes",
                 "show_nothing_planned":      "Yes",
                 "one_timer_at_a_time":       "No",
                 "holiday_country":           "UnitedStates",
@@ -110,6 +111,7 @@ class Config:
                 "color_confirmations":   "1",
                 "color_birthdays":       "1",
                 "color_holidays":        "2",
+                "color_holidays_date":   "2",
                 "color_todo":            "7",
                 "color_done":            "6",
                 "color_title":           "4",
@@ -132,6 +134,7 @@ class Config:
                 "bold_today":               "No",
                 "bold_days":                "No",
                 "bold_day_names":           "No",
+                "bold_holidays":            "No",
                 "bold_weekends":            "No",
                 "bold_weekend_names":       "No",
                 "bold_title":               "No",
@@ -139,6 +142,7 @@ class Config:
                 "underlined_today":         "No",
                 "underlined_days":          "No",
                 "underlined_day_names":     "No",
+                "underlined_holidays":      "No",
                 "underlined_weekends":      "No",
                 "underlined_weekend_names": "No",
                 "underlined_title":         "No",
@@ -221,6 +225,7 @@ class Config:
             self.DISPLAY_ICONS             = conf.getboolean("Parameters", "use_unicode_icons", fallback=True)
             self.USE_24_HOUR_FORMAT        = conf.getboolean("Parameters", "use_24_hour_format", fallback=True)
             self.DISPLAY_HOLIDAYS          = conf.getboolean("Parameters", "show_holidays", fallback=True)
+            self.COLORIZE_HOLIDAYS_DATE    = conf.getboolean("Parameters", "colorize_holidays_date", fallback=True)
             self.PRIVACY_MODE              = conf.getboolean("Parameters", "privacy_mode", fallback=False)
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
@@ -279,6 +284,7 @@ class Config:
             self.COLOR_PROMPTS         = int(conf.get("Colors", "color_prompts", fallback=7))
             self.COLOR_BIRTHDAYS       = int(conf.get("Colors", "color_birthdays", fallback=1))
             self.COLOR_HOLIDAYS        = int(conf.get("Colors", "color_holidays", fallback=2))
+            self.COLOR_HOLIDAYS_DATE   = int(conf.get("Colors", "color_holidays_date", fallback=2))
             self.COLOR_DEADLINES       = int(conf.get("Colors", "color_deadlines", fallback=3))
             self.COLOR_CONFIRMATIONS   = int(conf.get("Colors", "color_confirmations", fallback=1))
             self.COLOR_TIMER           = int(conf.get("Colors", "color_timer", fallback=2))
@@ -304,6 +310,7 @@ class Config:
             self.BOLD_TODAY               = conf.getboolean("Styles", "bold_today", fallback=False)
             self.BOLD_DAYS                = conf.getboolean("Styles", "bold_days", fallback=False)
             self.BOLD_DAY_NAMES           = conf.getboolean("Styles", "bold_day_names", fallback=False)
+            self.BOLD_HOLIDAYS            = conf.getboolean("Styles", "bold_holidays", fallback=False)
             self.BOLD_WEEKENDS            = conf.getboolean("Styles", "bold_weekends", fallback=False)
             self.BOLD_WEEKEND_NAMES       = conf.getboolean("Styles", "bold_weekend_names", fallback=False)
             self.BOLD_TITLE               = conf.getboolean("Styles", "bold_title", fallback=False)
@@ -311,6 +318,7 @@ class Config:
             self.UNDERLINED_TODAY         = conf.getboolean("Styles", "underlined_today", fallback=False)
             self.UNDERLINED_DAYS          = conf.getboolean("Styles", "underlined_days", fallback=False)
             self.UNDERLINED_DAY_NAMES     = conf.getboolean("Styles", "underlined_day_names", fallback=False)
+            self.UNDERLINED_HOLIDAYS      = conf.getboolean("Styles", "underlined_holidays", fallback=False)
             self.UNDERLINED_WEEKENDS      = conf.getboolean("Styles", "underlined_weekends", fallback=False)
             self.UNDERLINED_WEEKEND_NAMES = conf.getboolean("Styles", "underlined_weekend_names", fallback=False)
             self.UNDERLINED_TITLE         = conf.getboolean("Styles", "underlined_title", fallback=False)
