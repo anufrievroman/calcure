@@ -544,10 +544,13 @@ class DayNumberView(View):
             weekday = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekday, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
+
     def is_holiday(self):
         """Check if current day is a holiday"""
-        all_holidays = holidays.country_holidays(cf.HOLIDAY_COUNTRY)
-        return date(self.screen.year, self.screen.month, self.screen.day) in all_holidays
+        country_holiday_collections = [holidays.country_holidays(country) for country in cf.HOLIDAY_COUNTRY.split(",")]
+        self_date = date(self.screen.year, self.screen.month, self.screen.day)
+        return any(self_date in holiday_collection for holiday_collection in country_holiday_collections)
+
 
 class TitleView(View):
     """Show the title in the header"""
