@@ -84,6 +84,7 @@ class Config:
                 "refresh_interval":          "1",
                 "data_reload_interval":      "0",
                 "split_screen":              "Yes",
+                "inverse_daily_scroll":      "No",
                 "right_pane_percentage":     "25",
                 "journal_header":            "JOURNAL",
                 "event_icon":                "•",
@@ -230,6 +231,7 @@ class Config:
             self.CUT_TITLES                = conf.getboolean("Parameters", "cut_titles_by_cell_length", fallback=False)
             self.BIRTHDAYS_FROM_ABOOK      = conf.getboolean("Parameters", "birthdays_from_abook", fallback=True)
             self.SPLIT_SCREEN              = conf.getboolean("Parameters", "split_screen", fallback=True)
+            self.INVERSE_DAILY_SCROLL      = conf.getboolean("Parameters", "inverse_daily_scroll", fallback=False)
             self.SHOW_NOTHING_PLANNED      = conf.getboolean("Parameters", "show_nothing_planned", fallback=True)
             self.SHOW_CALENDAR_BORDERS     = conf.getboolean("Parameters", "show_calendar_borders", fallback=False)
             self.SHOW_WEEK_NUMBERS         = conf.getboolean("Parameters", "show_week_numbers", fallback=False)

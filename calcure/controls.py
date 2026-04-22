@@ -301,9 +301,15 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
         # Navigation:
         if screen.key in ["n", "j", "KEY_UP", "KEY_RIGHT"]:
-            screen.next_day()
+            if cf.INVERSE_DAILY_SCROLL:
+                screen.previous_day()
+            else:
+                screen.next_day()
         if screen.key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
-            screen.previous_day()
+            if cf.INVERSE_DAILY_SCROLL:
+                screen.next_day()
+            else:
+                screen.previous_day()
         if screen.key in ["KEY_HOME", "R"]:
             screen.reset_to_today()
 
