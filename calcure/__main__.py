@@ -8,6 +8,9 @@ import getopt
 import sys
 import importlib
 import threading
+from datetime import date
+
+import holidays
 
 from calcure.calendars import Calendar
 from calcure.errors import Error
@@ -531,6 +534,9 @@ class DayNumberView(View):
         if self.screen.date == self.screen.today:
             today = f"{self.day}{cf.TODAY_ICON}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 2)} "
             self.display_line(self.y, self.x, today, Color.TODAY, cf.BOLD_TODAY, cf.UNDERLINED_TODAY)
+        elif cf.COLORIZE_HOLIDAYS_DATE and self.is_holiday():
+            holiday = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
+            self.display_line(self.y, self.x, holiday, Color.HOLIDAYS_DATE, cf.BOLD_HOLIDAYS, cf.UNDERLINED_HOLIDAYS)
         elif self.day_in_week + 1 in cf.WEEKEND_DAYS:
             weekend = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekend, Color.WEEKENDS, cf.BOLD_WEEKENDS, cf.UNDERLINED_WEEKENDS)
@@ -538,6 +544,10 @@ class DayNumberView(View):
             weekday = f"{self.day}{self.moon_icon}{' '*(self.x_cell - len(str(self.day)) - 1)}"
             self.display_line(self.y, self.x, weekday, Color.DAYS, cf.BOLD_DAYS, cf.UNDERLINED_DAYS)
 
+    def is_holiday(self):
+        """Check if current day is a holiday"""
+        all_holidays = holidays.country_holidays(cf.HOLIDAY_COUNTRY)
+        return date(self.screen.year, self.screen.month, self.screen.day) in all_holidays
 
 class TitleView(View):
     """Show the title in the header"""
