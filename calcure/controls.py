@@ -30,6 +30,8 @@ elif cf.LANG == "sk":
     from calcure.translations.sk import *
 elif cf.LANG == "es":
     from calcure.translations.es import *
+elif cf.LANG == "si":
+    from calcure.translations.si import *
 else:
     from calcure.translations.en import *
 

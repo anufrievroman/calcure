@@ -54,6 +54,8 @@ elif cf.LANG == "es":
     from calcure.translations.es import *
 elif cf.LANG == "hu":
     from calcure.translations.hu import *
+elif cf.LANG == "si":
+    from calcure.translations.si import *
 else:
     from calcure.translations.en import *
 
@@ -711,7 +713,7 @@ class WeekNumberView(View):
     def render(self):
         """Render this view on the screen"""
         y_cell = (self.screen.y_max - 3) // 6
-        
+
         for row, week_num in enumerate(self.week_numbers):
             # Position week number in the vertical middle of the cell
             y_pos = 2 + row * y_cell + (y_cell // 2)
@@ -873,7 +875,7 @@ class MonthlyScreenView(View):
             week_numbers = []
             week_column_width = 0
             calendar_start_x = 0
-        
+
         y_cell = (self.screen.y_max - 3) // 6
         x_cell = (self.screen.x_max - week_column_width) // 7
 
