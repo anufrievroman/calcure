@@ -6,6 +6,7 @@ from enum import Enum, auto
 
 class Color(Enum):
     """Colors read from user config"""
+    DEFAULT = auto()
     DAY_NAMES = auto()
     WEEKENDS = auto()
     HINTS = auto()
@@ -30,7 +31,6 @@ class Color(Enum):
     CALENDAR_HEADER = auto()
     ACTIVE_PANE = auto()
     SEPARATOR = auto()
-    EMPTY = auto()
     CALENDAR_BORDER = auto()
     DEADLINES = auto()
     ICS_CALENDARS0 = auto()
@@ -50,6 +50,7 @@ def initialize_colors(cf):
     """Define all the color pairs"""
     curses.start_color()
     curses.use_default_colors()
+    curses.init_pair(Color.DEFAULT.value, cf.COLOR_FOREGROUND, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.DAY_NAMES.value, cf.COLOR_DAY_NAMES, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.WEEKENDS.value, cf.COLOR_WEEKENDS, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.HINTS.value, cf.COLOR_HINTS, cf.COLOR_BACKGROUND)
@@ -74,7 +75,6 @@ def initialize_colors(cf):
     curses.init_pair(Color.CALENDAR_HEADER.value, cf.COLOR_CALENDAR_HEADER, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.ACTIVE_PANE.value, cf.COLOR_ACTIVE_PANE, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.SEPARATOR.value, cf.COLOR_SEPARATOR, cf.COLOR_BACKGROUND)
-    curses.init_pair(Color.EMPTY.value, cf.COLOR_BACKGROUND, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.CALENDAR_BORDER.value, cf.COLOR_CALENDAR_BORDER, cf.COLOR_BACKGROUND)
     curses.init_pair(Color.DEADLINES.value, cf.COLOR_DEADLINES, cf.COLOR_BACKGROUND)
     # Initialize week numbers with a dim white/grey color

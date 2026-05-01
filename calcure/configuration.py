@@ -128,6 +128,7 @@ class Config:
                 "color_separator":       "7",
                 "color_calendar_border": "7",
                 "color_ics_calendars":   "2,3,1,7,4,5,2,3,1,7",
+                "color_foreground":      "-1",
                 "color_background":      "-1",
                 }
 
@@ -293,6 +294,7 @@ class Config:
             self.COLOR_TIMER_PAUSED    = int(conf.get("Colors", "color_timer_paused", fallback=7))
             self.COLOR_TIME            = int(conf.get("Colors", "color_time", fallback=7))
             self.COLOR_WEATHER         = int(conf.get("Colors", "color_weather", fallback=2))
+            self.COLOR_FOREGROUND      = int(conf.get("Colors", "color_foreground", fallback=-1))
             self.COLOR_BACKGROUND      = int(conf.get("Colors", "color_background", fallback=-1))
             self.COLOR_CALENDAR_HEADER = int(conf.get("Colors", "color_calendar_header", fallback=4))
             self.COLOR_ACTIVE_PANE     = int(conf.get("Colors", "color_active_pane", fallback=2))
