@@ -1096,13 +1096,23 @@ def main(stdscr) -> None:
 
     # Running different screens depending on the state:
     while screen.state != AppState.EXIT:
+        # The screen is completely redrawn on each iteration of the loop. This
+        # causes flicker on each iteration. If the screen would have to be
+        # redrawn anyway, this is a non-issue, but redrawing only parts of the
+        # screen should be the preferred default.
+        # Note that the loop generally hangs waiting for user input.
         stdscr.clear()
         app_view.fill_background()
 
-        # Calculate screen refresh rate:
-        curses.halfdelay(200)
         if user_tasks.has_active_timer and screen.state == AppState.JOURNAL:
+            # By setting a `halfdelay`, we only wait for user input for the
+            # configured number of seconds, then we crash. This causes another
+            # iteration of the loop, which redraws the screen and updates the
+            # timer as a consequence. A bit hacky.
             curses.halfdelay(cf.REFRESH_INTERVAL * 10)
+        else:
+            # We make sure there is no active `halfdelay` to prevent flickering.
+            curses.cbreak()
 
         # Calendar screens:
         if screen.state == AppState.CALENDAR:
