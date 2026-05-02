@@ -403,7 +403,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
 @safe_run
 @block_until_valid_input(accepted_keys=[
-    " ", "*", ".", "/" "?", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "Q",
+    " ", "*", ".", "/", "?", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "Q",
     "T", "U", "V", "X", "a", "c", "d", "e", "f", "h", "i", "l", "m", "q", "r",
     "s", "t", "u", "v", "x",
 ])
