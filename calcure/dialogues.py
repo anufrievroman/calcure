@@ -48,7 +48,11 @@ def input_field(stdscr, y, x, field_length):
 
     while True:
         stdscr.move(y, x + cursor_pos)
-        key = stdscr.get_wch()
+        curses.halfdelay(255)
+        try:
+            key = stdscr.get_wch()
+        except curses.error:
+            return ""
 
         # Regular Unicode characters:
         if isinstance(key, str):

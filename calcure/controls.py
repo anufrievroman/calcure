@@ -54,7 +54,30 @@ def safe_run(func):
     return inner
 
 
+def block_until_valid_input(accepted_keys):
+    """Decorator preventing flickering on no-op keypresses."""
+    def decorator(func):
+        def inner(stdscr, screen, *args, **kwargs):
+            while not screen.selection_mode:
+                screen.key = stdscr.getkey()
+                if vim_style_exit(stdscr, screen):
+                    confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
+                    if confirmed:
+                        screen.state = AppState.EXIT
+                        break
+                elif screen.key in accepted_keys:
+                    break
+            func(stdscr, screen, *args, **kwargs)
+        return inner
+    return decorator
+
+
 @safe_run
+@block_until_valid_input(accepted_keys=[
+    " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
+    "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "a", "c", "d", "e", "g",
+    "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
+])
 def control_monthly_screen(stdscr, screen, user_events, importer):
     """Handle user input on the monthly screen"""
 
@@ -126,9 +149,6 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
 
     # Otherwise, we check for user input:
     else:
-        # Wait for user to press a key:
-        screen.key = stdscr.getkey()
-
         # If we need to select an event, change to selection mode:
         selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
         if screen.key in selection_keys and user_events.filter_events_that_month(screen).items:
@@ -202,9 +222,6 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 screen.refresh_now = True
 
         # Other actions:
-        if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
-            screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
         if screen.key in [" ", "KEY_BTAB"]:
@@ -223,6 +240,11 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
 
 
 @safe_run
+@block_until_valid_input(accepted_keys=[
+    " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
+    "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "a", "c", "d", "e", "g",
+    "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
+])
 def control_daily_screen(stdscr, screen, user_events, importer):
     """Handle user input on the daily screen"""
     # If we previously entered the selection mode, now we perform the action:
@@ -293,9 +315,6 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
     # Otherwise, we check for user input:
     else:
-        # Wait for user to press a key:
-        screen.key = stdscr.getkey()
-
         # If we need to select an event, change to selection mode:
         selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
         if screen.key in selection_keys and user_events.filter_events_that_day(screen).items:
@@ -365,9 +384,6 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.calendar_state = CalState.MONTHLY
 
         # Other actions:
-        if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
-            screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
         if screen.key in [" ", "KEY_BTAB"]:
@@ -386,6 +402,11 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
 
 @safe_run
+@block_until_valid_input(accepted_keys=[
+    " ", "*", ".", "/", "?", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "Q",
+    "T", "U", "V", "X", "a", "c", "d", "e", "f", "h", "i", "l", "m", "q", "r",
+    "s", "t", "u", "v", "x",
+])
 def control_journal_screen(stdscr, screen, user_tasks, importer):
     """Process user input on the journal screen"""
     # If we previously selected a task, now we perform the action:
@@ -490,9 +511,6 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
 
     # Otherwise, we check for user input:
     else:
-        # Wait for user to press a key:
-        screen.key = stdscr.getkey()
-
         # If we need to select a task, change to selection mode:
         selection_keys = ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']
         if screen.key in selection_keys and user_tasks.items:
@@ -545,9 +563,6 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             screen.refresh_now = True
 
         # Other actions:
-        if vim_style_exit(stdscr, screen):
-            confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
-            screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "*":
             screen.privacy = not screen.privacy
         if screen.key in [" ", "KEY_BTAB"]:
@@ -563,16 +578,9 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
 
 
 @safe_run
+@block_until_valid_input(accepted_keys=[" ", "?", "q", "^[", "\x7f"])
 def control_help_screen(stdscr, screen):
     """Process user input on the help screen"""
-    # Getting user's input:
-    screen.key = stdscr.getkey()
-
-    # Handle vim-style exit on "ZZ" and "ZQ":
-    if vim_style_exit(stdscr, screen):
-        confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
-        screen.state = AppState.EXIT if confirmed else screen.state
-
     # Handle keys to exit the help screen:
     if screen.key in [" ", "?", "q", "^[", "\x7f"]:
         screen.state = AppState.CALENDAR
