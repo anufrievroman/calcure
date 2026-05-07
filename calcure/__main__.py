@@ -95,12 +95,6 @@ class View:
         self.y = y
         self.x = x
 
-    def fill_background(self):
-        """Fill the screen background with background color"""
-        y_max, x_max = self.stdscr.getmaxyx()
-        for index in range(y_max - 1):
-            self.stdscr.addstr(index, 0, " " * x_max, curses.color_pair(Color.EMPTY.value))
-
     def display_line(self, y, x, text, color, bold=False, underlined=False):
         """Display the line of text respecting the slyling and available space"""
 
@@ -620,6 +614,9 @@ class FooterView(View):
                 hint = CALENDAR_HINT_D
         elif self.screen.state == AppState.JOURNAL:
             hint = JOURNAL_HINT
+        else:
+            # Render empty hint to fill the line with the background color.
+            hint = ""
         self.display_line(self.screen.y_max - 1, 0, hint, Color.HINTS)
 
 
@@ -952,7 +949,6 @@ class WelcomeScreenView(View):
         """Draw the welcome screen"""
         self.calibrate_position()
         self.stdscr.clear()
-        self.fill_background()
 
         if self.x_max < len(MSG_WELCOME_4)+2 or self.y_max < 12:
             self.display_line(0, 0, "Welcome!", Color.ACTIVE_PANE)
@@ -1001,7 +997,6 @@ class HelpScreenView(View):
         if self.x_max < 6 or self.y_max < 3:
             return
         self.stdscr.clear()
-        self.fill_background()
 
         # Left column:
         self.display_line(self.global_shift_y, self.global_shift_x + 1, f"{MSG_NAME} {__version__}",
@@ -1043,6 +1038,7 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         threading.Thread(target=weather.load_from_wttr).start()
 
+    stdscr.bkgd(" ", curses.color_pair(Color.DEFAULT.value))
     screen = Screen(stdscr, cf)
 
     # Initialise loaders:
@@ -1092,6 +1088,7 @@ def main(stdscr) -> None:
         screen.state = AppState.WELCOME
     while screen.state == AppState.WELCOME:
         welcome_screen_view.render()
+        footer_view.render()
         control_welcome_screen(stdscr, screen)
 
     # Running different screens depending on the state:
@@ -1102,7 +1099,6 @@ def main(stdscr) -> None:
         # screen should be the preferred default.
         # Note that the loop generally hangs waiting for user input.
         stdscr.clear()
-        app_view.fill_background()
 
         if user_tasks.has_active_timer and screen.state == AppState.JOURNAL:
             # By setting a `halfdelay`, we only wait for user input for the
@@ -1149,6 +1145,7 @@ def main(stdscr) -> None:
         # Help screen:
         elif screen.state == AppState.HELP:
             help_screen_view.render()
+            footer_view.render()
             control_help_screen(stdscr, screen)
 
         else:
