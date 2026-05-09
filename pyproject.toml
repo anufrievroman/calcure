@@ -1,4 +1,39 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "calcure"
+authors = [
+    { name = "Roman Anufriev", email = "anufriev.roman@protonmail.com" }
+]
+description = "Modern TUI calendar and task manager"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = ["holidays", "jdatetime", "icalendar"]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://anufrievroman.gitbook.io/calcure"
+Repository = "https://github.com/anufrievroman/calcure"
+
+[project.scripts]
+calcure = "calcure.__main__:cli"
+
+[tool.setuptools.package-data]
+calcure = ["../calcure.1"]
+
+[tool.setuptools.dynamic]
+version = { attr = "calcure.__main__.__version__" }
