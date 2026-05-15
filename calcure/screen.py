@@ -28,6 +28,7 @@ class Screen:
         self.year = self.today.year
         self.reload_interval = cf.DATA_RELOAD_INTERVAL
         self.last_data_reload_time = datetime.datetime.now()
+        self.hide_done_tasks = cf.HIDE_DONE_TASKS
 
     @property
     def is_active_pane(self):

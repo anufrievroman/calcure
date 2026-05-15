@@ -403,7 +403,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
 
 @safe_run
 @block_until_valid_input(accepted_keys=[
-    " ", "*", ".", "/", "?", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "P", "Q",
+    " ", "*", ".", "/", "?", "-", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "P", "Q",
     "T", "U", "V", "X", "a", "c", "d", "e", "f", "h", "i", "l", "m", "q", "r",
     "s", "t", "u", "v", "x",
 ])
@@ -512,7 +512,7 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
     # Otherwise, we check for user input:
     else:
         # If we need to select a task, change to selection mode:
-        selection_keys = ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']
+        selection_keys = ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F', '-']
         if screen.key in selection_keys and user_tasks.items:
             screen.selection_mode = True
 
@@ -569,6 +569,8 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
         # Other actions:
         if screen.key == "*":
             screen.privacy = not screen.privacy
+        if screen.key == "-":
+            screen.hide_done_tasks = not screen.hide_done_tasks
         if screen.key in [" ", "KEY_BTAB"]:
             screen.state = AppState.CALENDAR
         if screen.key == "?":

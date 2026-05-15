@@ -48,6 +48,7 @@ KEYS_TODO = {
         "   r   ": "Premenovať úlohu",
         "   s   ": "Prepnúť medzi úlohou a podúlohou",
         "   .   ": "Prepnúť viditeľnosť úlohy",
+        "   -   ": "Prepnúť viditeľnosť dokončených úloh",
         "  f(F) ": "Zmeniť (odstrániť) hraničný termín úlohy",
         "   m   ": "Odstrániť úlohu",
         "   C   ": "Importovať úlohy z calcurse",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "Zadajte podúlohu: "
 MSG_TS_IM         = "Importovať úlohy z Calcurse? (y/n)"
 MSG_TS_TW         = "Importovať úlohy z Taskwarriora? (y/n)"
 MSG_TS_NOTHING    = "Nič nie je naplánované..."
+MSG_TS_DONE_COUNT = "Dokončené úlohy"
 MSG_TS_PRIVACY    = "Vypnúť/zapnúť viditeľnosť úlohy číslo: "
 MSG_TS_DEAD_ADD   = "Pridať hraničný termín úlohy číslo: "
 MSG_TS_DEAD_DEL   = "Odstrániť hraničný termín ulohy číslo: "

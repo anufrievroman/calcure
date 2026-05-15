@@ -48,6 +48,7 @@ KEYS_TODO = {
         "  e,c  ": "Görev düzenleme",
         "   s   ": "Görev ve alt görev arasında geçiş yapma",
         "   .   ": "Görev gizliliğini aç / kapat",
+        "   -   ": "Tamamlanan görevlerin görünürlüğünü aç/kapat",
         "  f(F) ": "Görev son tarihini değiştir (kaldır)",
         "   m   ": "Görev taşıma",
         "   C   ": "Calcurse'den görevleri içe aktarma",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "Alt görev girin: "
 MSG_TS_IM         = "Calcurse'den görevleri içe aktarma? (y/n)"
 MSG_TS_TW         = "Taskwarrior'dan görevleri içe aktarma? (y/n)"
 MSG_TS_NOTHING    = "Planlanmış bir şey yok..."
+MSG_TS_DONE_COUNT = "Tamamlanan görevler"
 MSG_TS_PRIVACY    = "Görev numarasının gizliliğini aç / kapat: "
 MSG_TS_DEAD_ADD   = "Görev numarası için son tarih ekle: "
 MSG_TS_DEAD_DEL   = "Görev numarasının son tarihini kaldırın: "

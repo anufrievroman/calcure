@@ -49,6 +49,7 @@ KEYS_TODO = {
         "   r   ": "Preimenuj opravilo",
         "   s   ": "Spremeni opravilo v podopravilo ali obratno",
         "   .   ": "Vklopi/izklopi zasebnost za opravilo",
+        "   -   ": "Preklopi vidnost dokončanih nalog",
         "  f(F) ": "Spremeni (odstrani) rok za opravilo",
         "   m   ": "Premakni opravilo",
         "   C   ": "Uvozi opravila iz programa Calcurse",
@@ -94,6 +95,7 @@ MSG_TS_TITLE      = "Vnesi podopravilo: "
 MSG_TS_IM         = "Uvozi opravila iz programa Calcurse? (y/n)"
 MSG_TS_TW         = "Uvozi opravila iz programa Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Ni načrtov ..."
+MSG_TS_DONE_COUNT = "Dokončane naloge"
 MSG_TS_PRIVACY    = "Vklopi/izklopi zasebnost za opravilo s številko: "
 MSG_TS_DEAD_ADD   = "Dodaj rok za opravilo s številko: "
 MSG_TS_DEAD_DEL   = "Odstrani rok za opravilo s številko: "

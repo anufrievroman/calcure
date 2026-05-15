@@ -48,6 +48,7 @@ KEYS_TODO = {
         "   r   ": "Editar uma tarefa",
         "   s   ": "Alternar entre tarefa e subtarefa",
         "   .   ": "Alternar privacidade da tarefa",
+        "   -   ": "Alternar visibilidade de tarefas concluídas",
         "  f(F) ": "Mudar (remover) data limite da tarefa",
         "   m   ": "Mover tarefa",
         "   C   ": "Importar tarefas do calcurse",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "Digitar subtarefa: "
 MSG_TS_IM         = "Importar tarefas do Calcurse? (y/n)"
 MSG_TS_TW         = "Importar tarefas do Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Nada planejado..."
+MSG_TS_DONE_COUNT = "Tarefas concluídas"
 MSG_TS_PRIVACY    = "Alternar privacidade de tarefa número: "
 MSG_TS_DEAD_ADD   = "Adicionar data limite da tarefa número: "
 MSG_TS_DEAD_DEL   = "Remover data limite da tarefa número: "
