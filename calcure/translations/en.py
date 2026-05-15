@@ -49,6 +49,7 @@ KEYS_TODO = {
         "   r   ": "Rename a task",
         "   s   ": "Toggle between task and subtask",
         "   .   ": "Toggle task privacy",
+        "   -   ": "Toggle done tasks visibility",
         "  f(F) ": "Change (remove) task deadline",
         "   m   ": "Move a task",
         "   C   ": "Import tasks from calcurse",
@@ -94,6 +95,7 @@ MSG_TS_TITLE      = "Enter subtask: "
 MSG_TS_IM         = "Import tasks from Calcurse? (y/n)"
 MSG_TS_TW         = "Import tasks from Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Nothing planned..."
+MSG_TS_DONE_COUNT = "Done tasks"
 MSG_TS_PRIVACY    = "Toggle privacy of task number: "
 MSG_TS_DEAD_ADD   = "Add deadline for task number: "
 MSG_TS_DEAD_DEL   = "Remove deadline of the task number: "

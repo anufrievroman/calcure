@@ -75,6 +75,8 @@ class Config:
                 "show_current_time":         "No",
                 "show_holidays":             "Yes",
                 "colorize_holidays_date":    "Yes",
+                "hide_done_tasks":           "No",
+                "hidden_done_count":         "Yes",
                 "show_nothing_planned":      "Yes",
                 "one_timer_at_a_time":       "No",
                 "holiday_country":           "UnitedStates",
@@ -258,6 +260,8 @@ class Config:
 
             self.JOURNAL_HEADER        = conf.get("Parameters", "journal_header", fallback="JOURNAL")
             self.SHOW_KEYBINDINGS      = conf.getboolean("Parameters", "show_keybindings", fallback=True)
+            self.HIDE_DONE_TASKS       = conf.getboolean("Parameters", "hide_done_tasks", fallback=False)
+            self.HIDDEN_DONE_COUNT       = conf.getboolean("Parameters", "hidden_done_count", fallback=True)
             self.DONE_ICON             = conf.get("Parameters", "done_icon", fallback="✔") if self.DISPLAY_ICONS else "×"
             self.TODO_ICON             = conf.get("Parameters", "todo_icon", fallback="•") if self.DISPLAY_ICONS else "·"
             self.IMPORTANT_ICON        = conf.get("Parameters", "important_icon", fallback="‣") if self.DISPLAY_ICONS else "!"
@@ -392,4 +396,3 @@ class Config:
         except getopt.GetoptError as e_message:
             logging.error("Invalid user arguments. %s", e_message)
             pass
-

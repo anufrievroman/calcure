@@ -48,6 +48,7 @@ KEYS_TODO = {
         "   r   ": "重新命名任務",
         "   s   ": "切換主任務與子任務",
         "   .   ": "切換任務隱私設定",
+        "   -   ": "切換已完成任務的可見性",
         "  f(F) ": "修改（移除）任務期限",
         "   m   ": "移動任務",
         "   C   ": "從 Calcurse 匯入任務",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "輸入子任務："
 MSG_TS_IM         = "從 Calcurse 匯入任務？(y/n)"
 MSG_TS_TW         = "從 Taskwarrior 匯入任務？(y/n)"
 MSG_TS_NOTHING    = "沒有計劃..."
+MSG_TS_DONE_COUNT = "已完成的任務"
 MSG_TS_PRIVACY    = "切換任務編號隱私設定："
 MSG_TS_DEAD_ADD   = "為任務編號新增截止日期："
 MSG_TS_DEAD_DEL   = "移除任務編號的截止日期："

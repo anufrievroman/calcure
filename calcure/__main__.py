@@ -249,7 +249,12 @@ class JournalView(View):
         """Render the list of tasks"""
         if not self.user_tasks.items and not self.user_ics_tasks.items and cf.SHOW_NOTHING_PLANNED:
             self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
+
+        done_count = 0
         for index, task in enumerate(self.user_tasks.items):
+            if task.status == Status.DONE and self.screen.hide_done_tasks:
+                done_count += 1
+                continue
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode and self.screen.state == AppState.JOURNAL:
@@ -258,9 +263,25 @@ class JournalView(View):
 
         self.y += 1
         for index, task in enumerate(self.user_ics_tasks.items):
+            if task.status == Status.DONE and self.screen.hide_done_tasks:
+                done_count += 1
+                continue
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             self.y += 1
+
+        if self.user_ics_tasks.items: self.y += 1
+
+        if done_count and self.screen.hide_done_tasks and cf.HIDDEN_DONE_COUNT:
+            dummy_task = Task(
+                item_id=-1,
+                name=f"{done_count} {MSG_TS_DONE_COUNT}",
+                status=Status.DONE,
+                timer=Timer([]),
+                privacy=False
+            )
+            task_view = TaskView(self.stdscr, self.y, self.x, dummy_task, self.screen)
+            task_view.render()
 
 
 class EventView(View):

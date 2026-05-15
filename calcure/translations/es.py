@@ -48,6 +48,7 @@ KEYS_TODO = {
         "   r   ": "Renombra una tarea",
         "   s   ": "Alternar entre tarea y subtarea",
         "   .   ": "Alternar la privacidad de la tarea",
+        "   -   ": "Alternar visibilidad de tareas terminadas",
         "  f(F) ": "Cambiar (remover) la fecha límite de la tarea",
         "   m   ": "Mover una tarea",
         "   C   ": "Importar tareas desde calcurse",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "Ingresar subtarea: "
 MSG_TS_IM         = "¿Importar tareas desde Calcurse? (y/n)"
 MSG_TS_TW         = "¿Importar tareas desde Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Nada planificado..."
+MSG_TS_DONE_COUNT = "Tareas terminadas"
 MSG_TS_PRIVACY    = "Alternar privacidad de la tarea número: "
 MSG_TS_DEAD_ADD   = "Agregar fecha límite para la tarea número: "
 MSG_TS_DEAD_DEL   = "Remover fecha límite para la tarea número: "

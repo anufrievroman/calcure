@@ -48,6 +48,7 @@ KEYS_TODO = {
         "   r   ": "Aufgabe umbenennen",
         "   s   ": "Zwischen Aufgabe und Unteraufgabe wechseln",
         "   .   ": "Aufgaben-Privatsphäre umschalten",
+        "   -   ": "Sichtbarkeit abgeschlossener Aufgaben umschalten",
         "  f(F) ": "Aufgaben-Deadline ändern (entfernen)",
         "   m   ": "Aufgabe verschieben",
         "   C   ": "Aufgaben aus calcurse importieren",
@@ -93,6 +94,7 @@ MSG_TS_TITLE      = "Unteraufgabe eingeben: "
 MSG_TS_IM         = "Aufgaben aus Calcurse importieren? (j/n)"
 MSG_TS_TW         = "Aufgaben aus Taskwarrior importieren? (j/n)"
 MSG_TS_NOTHING    = "Nichts geplant..."
+MSG_TS_DONE_COUNT = "Erledigte Aufgaben"
 MSG_TS_PRIVACY    = "Privatsphäre für Aufgabennummer umschalten: "
 MSG_TS_DEAD_ADD   = "Deadline für Aufgabennummer hinzufügen: "
 MSG_TS_DEAD_DEL   = "Deadline für Aufgabennummer entfernen: "
