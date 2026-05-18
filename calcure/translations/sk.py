@@ -15,7 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Vypnúť/zapnúť rozdelenie obrazovky",
         "   *   ": "Vypnúť/zapnúť globálne súkromie",
         "   ?   ": "Vypnúť/zapnúť tohto pomocníka",
-        "   Q   ": "Reload",
+        "   Q   ": "Znova načítať",
         "   q   ": "Ukončiť",
         }
 
@@ -28,6 +28,7 @@ KEYS_CALENDAR = {
         "  m(M) ": "Presunúť udalosť (v rámci mesiaca)",
         "  g(G) ": "Prejsť na určitý deň (v rámci mesiaca)",
         "   v   ": "Prepnúť medzi zobrazením dní/mesiacov",
+        "   w   ": "Vypnúť/zapnúť čísla týždňov",
         "   h   ": "Nastaviť/zrušiť vysokú prioritu pre udalosť",
         "   l   ": "Nastaviť/zrušiť nízku prioritu pre udalosť",
         "   d   ": "Označiť udalosť ako (ne)dokončenú",
@@ -49,7 +50,7 @@ KEYS_TODO = {
         "   s   ": "Prepnúť medzi úlohou a podúlohou",
         "   .   ": "Prepnúť viditeľnosť úlohy",
         "  f(F) ": "Zmeniť (odstrániť) hraničný termín úlohy",
-        "   m   ": "Odstrániť úlohu",
+        "   m   ": "Presunúť úlohu",
         "   C   ": "Importovať úlohy z calcurse",
         }
 
@@ -83,7 +84,7 @@ MSG_TS_RES        = "Obnoviť stav úlohy číslo: "
 MSG_TS_DONE       = "Označiť ako hotovú úlohu číslo: "
 MSG_TS_DEL        = "Odstrániť úlohu číslo: "
 MSG_TS_DEL_ALL    = "Naozaj odstrániť všetky úlohy? (y/n)"
-MSG_TS_EDT_ALL    = "Do you confirm this action? (y/n)"
+MSG_TS_EDT_ALL    = "Potvrdzujete túto akciu? (y/n)"
 MSG_TS_MOVE       = "Presunúť úlohu z čísla: "
 MSG_TS_MOVE_TO    = "Presunúť úlohu na číslo: "
 MSG_TS_EDIT       = "Upraviť úlohu číslo: "

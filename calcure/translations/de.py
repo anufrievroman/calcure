@@ -28,6 +28,7 @@ KEYS_CALENDAR = {
         "  m(M) ": "Ereignis verschieben (in diesem Monat)",
         "  g(G) ": "Zu bestimmtem Tag gehen (in diesem Monat)",
         "   v   ": "Tages-/Monatsübersicht umschalten",
+        "   w   ": "Wochennummern ein-/ausblenden",
         "   h   ": "Ereignis als hohe Priorität markieren",
         "   l   ": "Ereignis als niedrige Priorität markieren",
         "   d   ": "Ereignis als erledigt markieren",

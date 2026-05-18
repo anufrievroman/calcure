@@ -52,7 +52,6 @@ KEYS_TODO = {
         "  f(F) ": "Határidő módosítása (hozzáadása/törlése)",
         "   m   ": "Feladat áthelyezése",
         "   C   ": "Feladatok importálása Calcurse-ból",
-        "  f(F) ": "Feladatok importálása Taskwarriorból",
         }
 
 MSG_NAME          = "CALCURE"

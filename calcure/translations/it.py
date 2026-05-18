@@ -27,6 +27,7 @@ KEYS_CALENDAR = {
         "   r   ": "Modifica un evento",
         "  m(M) ": "Sposta un evento",
         "   v   ": "Alterna la visualizzazione giornaliera/mensile",
+        "   w   ": "Attiva/disattiva i numeri delle settimane",
         "  g(G) ": "Vai ad un determinato giorno",
         "   h   ": "Imposta un evento come ad alta priorità",
         "   l   ": "Imposta un evento come a bassa priorità",
@@ -61,7 +62,7 @@ MSG_EXIT          = "Vuoi davvero uscire? (y/n) "
 
 MSG_EVENT_HIGH    = "Imposta ad alta priorità l'evento con numero: "
 MSG_EVENT_LOW     = "Imposta come a bassa priorità l'evento con numero: "
-MSG_EVENT_DONE    = "Mark as done event number: "
+MSG_EVENT_DONE    = "Imposta come fatto l'evento con numero: "
 MSG_EVENT_RESET   = "Ripristina lo stato per l'evento con numero: "
 MSG_EVENT_DEL     = "Cancella l'evento con numero: "
 MSG_EVENT_REN     = "Rinomina l'evento con numero: "
@@ -83,7 +84,7 @@ MSG_TS_RES        = "Ripristina lo stato per l'attività con numero: "
 MSG_TS_DONE       = "Segna come completata l'attività con numero: "
 MSG_TS_DEL        = "Cancella l'attività con numero: "
 MSG_TS_DEL_ALL    = "Vuoi davvero cancellare tutte le attività? (y/n)"
-MSG_TS_EDT_ALL    = "Do you confirm this action? (y/n)"
+MSG_TS_EDT_ALL    = "Vuoi davvero confermare questa azione? (y/n)"
 MSG_TS_MOVE       = "Sposta il task dal numero: "
 MSG_TS_MOVE_TO    = "Sposta il task al numero: "
 MSG_TS_EDIT       = "Modifica il numero dell'attività: "
@@ -98,14 +99,14 @@ MSG_TS_DEAD_ADD   = "Aggiungi una scadenza per l'attività con numero: "
 MSG_TS_DEAD_DEL   = "Rimuovi la scadenza per l'attività con numero: "
 MSG_TS_DEAD_DATE  = "Aggiungi una scandeza per il (AAAA/MM/GG): "
 MSG_WEATHER       = "Caricamento del meteo..."
-MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
+MSG_ERRORS        = "Si sono verificati degli errori. Consulta info.log nella cartella di configurazione."
 MSG_GOTO          = "Vai alla data (YYYY/MM/DD): "
 MSG_GOTO_D        = "Vai alla data: "
 MSG_INPUT         = "Inserimento errato."
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
 CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"
-JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Add task   d · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
+JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Aggiungi un'attività   d · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
 
 DAYS = ["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDì", "SABATO", "DOMENICA"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

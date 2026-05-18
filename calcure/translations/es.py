@@ -28,6 +28,7 @@ KEYS_CALENDAR = {
         "  m(M) ": "Mover evento (en este mes)",
         "  g(G) ": "Ir a un día específico (en este mes)",
         "   v   ": "Alternar vista diaria/mensual",
+        "   w   ": "Alternar números de semana",
         "   h   ": "Alternar evento como alta prioridad",
         "   l   ": "Alternar evento como baja prioridad",
         "   d   ": "Alternar evento como terminado",

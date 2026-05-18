@@ -15,7 +15,7 @@ KEYS_GENERAL = {
         "   /   ": "Bölünmüş ekranı aç / kapat",
         "   *   ": "Genel gizliliği aç / kapat",
         "   ?   ": "Bu yardımı aç / kapat",
-        "   Q   ": "Reload",
+        "   Q   ": "Yeniden yükle",
         "   q   ": "Çıkış",
         }
 
@@ -28,9 +28,10 @@ KEYS_CALENDAR = {
         "  m(M) ": "Etkinlik taşıma",
         "  g(G) ": "Belirli bir güne git",
         "   v   ": "Günlük/aylık görünümü değiştir",
+        "   w   ": "Hafta numaralarını aç/kapat",
         "   h   ": "Etkinliği yüksek öncelikli olarak değiştir",
         "   l   ": "Etkinliği düşük öncelikli olarak değiştir",
-        "   d   ": "Toggle event as done",
+        "   d   ": "Etkinliği tamamlandı olarak işaretle",
         "   .   ": "Etkinlik gizliliğini aç / kapat",
         "   C   ": "Calcurse'den etkinlikleri içe aktarma",
         "   R   ": "Geçerli aya (güne) dön",
@@ -61,7 +62,7 @@ MSG_EXIT          = "Gerçekten çıkıyorsun musun? (y/n) "
 
 MSG_EVENT_HIGH    = "Yüksek öncelikli olay numarası olarak işaretle: "
 MSG_EVENT_LOW     = "Düşük öncelikli olay numarası olarak işaretle: "
-MSG_EVENT_DONE    = "Mark as done event number: "
+MSG_EVENT_DONE    = "Etkinlik numarasını tamamlandı olarak işaretle: "
 MSG_EVENT_RESET   = "Etkinlik numarası için durumu sıfırla: "
 MSG_EVENT_DEL     = "Etkinlik numarasını sil: "
 MSG_EVENT_REN     = "Etkinlik numarasını yeniden adlandır: "
@@ -83,7 +84,7 @@ MSG_TS_RES        = "Görev numarasının durumunu sıfırla: "
 MSG_TS_DONE       = "Görev numarasını tamamlandı olarak işaretle: "
 MSG_TS_DEL        = "Görev numarasını sil: "
 MSG_TS_DEL_ALL    = "Gerçekten tüm görevleri silecek misiniz? (y/n)"
-MSG_TS_EDT_ALL    = "Do you confirm this action? (y/n)"
+MSG_TS_EDT_ALL    = "Bu eylemi onaylıyor musunuz? (y/n)"
 MSG_TS_MOVE       = "Numaradan görevi taşı: "
 MSG_TS_MOVE_TO    = "Görevi numaraya taşı: "
 MSG_TS_EDIT       = "Görev numarasını düzenle: "
@@ -98,10 +99,10 @@ MSG_TS_DEAD_ADD   = "Görev numarası için son tarih ekle: "
 MSG_TS_DEAD_DEL   = "Görev numarasının son tarihini kaldırın: "
 MSG_TS_DEAD_DATE  = "Son tarih ekleyin (YYYY/MM/DD): "
 MSG_WEATHER       = "Hava durumu yükleniyor..."
-MSG_ERRORS        = "Errors have occurred. See info.log in your config folder."
-MSG_GOTO          = "Go to date (YYYY/MM/DD): "
-MSG_GOTO_G        = "Go to date: "
-MSG_INPUT         = "Incorrect input."
+MSG_ERRORS        = "Hatalar oluştu. Yapılandırma klasörünüzdeki info.log dosyasına bakın."
+MSG_GOTO          = "Tarihe git (YYYY/MM/DD): "
+MSG_GOTO_D        = "Tarihe git: "
+MSG_INPUT         = "Hatalı giriş."
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"

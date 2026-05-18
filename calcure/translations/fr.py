@@ -28,9 +28,10 @@ KEYS_CALENDAR = {
         "  m(M) ": "Déplacer l'événement",
         "  g(G) ": "Aller à un certain jour",
         "   v   ": "Basculer la vue quotidienne/mensuelle",
+        "   w   ": "Afficher/masquer les numéros de semaine",
         "   h   ": "Désactiver l'événement en haute priorité",
         "   l   ": "Basculer l'événement en priorité basse",
-        "   d   ": "Toggle event as done",
+        "   d   ": "Marquer l'événement comme terminé",
         "   .   ": "Activer la confidentialité des événements",
         "   C   ": "Importer des événements depuis calcurse",
         "   R   ": "Revenir au mois (jour) en cours",
@@ -104,8 +105,8 @@ MSG_GOTO_D        = "Aller au: "
 MSG_INPUT         = "Entrée incorrecte."
 
 CALENDAR_HINT     = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de mois  ? · Aider"
-CALENDAR_HINT_D   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de jour  ? · All keybindings"
-JOURNAL_HINT      = "Espace · Passer au calendrier  a · Ajouter une tâche  d · Terminé  i · Important  ? · All keybindings"
+CALENDAR_HINT_D   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de jour  ? · Aide"
+JOURNAL_HINT      = "Espace · Passer au calendrier  a · Ajouter une tâche  d · Terminé  i · Important  ? · Aide"
 
 DAYS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE"]
 DAYS_PERSIAN = ["SHANBEH", "YEKSHANBEH", "DOSHANBEH", "SESHANBEH", "CHAHARSHANBEH", "PANJSHANBEH", "JOMEH"]

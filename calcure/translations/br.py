@@ -27,13 +27,14 @@ KEYS_CALENDAR = {
         "   r   ": "Editar um evento",
         "  m(M) ": "Mover evento",
         "   v   ": "Alternar visualização diária/mensal",
+        "   w   ": "Alternar números de semana",
         "  g(G) ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
         "   l   ": "Alternar evento como baixa prioridade",
-        "   d   ": "Toggle event as done",
+        "   d   ": "Alternar evento como feito",
         "   .   ": "Alternar privacidade do evento",
         "   C   ": "Importar eventos do calcurse",
-        "   G   ": "Retornar para o mês (dia) recorrente",
+        "   R   ": "Retornar para o mês (dia) atual",
         }
 
 KEYS_TODO = {
@@ -61,7 +62,7 @@ MSG_EXIT          = "Realmente sair? (y/n) "
 
 MSG_EVENT_HIGH    = "Marca como alta prioridade evento número: "
 MSG_EVENT_LOW     = "Marca como baixa prioridade evento número: "
-MSG_EVENT_DONE    = "Mark as done event number: "
+MSG_EVENT_DONE    = "Marcar como feito o evento número: "
 MSG_EVENT_RESET   = "Reseta status para evento número:"
 MSG_EVENT_DEL     = "Deleta evento número: "
 MSG_EVENT_REN     = "Renomeia evento número: "
@@ -83,7 +84,7 @@ MSG_TS_RES        = "Resetar status para tarefa número: "
 MSG_TS_DONE       = "Marcar como feita tarefa número: "
 MSG_TS_DEL        = "Deletar tarefa número: "
 MSG_TS_DEL_ALL    = "Quer mesmo deletar todas as tarefas? (y/n)"
-MSG_TS_EDT_ALL    = "Do you confirm this action? (y/n)"
+MSG_TS_EDT_ALL    = "Você confirma esta ação? (y/n)"
 MSG_TS_MOVE       = "Mover tarefa de número: "
 MSG_TS_MOVE_TO    = "Mover tarefa para número: "
 MSG_TS_EDIT       = "Editar tarefa número: "
@@ -98,10 +99,10 @@ MSG_TS_DEAD_ADD   = "Adicionar data limite da tarefa número: "
 MSG_TS_DEAD_DEL   = "Remover data limite da tarefa número: "
 MSG_TS_DEAD_DATE  = "Adicionar data limite em (AAAA/MM/DD): "
 MSG_WEATHER       = "Clima está carregando..."
-MSG_ERRORS        = "Errors have occurred. See info.log file in your config folder."
-MSG_GOTO          = "Go to date (YYYY/MM/DD): "
-MSG_GOTO_D        = "Go to date: "
-MSG_INPUT         = "Incorrect input."
+MSG_ERRORS        = "Ocorreram erros. Veja info.log na sua pasta de configuração."
+MSG_GOTO          = "Ir para a data (AAAA/MM/DD): "
+MSG_GOTO_D        = "Ir para a data: "
+MSG_INPUT         = "Entrada incorreta."
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"
