@@ -40,6 +40,17 @@ def clear_line(stdscr, y, x=0):
     stdscr.addstr(y, x, " " * (x_max - x - 1), curses.color_pair(Color.EMPTY.value))
 
 
+def _get_wch(stdscr):
+    """Get a character, falling back to getch() if ncurses lacks wide-char support."""
+    if hasattr(stdscr, 'get_wch'):
+        return stdscr.get_wch()
+    key = stdscr.getch()
+    # Mirror get_wch() convention: return str for printable/control chars, int for special keys
+    if key != curses.ERR and (32 <= key <= 127 or key in (9, 10, 13, 27)):
+        return chr(key)
+    return key
+
+
 def input_field(stdscr, y, x, field_length):
     """Input field that gets characters entered by user"""
     curses.curs_set(1)
@@ -50,7 +61,7 @@ def input_field(stdscr, y, x, field_length):
         stdscr.move(y, x + cursor_pos)
         curses.halfdelay(255)
         try:
-            key = stdscr.get_wch()
+            key = _get_wch(stdscr)
         except curses.error:
             return ""
 
