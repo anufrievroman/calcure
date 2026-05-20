@@ -152,6 +152,13 @@ class Screen:
                 self.year -= 1
             self.day = Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
 
+    def week_dates(self, start_week_day):
+        """Return list of 7 date objects for the week containing the current screen date"""
+        current = datetime.date(self.year, self.month, self.day)
+        start_offset = (current.weekday() - (start_week_day - 1)) % 7
+        week_start = current - datetime.timedelta(days=start_offset)
+        return [week_start + datetime.timedelta(days=i) for i in range(7)]
+
     def next_week(self):
         """Switch to the next week"""
         current = datetime.date(self.year, self.month, self.day)

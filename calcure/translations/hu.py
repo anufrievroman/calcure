@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Esemény átnevezése",
         "  m(M) ": "Esemény áthelyezése (ebben a hónapban)",
         "  g(G) ": "Ugrás egy napra (ebben a hónapban)",
-        "   v   ": "Napi/havi nézet váltása",
-        "   w   ": "Heti/havi nézet váltása",
+        "   v   ": "Napi nézet váltása",
+        "   w   ": "Heti nézet váltása",
         "   W   ": "Hét számok megjelenítése",
         "   h   ": "Esemény magas prioritásúvá tétele",
         "   l   ": "Esemény alacsony prioritásúvá tétele",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Ugrás dátumra: "
 
 CALENDAR_HINT     = "Space · Váltás naplóhoz   a · Esemény hozzáadása  n/p · Hónap váltása   ? · Súgó"
 CALENDAR_HINT_D   = "Space · Váltás naplóhoz   a · Esemény hozzáadása  n/p · Nap váltása   ? · Súgó"
+CALENDAR_HINT_W   = "Space · Váltás naplóhoz   a · Esemény hozzáadása  n/p · Hét váltása   ? · Súgó"
 JOURNAL_HINT      = "Space · Váltás naptárhoz   a · Feladat hozzáadása   d · Kész   i · Fontos   ? · Súgó"
 
 DAYS = ["HÉTFŐ", "KEDD", "SZERDA", "CSÜTÖRTÖK", "PÉNTEK", "SZOMBAT", "VASÁRNAP"]

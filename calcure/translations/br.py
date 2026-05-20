@@ -26,8 +26,8 @@ KEYS_CALENDAR = {
         "   x   ": "Deletar um evento",
         "   r   ": "Editar um evento",
         "  m(M) ": "Mover evento",
-        "   v   ": "Alternar visualização diária/mensal",
-        "   w   ": "Alternar visualização semanal/mensal",
+        "   v   ": "Alternar visualização diária",
+        "   w   ": "Alternar visualização semanal",
         "   W   ": "Alternar números de semana",
         "  g(G) ": "Ir para dia específico",
         "   h   ": "Alternar evento como alta prioridade",
@@ -107,6 +107,7 @@ MSG_INPUT         = "Entrada incorreta."
 
 CALENDAR_HINT     = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar mês   ? · Todas as combinações de teclas"
 CALENDAR_HINT_D   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar dia   ? · Todas as combinações de teclas"
+CALENDAR_HINT_W   = "Espaço · Mudar para diário   a · Adicionar evento  n/p · Mudar semana   ? · Todas as combinações de teclas"
 JOURNAL_HINT      = "Espaço · Mudar para calendar   a · Adicionar tarefa   d · Feito   i · Importante   ? · Todas as combinações de teclas"
 
 DAYS = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"]

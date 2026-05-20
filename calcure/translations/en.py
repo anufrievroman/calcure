@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Rename an event",
         "  m(M) ": "Move event (in this month)",
         "  g(G) ": "Go to a certain day (in this month)",
-        "   v   ": "Toggle daily/monthly view",
-        "   w   ": "Toggle weekly/monthly view",
+        "   v   ": "Toggle daily view",
+        "   w   ": "Toggle weekly view",
         "   W   ": "Toggle week numbers",
         "   h   ": "Toggle event as high priority",
         "   l   ": "Toggle event as low priority",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Go to date: "
 
 CALENDAR_HINT     = "Space · Switch to journal   a · Add event  n/p · Change month   ? · All keybindings"
 CALENDAR_HINT_D   = "Space · Switch to journal   a · Add event  n/p · Change day   ? · All keybindings"
+CALENDAR_HINT_W   = "Space · Switch to journal   a · Add event  n/p · Change week   ? · All keybindings"
 JOURNAL_HINT      = "Space · Switch to calendar   a · Add task   d · Done   i · Important   ? · All keybindings"
 
 DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]

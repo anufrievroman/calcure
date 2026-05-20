@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Renombrar un evento",
         "  m(M) ": "Mover evento (en este mes)",
         "  g(G) ": "Ir a un día específico (en este mes)",
-        "   v   ": "Alternar vista diaria/mensual",
-        "   w   ": "Alternar vista semanal/mensual",
+        "   v   ": "Alternar vista diaria",
+        "   w   ": "Alternar vista semanal",
         "   W   ": "Alternar números de semana",
         "   h   ": "Alternar evento como alta prioridad",
         "   l   ": "Alternar evento como baja prioridad",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Ir a la fecha: "
 
 CALENDAR_HINT     = "Espacio · Ir al diario   a · Agregar evento  n/p · Cambiar mes   ? · Mostrar atajos"
 CALENDAR_HINT_D   = "Espacio · Ir al diario   a · Agregar evento  n/p · Cambiar día   ? · Mostrar atajos"
+CALENDAR_HINT_W   = "Espacio · Ir al diario   a · Agregar evento  n/p · Cambiar semana   ? · Mostrar atajos"
 JOURNAL_HINT      = "Espacio · Ir al calendario   a · Agregar tarea   d · Hecho   i · Importante   ? · Mostrar atajos"
 
 DAYS = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO", "DOMINGO"]

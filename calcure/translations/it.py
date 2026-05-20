@@ -26,8 +26,8 @@ KEYS_CALENDAR = {
         "   x   ": "Cancella un evento",
         "   r   ": "Modifica un evento",
         "  m(M) ": "Sposta un evento",
-        "   v   ": "Alterna la visualizzazione giornaliera/mensile",
-        "   w   ": "Alterna la visualizzazione settimanale/mensile",
+        "   v   ": "Alterna la visualizzazione giornaliera",
+        "   w   ": "Alterna la visualizzazione settimanale",
         "   W   ": "Attiva/disattiva i numeri delle settimane",
         "  g(G) ": "Vai ad un determinato giorno",
         "   h   ": "Imposta un evento come ad alta priorità",
@@ -107,6 +107,7 @@ MSG_INPUT         = "Inserimento errato."
 
 CALENDAR_HINT     = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia mese   ? · Mostra tutte le scorciatoie"
 CALENDAR_HINT_D   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia giorno  ? · Mostra tutte le scorciatoie"
+CALENDAR_HINT_W   = "Barra spaziatrice · Passa al diario   a · Aggiungi un evento  n/p · Cambia settimana  ? · Mostra tutte le scorciatoie"
 JOURNAL_HINT      = "Barra spaziatrice · Passa al calendario   a · Aggiungi un'attività   d · Finito   i · Importante   ? · Mostra tutte le scorciatoie"
 
 DAYS = ["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDì", "SABATO", "DOMENICA"]

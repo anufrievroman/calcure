@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Ereignis umbenennen",
         "  m(M) ": "Ereignis verschieben (in diesem Monat)",
         "  g(G) ": "Zu bestimmtem Tag gehen (in diesem Monat)",
-        "   v   ": "Tages-/Monatsübersicht umschalten",
-        "   w   ": "Wochen-/Monatsübersicht umschalten",
+        "   v   ": "Tagesübersicht umschalten",
+        "   w   ": "Wochenübersicht umschalten",
         "   W   ": "Wochennummern ein-/ausblenden",
         "   h   ": "Ereignis als hohe Priorität markieren",
         "   l   ": "Ereignis als niedrige Priorität markieren",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Zum Datum gehen: "
 
 CALENDAR_HINT     = "Space · Zum Journal wechseln   a · Ereignis hinzufügen  n/p · Monat wechseln   ? · Alle Tastenkombinationen"
 CALENDAR_HINT_D   = "Space · Zum Journal wechseln   a · Ereignis hinzufügen  n/p · Tag wechseln   ? · Alle Tastenkombinationen"
+CALENDAR_HINT_W   = "Space · Zum Journal wechseln   a · Ereignis hinzufügen  n/p · Woche wechseln   ? · Alle Tastenkombinationen"
 JOURNAL_HINT      = "Space · Zum Kalender wechseln   a · Aufgabe hinzufügen   d · Erledigt   i · Wichtig   ? · Alle Tastenkombinationen"
 
 DAYS = ["MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG", "SONNTAG"]

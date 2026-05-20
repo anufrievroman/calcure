@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Modifier un événement",
         "  m(M) ": "Déplacer l'événement",
         "  g(G) ": "Aller à un certain jour",
-        "   v   ": "Basculer la vue quotidienne/mensuelle",
-        "   w   ": "Basculer la vue hebdomadaire/mensuelle",
+        "   v   ": "Basculer la vue quotidienne",
+        "   w   ": "Basculer la vue hebdomadaire",
         "   W   ": "Afficher/masquer les numéros de semaine",
         "   h   ": "Désactiver l'événement en haute priorité",
         "   l   ": "Basculer l'événement en priorité basse",
@@ -107,6 +107,7 @@ MSG_INPUT         = "Entrée incorrecte."
 
 CALENDAR_HINT     = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de mois  ? · Aider"
 CALENDAR_HINT_D   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de jour  ? · Aide"
+CALENDAR_HINT_W   = "Espace · Passer au journal  a · Ajouter un événement  n/p · Changer de semaine  ? · Aide"
 JOURNAL_HINT      = "Espace · Passer au calendrier  a · Ajouter une tâche  d · Terminé  i · Important  ? · Aide"
 
 DAYS = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE"]

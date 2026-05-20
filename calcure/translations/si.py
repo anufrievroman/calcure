@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Preimenuj dogodek",
         "  m(M) ": "Premakni dogodek (v tem mescu)",
         "  g(G) ": "Pojdi na določen dan (v tem mescu)",
-        "   v   ": "Preklopi med dnevnim in mesečnim prikazom",
-        "   w   ": "Preklopi med tedenskim in mesečnim prikazom",
+        "   v   ": "Preklopi na dnevni prikaz",
+        "   w   ": "Preklopi na tedenski prikaz",
         "   W   ": "Prikaži/skrij številke tednov",
         "   h   ": "Označi/odznači dogodek kot visokoprioriteten",
         "   l   ": "Označi/odznači dogodek kot nizkoprioriteten",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Pojdi na datum: "
 
 CALENDAR_HINT     = "Presledek · Preklopi na dnevnik   a · Dodaj dogodek  n/p · Zamenjaj mesec   ? · Vsi ukazi"
 CALENDAR_HINT_D   = "Presledek · Preklopi na dnevnik   a · Dodaj dogodek  n/p · Zamenjaj dan   ? · Vsi ukazi"
+CALENDAR_HINT_W   = "Presledek · Preklopi na dnevnik   a · Dodaj dogodek  n/p · Zamenjaj teden   ? · Vsi ukazi"
 JOURNAL_HINT      = "Presledek · Preklopi na koledar   a · Dodaj opravilo   d · Opravljeno   i · Pomembno   ? · Vsi ukazi"
 
 DAYS = ["PONEDELJEK", "TOREK", "SREDA", "ČETRTEK", "PETEK", "SOBOTA", "NEDELJA"]

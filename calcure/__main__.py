@@ -605,6 +605,8 @@ class FooterView(View):
         if self.screen.state == AppState.CALENDAR:
             if self.screen.calendar_state == CalState.MONTHLY:
                 hint = CALENDAR_HINT
+            elif self.screen.calendar_state == CalState.WEEKLY:
+                hint = CALENDAR_HINT_W
             else:
                 hint = CALENDAR_HINT_D
         elif self.screen.state == AppState.JOURNAL:
@@ -953,15 +955,18 @@ class WeeklyScreenView(View):
 
         orig_year, orig_month, orig_day = self.screen.year, self.screen.month, self.screen.day
 
+        num_events = 0
         for col, d in enumerate(dates):
             self.screen.year = d.year
             self.screen.month = d.month
             self.screen.day = d.day
 
             DayNumberView(self.stdscr, 2, col * x_cell, self.screen, d.day, d.weekday(), x_cell).render()
-            DailyView(self.stdscr, 3, col * x_cell, repeated_user_events, repeated_ics_events,
-                      self.user_events, self.user_ics_events, self.holidays, self.birthdays,
-                      self.user_tasks, self.user_ics_tasks, self.screen, 0).render()
+            daily_view = DailyView(self.stdscr, 3, col * x_cell, repeated_user_events, repeated_ics_events,
+                                   self.user_events, self.user_ics_events, self.holidays, self.birthdays,
+                                   self.user_tasks, self.user_ics_tasks, self.screen, num_events)
+            daily_view.render()
+            num_events += len(self.user_events.filter_events_that_day(self.screen).items)
 
         self.screen.year, self.screen.month, self.screen.day = orig_year, orig_month, orig_day
 

@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "   r   ": "Premenovať udalosť",
         "  m(M) ": "Presunúť udalosť (v rámci mesiaca)",
         "  g(G) ": "Prejsť na určitý deň (v rámci mesiaca)",
-        "   v   ": "Prepnúť medzi zobrazením dní/mesiacov",
-        "   w   ": "Prepnúť medzi zobrazením týždňov/mesiacov",
+        "   v   ": "Prepnúť na denné zobrazenie",
+        "   w   ": "Prepnúť na týždenné zobrazenie",
         "   W   ": "Vypnúť/zapnúť čísla týždňov",
         "   h   ": "Nastaviť/zrušiť vysokú prioritu pre udalosť",
         "   l   ": "Nastaviť/zrušiť nízku prioritu pre udalosť",
@@ -107,6 +107,7 @@ MSG_GOTO_D        = "Prejsť na dátum: "
 
 CALENDAR_HINT     = "Medzera · Prepnúť na denník   a · Pridať udalosť  n/p · Zmeniť mesiac ? · Všetky skratky"
 CALENDAR_HINT_D   = "Medzera · Prepnúť na denník   a · Pridať udalosť  n/p · Zmeniť deň   ? · Všetky skratky"
+CALENDAR_HINT_W   = "Medzera · Prepnúť na denník   a · Pridať udalosť  n/p · Zmeniť týždeň   ? · Všetky skratky"
 JOURNAL_HINT      = "Medzera · Prepnúť na kalendár   a · Pridať úlohu d · Hotovo   i · Dôležité   ? · Všetky skratky"
 
 DAYS = ["PONDELOK", "UTOROK", "STREDA", "ŠTVRTOK", "PIATOK", "SOBOTA", "NEDEĽA"]

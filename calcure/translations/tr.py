@@ -27,8 +27,8 @@ KEYS_CALENDAR = {
         "  e,r  ": "Etkinlik düzenleme",
         "  m(M) ": "Etkinlik taşıma",
         "  g(G) ": "Belirli bir güne git",
-        "   v   ": "Günlük/aylık görünümü değiştir",
-        "   w   ": "Haftalık/aylık görünümü değiştir",
+        "   v   ": "Günlük görünümüne geç",
+        "   w   ": "Haftalık görünümüne geç",
         "   W   ": "Hafta numaralarını aç/kapat",
         "   h   ": "Etkinliği yüksek öncelikli olarak değiştir",
         "   l   ": "Etkinliği düşük öncelikli olarak değiştir",
@@ -107,6 +107,7 @@ MSG_INPUT         = "Hatalı giriş."
 
 CALENDAR_HINT     = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Ayı değiştir   ? · Tüm tuş atamaları"
 CALENDAR_HINT_D   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Günü değiştir   ? · Tüm tuş atamaları"
+CALENDAR_HINT_W   = "Space · Günlüğe geç   a · Etkinlik ekle  n/p · Haftayı değiştir   ? · Tüm tuş atamaları"
 JOURNAL_HINT      = "Space · Takvime geç   a · Görev ekle   d · Tamamlandı   i · Önemli   ? · Tüm tuş atamaları"
 
 DAYS = ["PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ", "PAZAR"]

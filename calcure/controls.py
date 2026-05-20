@@ -185,6 +185,11 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.day = 1
             screen.calendar_state = CalState.DAILY
         if screen.key == "w":
+            today = screen.today
+            if screen.year == today.year and screen.month == today.month:
+                screen.day = today.day
+            else:
+                screen.day = 1
             screen.calendar_state = CalState.WEEKLY
 
         # Add single event:
@@ -245,7 +250,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
 @block_until_valid_input(accepted_keys=[
     " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
     "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "W", "a", "c", "d", "e",
-    "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "x",
+    "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
 ])
 def control_daily_screen(stdscr, screen, user_events, importer):
     """Handle user input on the daily screen"""
@@ -381,9 +386,11 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.reload_data = True
             screen.refresh_now = True
 
-        # Change the view to monthly:
+        # Change the view:
         if screen.key == "v":
             screen.calendar_state = CalState.MONTHLY
+        if screen.key == "w":
+            screen.calendar_state = CalState.WEEKLY
 
         # Other actions:
         if screen.key == "*":
@@ -398,9 +405,23 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         if screen.key in ["/"]:
             screen.split = not screen.split
             screen.refresh_now = True
-        if screen.key == "w":
+        if screen.key == "W":
             screen.show_week_numbers = not screen.show_week_numbers
             screen.refresh_now = True
+
+
+def _filter_events_that_week(screen, user_events):
+    """Return all user events across the 7 days of the current week, in column order."""
+    from calcure.data import Events
+    week = screen.week_dates(cf.START_WEEK_DAY)
+    result = Events()
+    orig = (screen.year, screen.month, screen.day)
+    for d in week:
+        screen.year, screen.month, screen.day = d.year, d.month, d.day
+        for evt in user_events.filter_events_that_day(screen).items:
+            result.add_item(evt)
+    screen.year, screen.month, screen.day = orig
+    return result
 
 
 @safe_run
@@ -414,53 +435,47 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
 
     if screen.selection_mode:
         screen.selection_mode = False
+        week_events = _filter_events_that_week(screen, user_events)
 
         # Change event status:
         if screen.key in ['i', 'h']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(event_id, Status.IMPORTANT)
+            if week_events.is_valid_number(number):
+                user_events.toggle_item_status(week_events.items[number].item_id, Status.IMPORTANT)
         if screen.key == 'l':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(event_id, Status.UNIMPORTANT)
+            if week_events.is_valid_number(number):
+                user_events.toggle_item_status(week_events.items[number].item_id, Status.UNIMPORTANT)
         if screen.key == 'u':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(event_id, Status.NORMAL)
+            if week_events.is_valid_number(number):
+                user_events.toggle_item_status(week_events.items[number].item_id, Status.NORMAL)
         if screen.key == 'd':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(event_id, Status.DONE)
+            if week_events.is_valid_number(number):
+                user_events.toggle_item_status(week_events.items[number].item_id, Status.DONE)
 
         if screen.key == '.':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_privacy(event_id)
+            if week_events.is_valid_number(number):
+                user_events.toggle_item_privacy(week_events.items[number].item_id)
 
         if screen.key == 'x':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.delete_item(event_id)
+            if week_events.is_valid_number(number):
+                user_events.delete_item(week_events.items[number].item_id)
 
         if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
+            if week_events.is_valid_number(number):
                 clear_line(stdscr, screen.y_max-2)
                 new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
-                user_events.rename_item(event_id, new_name)
+                user_events.rename_item(week_events.items[number].item_id, new_name)
 
         if screen.key in ['m', 'M']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
+            if week_events.is_valid_number(number):
+                event_id = week_events.items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
                 if screen.key == 'm':
                     year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
@@ -474,7 +489,7 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
 
     else:
         selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'm', 'M', '.']
-        if screen.key in selection_keys and user_events.filter_events_that_day(screen).items:
+        if screen.key in selection_keys and _filter_events_that_week(screen, user_events).items:
             screen.selection_mode = True
 
         # Navigation (week by week):
@@ -499,10 +514,12 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
 
         # Add single event:
         if screen.key == "a":
-            clear_line(stdscr, screen.y_max-2, 0)
-            year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_DATE)
-            if screen.is_valid_date(year, month, day):
-                screen.year, screen.month, screen.day = year, month, day
+            week = screen.week_dates(cf.START_WEEK_DAY)
+            question = f'{MSG_EVENT_DATE} {week[0].year}/{week[0].month}/'
+            day = input_day(stdscr, screen.y_max-2, 0, question)
+            matched = next((d for d in week if d.day == day), None) if day is not None else None
+            if matched:
+                screen.year, screen.month, screen.day = matched.year, matched.month, matched.day
                 clear_line(stdscr, screen.y_max-2)
                 name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 event_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
@@ -510,10 +527,12 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
 
         # Add a recurring event:
         if screen.key == "A":
-            clear_line(stdscr, screen.y_max-2, 0)
-            year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_DATE)
-            if screen.is_valid_date(year, month, day):
-                screen.year, screen.month, screen.day = year, month, day
+            week = screen.week_dates(cf.START_WEEK_DAY)
+            question = f'{MSG_EVENT_DATE} {week[0].year}/{week[0].month}/'
+            day = input_day(stdscr, screen.y_max-2, 0, question)
+            matched = next((d for d in week if d.day == day), None) if day is not None else None
+            if matched:
+                screen.year, screen.month, screen.day = matched.year, matched.month, matched.day
                 clear_line(stdscr, screen.y_max-2)
                 name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
                 item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
