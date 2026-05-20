@@ -37,7 +37,7 @@ def display_question(stdscr, y, x, question, color):
 def clear_line(stdscr, y, x=0):
     """Clear a line from any text"""
     _, x_max = stdscr.getmaxyx()
-    stdscr.addstr(y, x, " " * (x_max - x - 1), curses.color_pair(Color.EMPTY.value))
+    stdscr.addstr(y, x, " " * (x_max - x - 1), curses.color_pair(Color.DEFAULT.value))
 
 
 def _get_wch(stdscr):
@@ -53,7 +53,7 @@ def _get_wch(stdscr):
 
 def input_field(stdscr, y, x, field_length):
     """Input field that gets characters entered by user"""
-    curses.curs_set(1)
+    curses.curs_set(True)
     input_str = ""
     cursor_pos = 0
 
@@ -77,8 +77,6 @@ def input_field(stdscr, y, x, field_length):
             elif cursor_pos < field_length: # Other characters:
                 input_str = input_str[:cursor_pos] + chr(ord(key)) + input_str[cursor_pos:]
                 cursor_pos += 1
-            else:
-                pass
 
         # Various keys:
         else:
@@ -91,9 +89,6 @@ def input_field(stdscr, y, x, field_length):
                 cursor_pos -= 1
             elif key == curses.KEY_RIGHT and cursor_pos < len(input_str):
                 cursor_pos += 1
-            else:
-                pass
-
 
         # Redraw input field:
         stdscr.addstr(y, x, input_str + " ")
