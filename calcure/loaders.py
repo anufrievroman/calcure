@@ -2,6 +2,7 @@
 
 import configparser
 import csv
+import glob
 import os
 import datetime
 import icalendar
@@ -297,6 +298,12 @@ class LoaderICS:
         # If it's a URL, try to load it:
         if path.startswith('http'):
             ics_files.append(self.read_url(path))
+            return ics_files
+
+        # If it contains a glob pattern, expand and recurse:
+        if '*' in path or '?' in path:
+            for matched in sorted(glob.glob(path)):
+                ics_files.extend(self.read_resource(matched))
             return ics_files
 
         # If it's a local file, read it:
