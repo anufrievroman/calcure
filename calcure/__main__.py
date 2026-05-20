@@ -903,6 +903,69 @@ class MonthlyScreenView(View):
             calendar_border_view.render()
 
 
+class WeeklyScreenView(View):
+    """Weekly view showing 7 days as columns"""
+
+    def __init__(self, stdscr, y, x, weather, user_events, user_ics_events, holidays, birthdays, user_tasks, user_ics_tasks, screen):
+        super().__init__(stdscr, y, x)
+        self.weather = weather
+        self.user_events = user_events
+        self.user_ics_events = user_ics_events
+        self.holidays = holidays
+        self.birthdays = birthdays
+        self.user_tasks = user_tasks
+        self.user_ics_tasks = user_ics_tasks
+        self.screen = screen
+
+    def week_dates(self):
+        """Return list of 7 date objects for the week containing the current screen date"""
+        import datetime as _dt
+        try:
+            current = _dt.date(self.screen.year, self.screen.month, self.screen.day)
+        except ValueError:
+            current = _dt.date.today()
+        start_offset = (current.weekday() - (cf.START_WEEK_DAY - 1)) % 7
+        week_start = current - _dt.timedelta(days=start_offset)
+        return [week_start + _dt.timedelta(days=i) for i in range(7)]
+
+    def render(self):
+        """Render this view on the screen"""
+        self.screen.currently_drawn = AppState.CALENDAR
+        if self.screen.x_max < 14 or self.screen.y_max < 4:
+            return
+
+        x_cell = self.screen.x_max // 7
+        dates = self.week_dates()
+        week_start, week_end = dates[0], dates[-1]
+        month_names = MONTHS_PERSIAN if cf.USE_PERSIAN_CALENDAR else MONTHS
+
+        if week_start.month == week_end.month:
+            header_string = f"{month_names[week_start.month-1]} {week_start.day}–{week_end.day}, {week_start.year}"
+        else:
+            header_string = (f"{month_names[week_start.month-1]} {week_start.day} – "
+                             f"{month_names[week_end.month-1]} {week_end.day}, {week_end.year}")
+
+        HeaderView(self.stdscr, 0, 0, header_string, self.weather, self.screen).render()
+        DaysNameView(self.stdscr, 1, 0, self.screen, x_cell).render()
+
+        repeated_user_events = RepeatedEvents(self.user_events, cf.USE_PERSIAN_CALENDAR, week_start.year)
+        repeated_ics_events = RepeatedEvents(self.user_ics_events, cf.USE_PERSIAN_CALENDAR, week_start.year)
+
+        orig_year, orig_month, orig_day = self.screen.year, self.screen.month, self.screen.day
+
+        for col, d in enumerate(dates):
+            self.screen.year = d.year
+            self.screen.month = d.month
+            self.screen.day = d.day
+
+            DayNumberView(self.stdscr, 2, col * x_cell, self.screen, d.day, d.weekday(), x_cell).render()
+            DailyView(self.stdscr, 3, col * x_cell, repeated_user_events, repeated_ics_events,
+                      self.user_events, self.user_ics_events, self.holidays, self.birthdays,
+                      self.user_tasks, self.user_ics_tasks, self.screen, 0).render()
+
+        self.screen.year, self.screen.month, self.screen.day = orig_year, orig_month, orig_day
+
+
 class JournalScreenView(View):
     def __init__(self, stdscr, y, x, weather, user_tasks, user_ics_tasks, screen):
         super().__init__(stdscr, y, x)
@@ -1066,6 +1129,8 @@ def main(stdscr) -> None:
     app_view = View(stdscr, 0, 0)
     monthly_screen_view = MonthlyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events,
                                             holidays, birthdays, user_tasks, user_ics_tasks, screen)
+    weekly_screen_view = WeeklyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events,
+                                          holidays, birthdays, user_tasks, user_ics_tasks, screen)
     daily_screen_view = DailyScreenView(stdscr, 0, 0, weather, user_events, user_ics_events,
                                         holidays, birthdays, user_tasks, user_ics_tasks, screen)
     journal_screen_view = JournalScreenView(stdscr, 0, 0, weather, user_tasks, user_ics_tasks, screen)
@@ -1106,6 +1171,8 @@ def main(stdscr) -> None:
 
             if screen.calendar_state == CalState.MONTHLY:
                 monthly_screen_view.render()
+            elif screen.calendar_state == CalState.WEEKLY:
+                weekly_screen_view.render()
             else:
                 daily_screen_view.render()
 
@@ -1117,6 +1184,8 @@ def main(stdscr) -> None:
 
             if screen.calendar_state == CalState.MONTHLY:
                 control_monthly_screen(stdscr, screen, user_events, importer)
+            elif screen.calendar_state == CalState.WEEKLY:
+                control_weekly_screen(stdscr, screen, user_events, importer)
             else:
                 control_daily_screen(stdscr, screen, user_events, importer)
 
@@ -1125,6 +1194,8 @@ def main(stdscr) -> None:
             if screen.split:
                 if screen.calendar_state == CalState.MONTHLY:
                     monthly_screen_view.render()
+                elif screen.calendar_state == CalState.WEEKLY:
+                    weekly_screen_view.render()
                 else:
                     daily_screen_view.render()
                 separator_view.render()

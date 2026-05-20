@@ -22,6 +22,7 @@ class CalState(enum.Enum):
     """Possible states of the calendar view"""
     MONTHLY = 1
     DAILY = 2
+    WEEKLY = 3
 
 
 class Status(enum.Enum):

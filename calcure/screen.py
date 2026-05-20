@@ -13,7 +13,12 @@ class Screen:
         self.stdscr = stdscr
         self.privacy = cf.PRIVACY_MODE
         self.state = cf.DEFAULT_VIEW
-        self.calendar_state = CalState.DAILY if cf.DEFAULT_CALENDAR_VIEW == "daily" else CalState.MONTHLY
+        if cf.DEFAULT_CALENDAR_VIEW == "daily":
+            self.calendar_state = CalState.DAILY
+        elif cf.DEFAULT_CALENDAR_VIEW == "weekly":
+            self.calendar_state = CalState.WEEKLY
+        else:
+            self.calendar_state = CalState.MONTHLY
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.split = cf.SPLIT_SCREEN
         self.show_week_numbers = cf.SHOW_WEEK_NUMBERS
@@ -146,6 +151,18 @@ class Screen:
                 self.month = 12
                 self.year -= 1
             self.day = Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
+
+    def next_week(self):
+        """Switch to the next week"""
+        current = datetime.date(self.year, self.month, self.day)
+        nxt = current + datetime.timedelta(days=7)
+        self.year, self.month, self.day = nxt.year, nxt.month, nxt.day
+
+    def previous_week(self):
+        """Switch to the previous week"""
+        current = datetime.date(self.year, self.month, self.day)
+        prv = current - datetime.timedelta(days=7)
+        self.year, self.month, self.day = prv.year, prv.month, prv.day
 
     def reset_to_today(self):
         """Reset the day, month, and year to the current date"""

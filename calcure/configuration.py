@@ -18,6 +18,7 @@ def _build_arg_parser():
     parser.add_argument("-v", "--version", action="version", version="%(prog)s 3.2.1")
     parser.add_argument("-j", help="start on journal page", action="store_true")
     parser.add_argument("-d", help="start on daily view", action="store_true")
+    parser.add_argument("-w", help="start on weekly view", action="store_true")
     parser.add_argument("-p", help="enable privacy mode", action="store_true")
     parser.add_argument("-i", help="use Persian calendar", action="store_true")
     parser.add_argument("--folder", help="folder with data files", metavar="PATH")
@@ -405,6 +406,9 @@ class Config:
         if args.d:
             self.DEFAULT_VIEW = AppState.CALENDAR
             self.DEFAULT_CALENDAR_VIEW = "daily"
+        if args.w:
+            self.DEFAULT_VIEW = AppState.CALENDAR
+            self.DEFAULT_CALENDAR_VIEW = "weekly"
         if args.i:
             self.USE_PERSIAN_CALENDAR = True
 
