@@ -807,7 +807,7 @@ class DailyScreenView(View):
         max_num_days = (self.screen.y_max - 5)//2
         vertical_shift = 0
 
-        is_selection_day = True
+        num_events = 0
         for _ in range(max_num_days):
 
             # Display day name:
@@ -818,14 +818,13 @@ class DailyScreenView(View):
             # Display events of the day:
             daily_view = DailyView(self.stdscr, self.y + 3 + vertical_shift, self.x, repeated_user_events,
                                    repeated_ics_events, self.user_events, self.user_ics_events, self.holidays,
-                                   self.birthdays, self.user_tasks, self.user_ics_tasks, self.screen, 0,
-                                   is_selection_day)
+                                   self.birthdays, self.user_tasks, self.user_ics_tasks, self.screen, num_events)
             daily_view.render()
+            num_events += len(self.user_events.filter_events_that_day(self.screen).items)
 
             # Move to the next day:
             vertical_shift += daily_view.num_events_this_day + 2
             self.screen.next_day()
-            is_selection_day = False
 
         # Return screen day back to the original day:
         for _ in range(max_num_days):

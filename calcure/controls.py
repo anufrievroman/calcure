@@ -257,74 +257,67 @@ def control_daily_screen(stdscr, screen, user_events, importer):
     # If we previously entered the selection mode, now we perform the action:
     if screen.selection_mode:
         screen.selection_mode = False
+        view_events = _filter_events_that_daily_view(screen, user_events)
 
         # Change event status:
         if screen.key in ['i', 'h']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(item_id, Status.IMPORTANT)
+            if view_events.is_valid_number(number):
+                user_events.toggle_item_status(view_events.items[number].item_id, Status.IMPORTANT)
         if screen.key == 'l':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(item_id, Status.UNIMPORTANT)
+            if view_events.is_valid_number(number):
+                user_events.toggle_item_status(view_events.items[number].item_id, Status.UNIMPORTANT)
         if screen.key == 'u':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(item_id, Status.NORMAL)
+            if view_events.is_valid_number(number):
+                user_events.toggle_item_status(view_events.items[number].item_id, Status.NORMAL)
         if screen.key == 'd':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_status(item_id, Status.DONE)
+            if view_events.is_valid_number(number):
+                user_events.toggle_item_status(view_events.items[number].item_id, Status.DONE)
 
         # Toggle event privacy:
         if screen.key == '.':
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                event_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.toggle_item_privacy(event_id)
+            if view_events.is_valid_number(number):
+                user_events.toggle_item_privacy(view_events.items[number].item_id)
 
         # Delete event:
         if screen.key in ['x']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
-                user_events.delete_item(item_id)
+            if view_events.is_valid_number(number):
+                user_events.delete_item(view_events.items[number].item_id)
 
         # Rename event:
         if screen.key in ['e', 'r']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
+            if view_events.is_valid_number(number):
                 clear_line(stdscr, screen.y_max-2)
                 new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
-                user_events.rename_item(item_id, new_name)
+                user_events.rename_item(view_events.items[number].item_id, new_name)
 
         # Move event:
         if screen.key in ['m', 'M']:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
-            if user_events.filter_events_that_day(screen).is_valid_number(number):
-                item_id = user_events.filter_events_that_day(screen).items[number].item_id
+            if view_events.is_valid_number(number):
+                item_id = view_events.items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
                 if screen.key == 'm':
                     year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
                     if screen.is_valid_date(year, month, day):
-                        user_events.change_date(event_id, year, month, day)
-
+                        user_events.change_date(item_id, year, month, day)
                 if screen.key == 'M':
                     question = f'{MSG_EVENT_MV_TO_D}{screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
-                        user_events.change_day(event_id, day)
+                        user_events.change_day(item_id, day)
 
     # Otherwise, we check for user input:
     else:
         # If we need to select an event, change to selection mode:
         selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
-        if screen.key in selection_keys and user_events.filter_events_that_day(screen).items:
+        if screen.key in selection_keys and _filter_events_that_daily_view(screen, user_events).items:
             screen.selection_mode = True
 
         # Navigation:
@@ -408,6 +401,20 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         if screen.key == "W":
             screen.show_week_numbers = not screen.show_week_numbers
             screen.refresh_now = True
+
+
+def _filter_events_that_daily_view(screen, user_events):
+    """Return all user events across all days currently visible in the daily view."""
+    from calcure.data import Events
+    max_num_days = (screen.y_max - 5) // 2
+    result = Events()
+    orig = (screen.year, screen.month, screen.day)
+    for _ in range(max_num_days):
+        for evt in user_events.filter_events_that_day(screen).items:
+            result.add_item(evt)
+        screen.next_day()
+    screen.year, screen.month, screen.day = orig
+    return result
 
 
 def _filter_events_that_week(screen, user_events):
