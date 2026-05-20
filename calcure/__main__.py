@@ -4,7 +4,6 @@
 
 import curses
 import time
-import getopt
 import sys
 import importlib
 import threading
@@ -14,7 +13,7 @@ import holidays
 
 from calcure.calendars import Calendar
 from calcure.errors import Error
-from calcure.configuration import Config
+from calcure.configuration import Config, get_args
 from calcure.weather import Weather
 from calcure.importers import Importer
 from calcure.dialogues import clear_line
@@ -65,26 +64,22 @@ __version__ = "3.2.1"
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
     """Read --task and --event flags from user arguments to create new tasks or events"""
-    try:
-        opts, _ = getopt.getopt(sys.argv[1:], "pjhvi", ["folder=", "config=", "task=", "event="])
-        for opt, arg in opts:
-            if opt in '--task':
-                name = arg
-                user_tasks.add_item(Task(len(user_tasks.items), name, Status.NORMAL, Timer([]), False))
-                screen.state = AppState.EXIT
-                task_saver_csv.save()
-            if opt in '--event':
-                year = int(arg.split("-")[0])
-                month = int(arg.split("-")[1])
-                day = int(arg.split("-")[2])
-                name = arg.split("-")[3]
-                event_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
-                user_events.add_item(UserEvent(event_id, year, month, day, name,
-                                        1, Frequency.ONCE, Status.NORMAL, False))
-                screen.state = AppState.EXIT
-                event_saver_csv.save()
-    except (getopt.GetoptError, ValueError):
-        pass
+    args = get_args()
+    if args.task:
+        user_tasks.add_item(Task(len(user_tasks.items), args.task, Status.NORMAL, Timer([]), False))
+        screen.state = AppState.EXIT
+        task_saver_csv.save()
+    if args.event:
+        try:
+            parts = args.event.split("-", 3)
+            year, month, day, name = int(parts[0]), int(parts[1]), int(parts[2]), parts[3]
+            event_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
+            user_events.add_item(UserEvent(event_id, year, month, day, name,
+                                    1, Frequency.ONCE, Status.NORMAL, False))
+            screen.state = AppState.EXIT
+            event_saver_csv.save()
+        except (ValueError, IndexError):
+            pass
 
 
 class View:

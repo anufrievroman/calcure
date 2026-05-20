@@ -1,13 +1,40 @@
 """This module creates and loads user config file"""
 
+import argparse
 import configparser
 import sys
-import getopt
 import logging
 import datetime
 from pathlib import Path
 
 from calcure.data import AppState
+
+
+def _build_arg_parser():
+    parser = argparse.ArgumentParser(
+        prog="calcure",
+        description="TUI calendar and task manager",
+    )
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 3.2.1")
+    parser.add_argument("-j", help="start on journal page", action="store_true")
+    parser.add_argument("-d", help="start on daily view", action="store_true")
+    parser.add_argument("-p", help="enable privacy mode", action="store_true")
+    parser.add_argument("-i", help="use Persian calendar", action="store_true")
+    parser.add_argument("--folder", help="folder with data files", metavar="PATH")
+    parser.add_argument("--config", help="path to config file", metavar="PATH")
+    parser.add_argument("--task", help="add a task and exit", metavar="NAME")
+    parser.add_argument("--event", help="add an event and exit (format: YYYY-MM-DD-name)", metavar="DATE-NAME")
+    return parser
+
+
+_args = None
+
+
+def get_args():
+    global _args
+    if _args is None:
+        _args = _build_arg_parser().parse_args()
+    return _args
 
 
 class Config:
@@ -357,41 +384,27 @@ class Config:
 
     def read_config_file_from_user_arguments(self):
         """Read user config.ini location from user arguments"""
-        try:
-            opts, _ = getopt.getopt(sys.argv[1:], "pjchv", ["folder=", "config="])
-            for opt, arg in opts:
-                if opt in "--config":
-                    self.config_file = Path(arg).expanduser()
-                    if not self.config_file.exists():
-                        self.create_config_file()
-        except getopt.GetoptError:
-            pass
-
+        args = get_args()
+        if args.config:
+            self.config_file = Path(args.config).expanduser()
+            if not self.config_file.exists():
+                self.create_config_file()
 
     def read_parameters_from_user_arguments(self):
-        """Read user arguments that were provided at the run. This values take priority over config.ini"""
-        try:
-            opts, _ = getopt.getopt(sys.argv[1:],"pjhvid",["folder=", "config=", "task=", "event="])
-            for opt, arg in opts:
-                if opt in '--folder':
-                    self.data_folder = Path(arg).expanduser()
-                    self.data_folder.mkdir(exist_ok=True)
-                    self.EVENTS_FILE = self.data_folder / "events.csv"
-                    self.TASKS_FILE = self.data_folder / "tasks.csv"
-                elif opt == '-p':
-                    self.PRIVACY_MODE = True
-                elif opt == '-j':
-                    self.DEFAULT_VIEW = AppState.JOURNAL
-                elif opt == '-d':
-                    self.DEFAULT_VIEW = AppState.JOURNAL
-                elif opt in ('-h'):
-                    self.DEFAULT_VIEW = AppState.HELP
-                elif opt in ('-v'):
-                    self.DEFAULT_VIEW = AppState.EXIT
-                    print ('Calcure - version 3.2.1')
-                elif opt in ('-i'):
-                    self.USE_PERSIAN_CALENDAR = True
-        except getopt.GetoptError as e_message:
-            logging.error("Invalid user arguments. %s", e_message)
-            pass
+        """Read user arguments that were provided at the run. These values take priority over config.ini"""
+        args = get_args()
+        if args.folder:
+            self.data_folder = Path(args.folder).expanduser()
+            self.data_folder.mkdir(exist_ok=True)
+            self.EVENTS_FILE = self.data_folder / "events.csv"
+            self.TASKS_FILE = self.data_folder / "tasks.csv"
+        if args.p:
+            self.PRIVACY_MODE = True
+        if args.j:
+            self.DEFAULT_VIEW = AppState.JOURNAL
+        if args.d:
+            self.DEFAULT_VIEW = AppState.CALENDAR
+            self.DEFAULT_CALENDAR_VIEW = "daily"
+        if args.i:
+            self.USE_PERSIAN_CALENDAR = True
 
