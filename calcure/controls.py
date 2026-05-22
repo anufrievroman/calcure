@@ -223,14 +223,12 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         # Reload:
         if screen.key in ["Q"]:
             screen.reload_data = True
-            screen.refresh_now = True
 
         # Imports:
         if screen.key == "C":
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
-                screen.refresh_now = True
 
         # Other actions:
         if screen.key == "*":
@@ -244,10 +242,8 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
-            screen.refresh_now = True
         if screen.key == "W":
             screen.show_week_numbers = not screen.show_week_numbers
-            screen.refresh_now = True
 
 
 @safe_run
@@ -381,7 +377,6 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         # Reload:
         if screen.key == "Q":
             screen.reload_data = True
-            screen.refresh_now = True
 
         # Change the view:
         if screen.key == "v":
@@ -401,10 +396,8 @@ def control_daily_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
-            screen.refresh_now = True
         if screen.key == "W":
             screen.show_week_numbers = not screen.show_week_numbers
-            screen.refresh_now = True
 
 
 def _filter_events_that_daily_view(screen, user_events):
@@ -557,11 +550,9 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
-                screen.refresh_now = True
 
         if screen.key == "Q":
             screen.reload_data = True
-            screen.refresh_now = True
 
         if screen.key == "*":
             screen.privacy = not screen.privacy
@@ -574,10 +565,8 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key == "/":
             screen.split = not screen.split
-            screen.refresh_now = True
         if screen.key == "W":
             screen.show_week_numbers = not screen.show_week_numbers
-            screen.refresh_now = True
 
 
 @safe_run
@@ -729,12 +718,10 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             confirmed = ask_confirmation(stdscr, MSG_TS_IM, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_tasks_from_calcurse()
-                screen.refresh_now = True
         # if screen.key == "W":
             # confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
             # if confirmed:
                 # importer.import_tasks_from_taskwarrior()
-                # screen.refresh_now = True
 
         # Toggle all active timers:
         if screen.key == "P":
@@ -743,7 +730,6 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
         # Reload:
         if screen.key in ["Q"]:
             screen.reload_data = True
-            screen.refresh_now = True
 
         # Other actions:
         if screen.key == "*":
@@ -757,7 +743,6 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
             screen.state = AppState.EXIT if confirmed else screen.state
         if screen.key in ["/"]:
             screen.split = not screen.split
-            screen.refresh_now = True
 
 
 @safe_run

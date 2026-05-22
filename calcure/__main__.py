@@ -1219,10 +1219,8 @@ def main(stdscr) -> None:
         # If something has been changed, save the data:
         if user_events.changed:
             event_saver_csv.save()
-            screen.refresh_now = True
         if user_tasks.changed:
             task_saver_csv.save()
-            screen.refresh_now = True
 
         # If needed, reload the data:
         if screen.is_time_to_reload:
