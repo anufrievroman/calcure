@@ -252,18 +252,18 @@ class JournalView(View):
 
         done_count = 0
         for index, task in enumerate(self.user_tasks.items):
-            if task.status == Status.DONE and self.screen.hide_done_tasks:
+            if task.status == Status.DONE and self.user_tasks.done_hidden:
                 done_count += 1
                 continue
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode and self.screen.state == AppState.JOURNAL:
-                self.display_line(self.y, self.x, str(index + 1), Color.ACTIVE_PANE)
+                self.display_line(self.y, self.x, str(index + 1 - done_count), Color.ACTIVE_PANE)
             self.y += 1
 
         self.y += 1
         for index, task in enumerate(self.user_ics_tasks.items):
-            if task.status == Status.DONE and self.screen.hide_done_tasks:
+            if task.status == Status.DONE and self.user_tasks.done_hidden:
                 done_count += 1
                 continue
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
@@ -272,15 +272,15 @@ class JournalView(View):
 
         if self.user_ics_tasks.items: self.y += 1
 
-        if done_count and self.screen.hide_done_tasks and cf.HIDDEN_DONE_COUNT:
-            dummy_task = Task(
+        if done_count and self.user_tasks.done_hidden and cf.HIDDEN_DONE_COUNT:
+            counter_task = Task(
                 item_id=-1,
                 name=f"{done_count} {MSG_TS_DONE_COUNT}",
                 status=Status.DONE,
                 timer=Timer([]),
                 privacy=False
             )
-            task_view = TaskView(self.stdscr, self.y, self.x, dummy_task, self.screen)
+            task_view = TaskView(self.stdscr, self.y, self.x, counter_task, self.screen)
             task_view.render()
 
 

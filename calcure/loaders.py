@@ -43,7 +43,7 @@ class TaskLoaderCSV(LoaderCSV):
     """Load tasks from CSV files"""
 
     def __init__(self, cf):
-        self.user_tasks = Tasks()
+        self.user_tasks = Tasks(cf.HIDE_DONE_TASKS)
         self.tasks_file = cf.TASKS_FILE
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
@@ -322,7 +322,7 @@ class TaskLoaderICS(LoaderICS):
     """Load tasks from ICS files"""
 
     def __init__(self, cf):
-        self.user_ics_tasks = Tasks()
+        self.user_ics_tasks = Tasks(cf.HIDE_DONE_TASKS)
         self.ics_task_files = cf.ICS_TASK_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 

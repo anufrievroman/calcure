@@ -4,6 +4,7 @@ import datetime
 import logging
 import time
 import enum
+from typing import override
 
 from dateutil.rrule import rruleset, rrulestr
 from calcure.calendars import Calendar
@@ -244,9 +245,11 @@ class Collection:
 class Tasks(Collection):
     """List of tasks created by the user"""
 
-    def __init__(self):
+    def __init__(self, done_hidden):
         super().__init__()
         self.paused_by_toggle = set()
+        self.done_hidden = done_hidden
+        self.done_count = 0
 
     @property
     def has_active_timer(self):
@@ -255,12 +258,17 @@ class Tasks(Collection):
                 return True
         return False
 
-    def add_subtask(self, task, number):
+    def add_subtask(self, task, parent_id):
         """Add a subtask for certain task in the journal"""
-        level = '----'if (self.items[number].name[:2] == '--') else '--'
+        parent_idx = 0
+        for index, item in enumerate(self.items):
+            if item.item_id == parent_id:
+                parent_idx = index
+                break
+        level = '----'if (self.items[parent_idx].name[:2] == '--') else '--'
         task.name = level + task.name
         if 100 > len(task.name) > 0:
-            self.items.insert(number+1, task)
+            self.items.insert(parent_idx+1, task)
             self.changed = True
 
     def add_timestamp_for_task(self, selected_task_id):
@@ -323,7 +331,18 @@ class Tasks(Collection):
 
     def move_task(self, number_from, number_to):
         """Move task from certain place to another in the list"""
-        self.items.insert(number_to, self.items.pop(number_from))
+        if not self.done_hidden:
+            self.items.insert(number_to, self.items.pop(number_from))
+        else:
+            from_idx, to_idx, count = 0, 0, 0
+            for idx, task in enumerate(self.items):
+                if task.status != Status.DONE:
+                    if count == number_from:
+                        from_idx = idx
+                    if count == number_to:
+                        to_idx = idx
+                    count +=1
+            self.items.insert(to_idx, self.items.pop(from_idx))
         self.changed = True
 
     def generate_id(self):
@@ -332,6 +351,60 @@ class Tasks(Collection):
             return 0
         return max([item.item_id for item in self.items]) + 1
 
+    @override
+    def add_item(self, item):
+        super().add_item(item)
+        if item.status == Status.DONE:
+            self.done_count += 1
+
+    @override
+    def delete_item(self, selected_task_id):
+        task = [item for item in self.items if item.item_id == selected_task_id]
+        if task and task[0].status == Status.DONE:
+            self.done_count -= 1
+        super().delete_item(selected_task_id)
+
+    @override
+    def delete_all_items(self):
+        super().delete_all_items()
+        self.done_count = 0
+
+    @override
+    def change_all_statuses(self, new_status):
+        if new_status == Status.DONE:
+            self.done_count = len(self.items)
+        else:
+            self.done_count = 0
+        super().change_all_statuses(new_status)
+
+    @override
+    def toggle_item_status(self, selected_task_id, new_status):
+        task = [item for item in self.items if item.item_id == selected_task_id]
+        if task:
+            if task[0].status == Status.DONE and new_status == Status.DONE:
+                self.done_count -= 1
+            elif new_status == Status.DONE:
+                self.done_count += 1
+            elif task[0].status == Status.DONE:
+                self. status -= 1
+        super().toggle_item_status(selected_task_id, new_status)
+
+    @override
+    def is_valid_number(self, number):
+        if not self.done_hidden:
+            return super().is_valid_number(number)
+        if number is not None:
+            return 0 <= number < len(self.items) - self.done_count
+
+    def __getitem__(self, index):
+        if not self.done_hidden:
+            return self.items[index]
+        count = 0
+        for idx, task in enumerate(self.items):
+            if task.status != Status.DONE:
+                if count == index:
+                    return self.items[idx]
+                count += 1
 
 class Events(Collection):
     """List of events created by the user or imported"""
