@@ -1,0 +1,105 @@
+version = 1
+revision = 3
+requires-python = ">=3.10"
+
+[[package]]
+name = "calcure"
+source = { editable = "." }
+dependencies = [
+    { name = "holidays" },
+    { name = "icalendar" },
+    { name = "jdatetime" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "holidays" },
+    { name = "icalendar" },
+    { name = "jdatetime" },
+]
+
+[[package]]
+name = "holidays"
+version = "0.96"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3e/dd/068cb4636a3cb433251e7d018d145f1a8c3c57c6fb0452d022561a35c46a/holidays-0.96.tar.gz", hash = "sha256:9d4d15bc28fa690969b82f07a1d6571aa14d4073cc98802510c08dfe3b1f2d25", size = 906699, upload-time = "2026-05-04T17:37:21.258Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/a2/05cbe4e2309a08a09bbfab04d3d37d687b5852abf7d037fea19313d2eb60/holidays-0.96-py3-none-any.whl", hash = "sha256:9d4f06603090304584f685b2f3d9f4289eb5c52b83fca472f922cb83cc3fb93f", size = 1473213, upload-time = "2026-05-04T17:37:18.933Z" },
+]
+
+[[package]]
+name = "icalendar"
+version = "7.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/99/4c/ea2ca8ea012a2bf486657ebc5704d97bd9628e1cb85130b3f5298ac08f60/icalendar-7.1.0.tar.gz", hash = "sha256:10cd223c792fcc43bee4c3ebe3149d4cf32406c85cfef146624df5a0d414260f", size = 467258, upload-time = "2026-04-30T23:25:20.282Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/df/68d5aa80188ad0880f12e2fc60d5df10fc831fdb11ef1d91e417e24ef4ee/icalendar-7.1.0-py3-none-any.whl", hash = "sha256:6de875370d22fc4aff172ad7c439b39fb109dc2eab9ce358fcb95e8689ad7b56", size = 471220, upload-time = "2026-04-30T23:25:18.584Z" },
+]
+
+[[package]]
+name = "jalali-core"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/3c/21e32e3444c572174a5d774643eb2aa8ab60ef68b99a4c3585a0a11428b4/jalali_core-1.0.0.tar.gz", hash = "sha256:f4287c70c630323dcf0a3ab26df905ba4d451e230ac1f65b3bb2f77797894a2b", size = 2752, upload-time = "2024-03-25T09:36:14.934Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/20/a4e942f9685df720a106da292e29a53212b27903749cc563b86b612b113e/jalali_core-1.0.0-py3-none-any.whl", hash = "sha256:84e6f5090eadfb35234f24fad084be831d00da3c0b238ee001e8a1fd49bf7924", size = 3616, upload-time = "2024-03-25T09:36:13.133Z" },
+]
+
+[[package]]
+name = "jdatetime"
+version = "5.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jalali-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/9d/5ed59c36f3cbc68c01fab6442e6efb6d35a484ba4eec4f790264fce39f6c/jdatetime-5.2.0.tar.gz", hash = "sha256:c81d5898717b82b609a3ce2a73f8b8d3230b0c757e5c0de9d6b1acfdc224f551", size = 21663, upload-time = "2025-01-26T09:29:16.802Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/16/39/0dd2676d08468692606645db5ea40091290dc20747ff59636c21c0567d3c/jdatetime-5.2.0-py3-none-any.whl", hash = "sha256:d4aa73543e4e6c0e6122b58743773168edee5efe5c5acf05d1dc8c90524ca71c", size = 12199, upload-time = "2025-01-26T09:29:15.038Z" },
+]
+
+[[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432, upload-time = "2024-03-01T18:36:20.211Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", size = 229892, upload-time = "2024-03-01T18:36:18.57Z" },
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466", size = 109391, upload-time = "2025-08-25T13:49:26.313Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548", size = 44614, upload-time = "2025-08-25T13:49:24.86Z" },
+]
+
+[[package]]
+name = "tzdata"
+version = "2026.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/19/1b9b0e29f30c6d35cb345486df41110984ea67ae69dddbc0e8a100999493/tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10", size = 198254, upload-time = "2026-04-24T15:22:08.651Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/e4/dccd7f47c4b64213ac01ef921a1337ee6e30e8c6466046018326977efd95/tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7", size = 349321, upload-time = "2026-04-24T15:22:05.876Z" },
+]
