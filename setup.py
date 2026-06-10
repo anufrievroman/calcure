@@ -25,7 +25,7 @@ setuptools.setup(
     },
     install_requires=['holidays', 'jdatetime', 'icalendar'],
     version=version,
-    python_requires='~=3.9',
+    python_requires='~=3.10',
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
@@ -43,7 +43,7 @@ setuptools.setup(
     include_package_data=True,
     data_files=[
         ('share/man/man1',
-         ['calcure.1.gz']
+         ['calcure.1']
          ),
     ],
 )
