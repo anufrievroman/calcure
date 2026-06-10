@@ -15,7 +15,7 @@ def _build_arg_parser():
         prog="calcure",
         description="TUI calendar and task manager",
     )
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 3.2.1")
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 3.3")
     parser.add_argument("-j", help="start on journal page", action="store_true")
     parser.add_argument("-d", help="start on daily view", action="store_true")
     parser.add_argument("-w", help="start on weekly view", action="store_true")
