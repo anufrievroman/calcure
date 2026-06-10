@@ -60,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "Vim tuşları (j, k, ZZ, ZQ) da çalışıyor!"
 MSG_INFO          = "Daha fazla bilgi için ziyaret edin:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Kısayolları özelleştirmek için bakın:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
 MSG_EXIT          = "Gerçekten çıkıyorsun musun? (y/n) "
 
 MSG_EVENT_HIGH    = "Yüksek öncelikli olay numarası olarak işaretle: "

@@ -60,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "方向鍵和 Vim 快捷鍵（j、k、ZZ、ZQ）也可以使用！"
 MSG_INFO          = "更多資訊，請造訪："
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "自訂快捷鍵，請參閱："
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
 MSG_EXIT          = "確定退出？(y/n)"
 
 MSG_EVENT_HIGH    = "標記為高優先級行程編號："

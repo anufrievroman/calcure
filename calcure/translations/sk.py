@@ -60,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "Fungujú aj Vim klávesy (j, k, ZZ, ZQ)!"
 MSG_INFO          = "Pre viac informácií navštívte:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Pre prispôsobenie klávesových skratiek pozrite:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
 MSG_EXIT          = "Naozaj ukončiť? (y/n) "
 
 MSG_EVENT_HIGH    = "Nastaviť vysokú prioritu udalosti číslo: "

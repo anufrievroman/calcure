@@ -60,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "Teclas Vim (j, k, ZZ, ZQ) também funcionam!"
 MSG_INFO          = "Para mais informações, visite:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Para personalizar atalhos, veja:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
 MSG_EXIT          = "Realmente sair? (y/n) "
 
 MSG_EVENT_HIGH    = "Marca como alta prioridade evento número: "

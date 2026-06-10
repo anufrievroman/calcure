@@ -1092,6 +1092,8 @@ class HelpScreenView(View):
         self.display_line(d_y + 2, d_x, MSG_VIM, Color.ACTIVE_PANE)
         self.display_line(d_y + 4, d_x, MSG_INFO, Color.TODO)
         self.display_line(d_y + 5, d_x, MSG_SITE, Color.TITLE)
+        self.display_line(d_y + 7, d_x, MSG_KEYS_INFO, Color.TODO)
+        self.display_line(d_y + 8, d_x, MSG_KEYS_SITE, Color.TITLE)
 
 
 def main(stdscr) -> None:
