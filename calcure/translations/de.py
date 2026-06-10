@@ -61,7 +61,7 @@ MSG_VIM           = "Pfeil- und Vim-Tasten (j, k, ZZ, ZQ) funktionieren ebenso!"
 MSG_INFO          = "Für weitere Informationen besuchen Sie:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "Zur Anpassung der Tastenkürzel, siehe:"
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Wirklich beenden? (j/n)"
 
 MSG_EVENT_HIGH    = "Als hohe Priorität markieren, Ereignisnummer: "

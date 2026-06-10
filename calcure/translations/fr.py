@@ -61,7 +61,7 @@ MSG_VIM           = "Les touches de Vim (j, k, ZZ, ZQ) et fléchées fonctionnen
 MSG_INFO          = "Pour plus d'informations, visitez:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "Pour personnaliser les raccourcis, voir:"
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Vraiment quitter ? (y/n) "
 
 MSG_EVENT_HIGH    = "Marquer comme hautement prioritaire l'événement numéro: "

@@ -61,7 +61,7 @@ MSG_VIM           = "方向键和 Vim 键 (j, k, ZZ, ZQ) 也可使用！"
 MSG_INFO          = "如需更多信息，请访问："
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "自定义快捷键，请参阅："
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "确认退出？(y/n) "
 
 MSG_EVENT_HIGH    = "标记事件为高优先级，事件编号："

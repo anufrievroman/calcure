@@ -61,7 +61,7 @@ MSG_VIM           = "Delujejo tudi puščice in Vimovi ukazi (j, k, ZZ, ZQ)!"
 MSG_INFO          = "Več informacij najdeš na:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "Za prilagoditev tipk poglej:"
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Res želiš zapreti program? (y/n) "
 
 MSG_EVENT_HIGH    = "Označi/odznači kot visokoprioriteten dogodek s številko: "

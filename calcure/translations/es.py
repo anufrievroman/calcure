@@ -61,7 +61,7 @@ MSG_VIM           = "¡Flechas y atajos de Vim (j, k, ZZ, ZQ) también funcionan
 MSG_INFO          = "Para más información, visite:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "Para personalizar atajos, ver:"
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "¿Realmente quire salir? (y/n) "
 
 MSG_EVENT_HIGH    = "Marcar como alta prioridad el evento número: ";

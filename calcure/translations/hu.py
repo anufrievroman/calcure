@@ -61,7 +61,7 @@ MSG_VIM           = "A nyilak és Vim gombok (j, k, ZZ, ZQ) is működnek!"
 MSG_INFO          = "További információért látogasd meg:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
 MSG_KEYS_INFO     = "A billentyűk testreszabásához lásd:"
-MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keybindings"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Valóban kilépsz? (y/n) "
 
 MSG_EVENT_HIGH    = "Esemény magas prioritásúvá tétele (sorszám): "
