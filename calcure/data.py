@@ -248,6 +248,18 @@ class Tasks(Collection):
     def __init__(self):
         super().__init__()
         self.paused_by_toggle = set()
+        self.done_hidden = False
+
+    @property
+    def visible_items(self):
+        if not self.done_hidden:
+            return self.items
+        return [t for t in self.items if t.status != Status.DONE]
+
+    def is_valid_number(self, number):
+        if number is None:
+            return False
+        return 0 <= number < len(self.visible_items)
 
     @property
     def has_active_timer(self):
@@ -256,13 +268,16 @@ class Tasks(Collection):
                 return True
         return False
 
-    def add_subtask(self, task, number):
+    def add_subtask(self, task, parent_id):
         """Add a subtask for certain task in the journal"""
-        level = '----'if (self.items[number].name[:2] == '--') else '--'
-        task.name = level + task.name
-        if 100 > len(task.name) > 0:
-            self.items.insert(number+1, task)
-            self.changed = True
+        for idx, item in enumerate(self.items):
+            if item.item_id == parent_id:
+                level = '----' if item.name[:2] == '--' else '--'
+                task.name = level + task.name
+                if 100 > len(task.name) > 0:
+                    self.items.insert(idx + 1, task)
+                    self.changed = True
+                break
 
     def add_timestamp_for_task(self, selected_task_id):
         """Add a timestamp to this task"""
@@ -324,7 +339,10 @@ class Tasks(Collection):
 
     def move_task(self, number_from, number_to):
         """Move task from certain place to another in the list"""
-        self.items.insert(number_to, self.items.pop(number_from))
+        visible = self.visible_items
+        from_idx = self.items.index(visible[number_from])
+        to_idx = self.items.index(visible[number_to])
+        self.items.insert(to_idx, self.items.pop(from_idx))
         self.changed = True
 
     def generate_id(self):

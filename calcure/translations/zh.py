@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "重命名任务",
         "   s   ": "切换任务和子任务",
         "   .   ": "切换任务隐私模式",
+        "   -   ": "切换已完成任务的可见性",
         "  f(F) ": "更改（删除）任务截止日期",
         "   m   ": "移动任务",
         "   C   ": "从 Calcurse 导入任务",
@@ -95,6 +96,7 @@ MSG_TS_TITLE      = "输入子任务："
 MSG_TS_IM         = "从 Calcurse 导入任务？(y/n)"
 MSG_TS_TW         = "从 Taskwarrior 导入任务？(y/n)"
 MSG_TS_NOTHING    = "暂无计划任务..."
+MSG_TS_DONE_COUNT = "已完成的任务"
 MSG_TS_PRIVACY    = "切换任务隐私模式，任务编号："
 MSG_TS_DEAD_ADD   = "为任务编号添加截止日期："
 MSG_TS_DEAD_DEL   = "移除任务编号的截止日期："

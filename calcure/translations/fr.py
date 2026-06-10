@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "Modifier une tâche",
         "   s   ": "Basculer entre tâche et sous-tâche",
         "   .   ": "Basculer la confidentialité des tâches",
+        "   -   ": "Basculer la visibilité des tâches terminées",
         "  f(F) ": "Modifier (supprimer) l'échéance de la tâche",
         "   m   ": "Déplacer une tâche",
         "   C   ": "Importer des tâches de calcurse",
@@ -95,6 +96,7 @@ MSG_TS_TITLE      = "Entrez la sous-tâche: "
 MSG_TS_IM         = "Importer des tâches depuis Calcurse ? (y/n)"
 MSG_TS_TW         = "Importer des tâches depuis Taskwarrior ? (y/n)"
 MSG_TS_NOTHING    = "Rien de prévu..."
+MSG_TS_DONE_COUNT = "Tâches terminées"
 MSG_TS_PRIVACY    = "Basculer la confidentialité du numéro de tâche: "
 MSG_TS_DEAD_ADD   = "Ajouter le deadline pour la tâche numéro: "
 MSG_TS_DEAD_DEL   = "Supprimer le deadline de la tâche numéro: "

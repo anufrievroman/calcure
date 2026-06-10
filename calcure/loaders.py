@@ -45,6 +45,7 @@ class TaskLoaderCSV(LoaderCSV):
 
     def __init__(self, cf):
         self.user_tasks = Tasks()
+        self.user_tasks.done_hidden = cf.HIDE_DONE_TASKS
         self.tasks_file = cf.TASKS_FILE
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
@@ -330,6 +331,7 @@ class TaskLoaderICS(LoaderICS):
 
     def __init__(self, cf):
         self.user_ics_tasks = Tasks()
+        self.user_ics_tasks.done_hidden = cf.HIDE_DONE_TASKS
         self.ics_task_files = cf.ICS_TASK_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
 
