@@ -8,6 +8,7 @@ import logging
 from calcure.data import *
 from calcure.dialogues import *
 from calcure.configuration import Config
+from calcure.keybindings import *
 
 cf = Config()
 
@@ -77,11 +78,7 @@ def block_until_valid_input(accepted_keys):
 
 
 @safe_run
-@block_until_valid_input(accepted_keys=[
-    " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
-    "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "W", "a", "c", "d", "e",
-    "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
-])  # w=weekly, W=week numbers
+@block_until_valid_input(accepted_keys=CALENDAR_KEYS)
 def control_monthly_screen(stdscr, screen, user_events, importer):
     """Handle user input on the monthly screen"""
 
@@ -90,43 +87,43 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
         screen.selection_mode = False
 
         # Change event status:
-        if screen.key in ['i', 'h']:
+        if screen.key in [KEY_IMPORTANT, "h"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_status(event_id, Status.IMPORTANT)
-        if screen.key == 'l':
+        if screen.key == KEY_LOW:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_status(event_id, Status.UNIMPORTANT)
-        if screen.key == 'u':
+        if screen.key == KEY_UNMARK:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_status(event_id, Status.NORMAL)
-        if screen.key == 'd':
+        if screen.key == KEY_DONE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_status(event_id, Status.DONE)
 
         # Toggle event privacy:
-        if screen.key == '.':
+        if screen.key == KEY_PRIVACY_ITEM:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.toggle_item_privacy(event_id)
 
         # Delete event:
-        if screen.key == 'x':
+        if screen.key == KEY_DELETE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 user_events.delete_item(event_id)
 
         # Rename event:
-        if screen.key in ['e', 'r']:
+        if screen.key in [KEY_EDIT, "r"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
@@ -135,17 +132,17 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 user_events.rename_item(event_id, new_name)
 
         # Move event:
-        if screen.key in ['m', 'M']:
+        if screen.key in [KEY_MOVE, KEY_MOVE_IN_MONTH]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
             if user_events.filter_events_that_month(screen).is_valid_number(number):
                 event_id = user_events.filter_events_that_month(screen).items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
-                if screen.key == 'm':
+                if screen.key == KEY_MOVE:
                     year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
                     if screen.is_valid_date(year, month, day):
                         user_events.change_date(event_id, year, month, day)
 
-                if screen.key == 'M':
+                if screen.key == KEY_MOVE_IN_MONTH:
                     question = f'{MSG_EVENT_MV_TO_D} {screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
@@ -154,20 +151,21 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
     # Otherwise, we check for user input:
     else:
         # If we need to select an event, change to selection mode:
-        selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
+        selection_keys = [KEY_IMPORTANT, KEY_LOW, KEY_UNMARK, KEY_DONE, KEY_DELETE,
+                          KEY_EDIT, KEY_MOVE, KEY_MOVE_IN_MONTH, KEY_PRIVACY_ITEM, "h", "r", "c"]
         if screen.key in selection_keys and user_events.filter_events_that_month(screen).items:
             screen.selection_mode = True
 
         # Navigation:
-        if screen.key in ["n", "j", "KEY_DOWN", "KEY_RIGHT"]:
+        if screen.key in [KEY_NEXT, "j", "KEY_DOWN", "KEY_RIGHT"]:
             screen.next_month()
-        if screen.key in ["p", "k", "KEY_UP", "KEY_LEFT"]:
+        if screen.key in [KEY_PREV, "k", "KEY_UP", "KEY_LEFT"]:
             screen.previous_month()
-        if screen.key in ["KEY_HOME", "R"]:
+        if screen.key in ["KEY_HOME", KEY_TODAY]:
             screen.reset_to_today()
 
         # Handle "g" and "G" as go to selected day:
-        if screen.key == "g":
+        if screen.key == KEY_GOTO:
             clear_line(stdscr, screen.y_max-2, 0)
             year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
             if screen.is_valid_date(year, month, day):
@@ -176,7 +174,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 screen.year = year
                 screen.calendar_state = CalState.DAILY
 
-        if screen.key == "G":
+        if screen.key == KEY_GOTO_DAY:
             clear_line(stdscr, screen.y_max-2, 0)
             question = f"{MSG_GOTO_D} {screen.year}/{screen.month}/"
             day = input_day(stdscr, screen.y_max-2, 0, question)
@@ -185,10 +183,10 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 screen.calendar_state = CalState.DAILY
 
         # Change the view:
-        if screen.key == "v":
+        if screen.key == KEY_VIEW_DAILY:
             screen.day = 1
             screen.calendar_state = CalState.DAILY
-        if screen.key == "w":
+        if screen.key == KEY_VIEW_WEEKLY:
             today = screen.today
             if screen.year == today.year and screen.month == today.month:
                 screen.day = today.day
@@ -197,7 +195,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
             screen.calendar_state = CalState.WEEKLY
 
         # Add single event:
-        if screen.key == "a":
+        if screen.key == KEY_ADD:
             question = f'{MSG_EVENT_DATE} {screen.year}/{screen.month}/'
             day = input_day(stdscr, screen.y_max-2, 0, question)
             if screen.is_valid_day(day):
@@ -207,7 +205,7 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                 user_events.add_item(UserEvent(event_id, screen.year, screen.month, day, name, 1, Frequency.ONCE, Status.NORMAL, False))
 
         # Add a recurring event:
-        if screen.key == "A":
+        if screen.key == KEY_ADD_EXTRA:
             question = f'{MSG_EVENT_DATE}{screen.year}/{screen.month}/'
             day = input_day(stdscr, screen.y_max-2, 0, question)
             if screen.is_valid_day(day):
@@ -221,37 +219,33 @@ def control_monthly_screen(stdscr, screen, user_events, importer):
                     user_events.add_item(UserEvent(item_id, screen.year, screen.month, day, name, reps+1, freq, Status.NORMAL, False))
 
         # Reload:
-        if screen.key in ["Q"]:
+        if screen.key == KEY_RELOAD:
             screen.reload_data = True
 
         # Imports:
-        if screen.key == "C":
+        if screen.key == KEY_IMPORT:
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
 
         # Other actions:
-        if screen.key == "*":
+        if screen.key == KEY_PRIVACY:
             screen.privacy = not screen.privacy
-        if screen.key in [" ", "KEY_BTAB"]:
+        if screen.key in [KEY_SWITCH, "KEY_BTAB"]:
             screen.state = AppState.JOURNAL
-        if screen.key == "?":
+        if screen.key == KEY_HELP:
             screen.state = AppState.HELP
-        if screen.key == "q":
+        if screen.key == KEY_QUIT:
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
-        if screen.key in ["/"]:
+        if screen.key == KEY_SPLIT:
             screen.split = not screen.split
-        if screen.key == "W":
+        if screen.key == KEY_VIEW_WEEK_NUMBERS:
             screen.show_week_numbers = not screen.show_week_numbers
 
 
 @safe_run
-@block_until_valid_input(accepted_keys=[
-    " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
-    "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "W", "a", "c", "d", "e",
-    "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
-])
+@block_until_valid_input(accepted_keys=CALENDAR_KEYS)
 def control_daily_screen(stdscr, screen, user_events, importer):
     """Handle user input on the daily screen"""
     # If we previously entered the selection mode, now we perform the action:
@@ -260,37 +254,37 @@ def control_daily_screen(stdscr, screen, user_events, importer):
         view_events = _filter_events_that_daily_view(screen, user_events)
 
         # Change event status:
-        if screen.key in ['i', 'h']:
+        if screen.key in [KEY_IMPORTANT, "h"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
             if view_events.is_valid_number(number):
                 user_events.toggle_item_status(view_events.items[number].item_id, Status.IMPORTANT)
-        if screen.key == 'l':
+        if screen.key == KEY_LOW:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
             if view_events.is_valid_number(number):
                 user_events.toggle_item_status(view_events.items[number].item_id, Status.UNIMPORTANT)
-        if screen.key == 'u':
+        if screen.key == KEY_UNMARK:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
             if view_events.is_valid_number(number):
                 user_events.toggle_item_status(view_events.items[number].item_id, Status.NORMAL)
-        if screen.key == 'd':
+        if screen.key == KEY_DONE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
             if view_events.is_valid_number(number):
                 user_events.toggle_item_status(view_events.items[number].item_id, Status.DONE)
 
         # Toggle event privacy:
-        if screen.key == '.':
+        if screen.key == KEY_PRIVACY_ITEM:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
             if view_events.is_valid_number(number):
                 user_events.toggle_item_privacy(view_events.items[number].item_id)
 
         # Delete event:
-        if screen.key in ['x']:
+        if screen.key == KEY_DELETE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if view_events.is_valid_number(number):
                 user_events.delete_item(view_events.items[number].item_id)
 
         # Rename event:
-        if screen.key in ['e', 'r']:
+        if screen.key in [KEY_EDIT, "r"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if view_events.is_valid_number(number):
                 clear_line(stdscr, screen.y_max-2)
@@ -298,16 +292,16 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 user_events.rename_item(view_events.items[number].item_id, new_name)
 
         # Move event:
-        if screen.key in ['m', 'M']:
+        if screen.key in [KEY_MOVE, KEY_MOVE_IN_MONTH]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
             if view_events.is_valid_number(number):
                 item_id = view_events.items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
-                if screen.key == 'm':
+                if screen.key == KEY_MOVE:
                     year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
                     if screen.is_valid_date(year, month, day):
                         user_events.change_date(item_id, year, month, day)
-                if screen.key == 'M':
+                if screen.key == KEY_MOVE_IN_MONTH:
                     question = f'{MSG_EVENT_MV_TO_D}{screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
@@ -316,32 +310,33 @@ def control_daily_screen(stdscr, screen, user_events, importer):
     # Otherwise, we check for user input:
     else:
         # If we need to select an event, change to selection mode:
-        selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'c', 'm', 'M', '.']
+        selection_keys = [KEY_IMPORTANT, KEY_LOW, KEY_UNMARK, KEY_DONE, KEY_DELETE,
+                          KEY_EDIT, KEY_MOVE, KEY_MOVE_IN_MONTH, KEY_PRIVACY_ITEM, "h", "r", "c"]
         if screen.key in selection_keys and _filter_events_that_daily_view(screen, user_events).items:
             screen.selection_mode = True
 
         # Navigation:
-        if screen.key in ["n", "j", "KEY_UP", "KEY_RIGHT"]:
+        if screen.key in [KEY_NEXT, "j", "KEY_UP", "KEY_RIGHT"]:
             if cf.INVERSE_DAILY_SCROLL:
                 screen.previous_day()
             else:
                 screen.next_day()
-        if screen.key in ["p", "k", "KEY_DOWN", "KEY_LEFT"]:
+        if screen.key in [KEY_PREV, "k", "KEY_DOWN", "KEY_LEFT"]:
             if cf.INVERSE_DAILY_SCROLL:
                 screen.next_day()
             else:
                 screen.previous_day()
-        if screen.key in ["KEY_HOME", "R"]:
+        if screen.key in ["KEY_HOME", KEY_TODAY]:
             screen.reset_to_today()
 
         # Add single event:
-        if screen.key == "a":
+        if screen.key == KEY_ADD:
             name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
             item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
             user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, 1, Frequency.ONCE, Status.NORMAL, False))
 
         # Add a recurring event:
-        if screen.key == "A":
+        if screen.key == KEY_ADD_EXTRA:
             name = input_string(stdscr, screen.y_max-2, 0, MSG_EVENT_TITLE, screen.x_max-len(MSG_EVENT_TITLE)-2)
             item_id = user_events.items[-1].item_id + 1 if not user_events.is_empty() else 1
             reps = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REP)
@@ -351,13 +346,13 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps+1, freq, Status.NORMAL, False))
 
         # Import from calcurse:
-        if screen.key == "C":
+        if screen.key == KEY_IMPORT:
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
 
         # Handle "g" and "G" as go to selected (prefilled) day:
-        if screen.key == "g":
+        if screen.key == KEY_GOTO:
             clear_line(stdscr, screen.y_max-2, 0)
             year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
             if screen.is_valid_date(year, month, day):
@@ -366,7 +361,7 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 screen.year = year
                 screen.calendar_state = CalState.DAILY
 
-        if screen.key == "G":
+        if screen.key == KEY_GOTO_DAY:
             clear_line(stdscr, screen.y_max-2, 0)
             question = f"{MSG_GOTO_D} {screen.year}/{screen.month}/"
             day = input_day(stdscr, screen.y_max-2, 0, question)
@@ -375,28 +370,28 @@ def control_daily_screen(stdscr, screen, user_events, importer):
                 screen.calendar_state = CalState.DAILY
 
         # Reload:
-        if screen.key == "Q":
+        if screen.key == KEY_RELOAD:
             screen.reload_data = True
 
         # Change the view:
-        if screen.key == "v":
+        if screen.key == KEY_VIEW_DAILY:
             screen.calendar_state = CalState.MONTHLY
-        if screen.key == "w":
+        if screen.key == KEY_VIEW_WEEKLY:
             screen.calendar_state = CalState.WEEKLY
 
         # Other actions:
-        if screen.key == "*":
+        if screen.key == KEY_PRIVACY:
             screen.privacy = not screen.privacy
-        if screen.key in [" ", "KEY_BTAB"]:
+        if screen.key in [KEY_SWITCH, "KEY_BTAB"]:
             screen.state = AppState.JOURNAL
-        if screen.key == "?":
+        if screen.key == KEY_HELP:
             screen.state = AppState.HELP
-        if screen.key == "q":
+        if screen.key == KEY_QUIT:
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
-        if screen.key in ["/"]:
+        if screen.key == KEY_SPLIT:
             screen.split = not screen.split
-        if screen.key == "W":
+        if screen.key == KEY_VIEW_WEEK_NUMBERS:
             screen.show_week_numbers = not screen.show_week_numbers
 
 
@@ -429,11 +424,7 @@ def _filter_events_that_week(screen, user_events):
 
 
 @safe_run
-@block_until_valid_input(accepted_keys=[
-    " ", "*", ".", "/", "?", "A", "C", "G", "KEY_BTAB", "KEY_DOWN", "KEY_HOME",
-    "KEY_LEFT", "KEY_RIGHT", "KEY_UP", "M", "Q", "R", "V", "W", "a", "c", "d",
-    "e", "g", "h", "i", "j", "k", "l", "m", "n", "p", "q", "r", "u", "v", "w", "x",
-])  # v=daily, w/V=monthly, W=week numbers
+@block_until_valid_input(accepted_keys=WEEKLY_KEYS)
 def control_weekly_screen(stdscr, screen, user_events, importer):
     """Handle user input on the weekly screen"""
 
@@ -442,82 +433,83 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
         week_events = _filter_events_that_week(screen, user_events)
 
         # Change event status:
-        if screen.key in ['i', 'h']:
+        if screen.key in [KEY_IMPORTANT, "h"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_HIGH)
             if week_events.is_valid_number(number):
                 user_events.toggle_item_status(week_events.items[number].item_id, Status.IMPORTANT)
-        if screen.key == 'l':
+        if screen.key == KEY_LOW:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_LOW)
             if week_events.is_valid_number(number):
                 user_events.toggle_item_status(week_events.items[number].item_id, Status.UNIMPORTANT)
-        if screen.key == 'u':
+        if screen.key == KEY_UNMARK:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_RESET)
             if week_events.is_valid_number(number):
                 user_events.toggle_item_status(week_events.items[number].item_id, Status.NORMAL)
-        if screen.key == 'd':
+        if screen.key == KEY_DONE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DONE)
             if week_events.is_valid_number(number):
                 user_events.toggle_item_status(week_events.items[number].item_id, Status.DONE)
 
-        if screen.key == '.':
+        if screen.key == KEY_PRIVACY_ITEM:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_PRIVACY)
             if week_events.is_valid_number(number):
                 user_events.toggle_item_privacy(week_events.items[number].item_id)
 
-        if screen.key == 'x':
+        if screen.key == KEY_DELETE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_DEL)
             if week_events.is_valid_number(number):
                 user_events.delete_item(week_events.items[number].item_id)
 
-        if screen.key in ['e', 'r']:
+        if screen.key in [KEY_EDIT, "r"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_REN)
             if week_events.is_valid_number(number):
                 clear_line(stdscr, screen.y_max-2)
                 new_name = input_string(stdscr, screen.y_max-2, 0, MSG_NEW_TITLE, screen.x_max-len(MSG_NEW_TITLE)-2)
                 user_events.rename_item(week_events.items[number].item_id, new_name)
 
-        if screen.key in ['m', 'M']:
+        if screen.key in [KEY_MOVE, KEY_MOVE_IN_MONTH]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_EVENT_MV)
             if week_events.is_valid_number(number):
                 event_id = week_events.items[number].item_id
                 clear_line(stdscr, screen.y_max-2)
-                if screen.key == 'm':
+                if screen.key == KEY_MOVE:
                     year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_EVENT_MV_TO)
                     if screen.is_valid_date(year, month, day):
                         user_events.change_date(event_id, year, month, day)
-                if screen.key == 'M':
+                if screen.key == KEY_MOVE_IN_MONTH:
                     question = f'{MSG_EVENT_MV_TO_D} {screen.year}/{screen.month}/'
                     day = input_day(stdscr, screen.y_max-2, 0, question)
                     if screen.is_valid_day(day):
                         user_events.change_day(event_id, day)
 
     else:
-        selection_keys = ['h', 'l', 'u', 'i', 'd', 'x', 'e', 'r', 'm', 'M', '.']
+        selection_keys = [KEY_IMPORTANT, KEY_LOW, KEY_UNMARK, KEY_DONE, KEY_DELETE,
+                          KEY_EDIT, KEY_MOVE, KEY_MOVE_IN_MONTH, KEY_PRIVACY_ITEM, "h", "r"]
         if screen.key in selection_keys and _filter_events_that_week(screen, user_events).items:
             screen.selection_mode = True
 
         # Navigation (week by week):
-        if screen.key in ["n", "j", "KEY_DOWN", "KEY_RIGHT"]:
+        if screen.key in [KEY_NEXT, "j", "KEY_DOWN", "KEY_RIGHT"]:
             screen.next_week()
-        if screen.key in ["p", "k", "KEY_UP", "KEY_LEFT"]:
+        if screen.key in [KEY_PREV, "k", "KEY_UP", "KEY_LEFT"]:
             screen.previous_week()
-        if screen.key in ["KEY_HOME", "R"]:
+        if screen.key in ["KEY_HOME", KEY_TODAY]:
             screen.reset_to_today()
 
-        if screen.key == "g":
+        if screen.key == KEY_GOTO:
             clear_line(stdscr, screen.y_max-2, 0)
             year, month, day = input_date(stdscr, screen.y_max-2, 0, MSG_GOTO)
             if screen.is_valid_date(year, month, day):
                 screen.year, screen.month, screen.day = year, month, day
 
         # Switch views:
-        if screen.key == "v":
+        if screen.key == KEY_VIEW_DAILY:
             screen.calendar_state = CalState.DAILY
-        if screen.key in ["V", "w"]:
+        if screen.key in [KEY_VIEW_WEEKLY, "V"]:
             screen.calendar_state = CalState.MONTHLY
 
         # Add single event:
-        if screen.key == "a":
+        if screen.key == KEY_ADD:
             week = screen.week_dates(cf.START_WEEK_DAY)
             question = f'{MSG_EVENT_DATE} {week[0].year}/{week[0].month}/'
             day = input_day(stdscr, screen.y_max-2, 0, question)
@@ -530,7 +522,7 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
                 user_events.add_item(UserEvent(event_id, screen.year, screen.month, screen.day, name, 1, Frequency.ONCE, Status.NORMAL, False))
 
         # Add a recurring event:
-        if screen.key == "A":
+        if screen.key == KEY_ADD_EXTRA:
             week = screen.week_dates(cf.START_WEEK_DAY)
             question = f'{MSG_EVENT_DATE} {week[0].year}/{week[0].month}/'
             day = input_day(stdscr, screen.y_max-2, 0, question)
@@ -546,42 +538,38 @@ def control_weekly_screen(stdscr, screen, user_events, importer):
                     reps = 1 if reps == 0 else reps
                     user_events.add_item(UserEvent(item_id, screen.year, screen.month, screen.day, name, reps+1, freq, Status.NORMAL, False))
 
-        if screen.key == "C":
+        if screen.key == KEY_IMPORT:
             confirmed = ask_confirmation(stdscr, MSG_EVENT_IMP, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_events_from_calcurse()
 
-        if screen.key == "Q":
+        if screen.key == KEY_RELOAD:
             screen.reload_data = True
 
-        if screen.key == "*":
+        if screen.key == KEY_PRIVACY:
             screen.privacy = not screen.privacy
-        if screen.key in [" ", "KEY_BTAB"]:
+        if screen.key in [KEY_SWITCH, "KEY_BTAB"]:
             screen.state = AppState.JOURNAL
-        if screen.key == "?":
+        if screen.key == KEY_HELP:
             screen.state = AppState.HELP
-        if screen.key == "q":
+        if screen.key == KEY_QUIT:
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
-        if screen.key == "/":
+        if screen.key == KEY_SPLIT:
             screen.split = not screen.split
-        if screen.key == "W":
+        if screen.key == KEY_VIEW_WEEK_NUMBERS:
             screen.show_week_numbers = not screen.show_week_numbers
 
 
 @safe_run
-@block_until_valid_input(accepted_keys=[
-    " ", "*", "-", ".", "/", "?", "A", "C", "D", "F", "H", "I", "KEY_BTAB", "L", "P", "Q",
-    "T", "U", "V", "X", "a", "c", "d", "e", "f", "h", "i", "l", "m", "q", "r",
-    "s", "t", "u", "v", "x",
-])
+@block_until_valid_input(accepted_keys=JOURNAL_KEYS)
 def control_journal_screen(stdscr, screen, user_tasks, importer):
     """Process user input on the journal screen"""
     # If we previously selected a task, now we perform the action:
     if screen.selection_mode:
 
         # Timer operations:
-        if screen.key == 't':
+        if screen.key == KEY_TIMER:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_ADD)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
@@ -589,14 +577,14 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                     user_tasks.pause_all_other_timers(task_id)
                 user_tasks.add_timestamp_for_task(task_id)
 
-        if screen.key == 'T':
+        if screen.key == KEY_TIMER_RESET:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TM_RESET)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.reset_timer_for_task(task_id)
 
         # Add deadline:
-        if screen.key == "f":
+        if screen.key == KEY_DEADLINE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEAD_ADD)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
@@ -606,55 +594,55 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                     user_tasks.change_deadline(task_id, year, month, day)
 
         # Remove deadline:
-        if screen.key == "F":
+        if screen.key == KEY_DEADLINE_REMOVE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEAD_DEL)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.change_deadline(task_id, 0, 0, 0)
 
         # Change the status:
-        if screen.key in ['i', 'h']:
+        if screen.key in [KEY_IMPORTANT, "h"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_HIGH)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_item_status(task_id, Status.IMPORTANT)
-        if screen.key == 'l':
+        if screen.key == KEY_LOW:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_LOW)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_item_status(task_id, Status.UNIMPORTANT)
-        if screen.key == 'u':
+        if screen.key == KEY_UNMARK:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_RES)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_item_status(task_id, Status.NORMAL)
-        if screen.key in ['d', 'v']:
+        if screen.key in [KEY_DONE, "v"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DONE)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_item_status(task_id, Status.DONE)
 
         # Toggle task privacy:
-        if screen.key == '.':
+        if screen.key == KEY_PRIVACY_ITEM:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_PRIVACY)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_item_privacy(task_id)
 
         # Modify the task:
-        if screen.key in ['x']:
+        if screen.key == KEY_DELETE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_DEL)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.delete_item(task_id)
-        if screen.key == 'm':
+        if screen.key == KEY_MOVE:
             number_from = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE)
             if user_tasks.is_valid_number(number_from):
                 clear_line(stdscr, screen.y_max-2)
                 number_to = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_MOVE_TO)
                 if user_tasks.is_valid_number(number_to):
                     user_tasks.move_task(number_from, number_to)
-        if screen.key in ['e', 'r']:
+        if screen.key in [KEY_EDIT, "r"]:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_EDIT)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
@@ -663,12 +651,12 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
                 user_tasks.rename_item(task_id, new_name)
 
         # Subtask operations:
-        if screen.key == 's':
+        if screen.key == KEY_SUBTASK_STATE:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_TOG)
             if user_tasks.is_valid_number(number):
                 task_id = user_tasks.visible_items[number].item_id
                 user_tasks.toggle_subtask_state(task_id)
-        if screen.key == 'A':
+        if screen.key == KEY_ADD_EXTRA:
             number = input_integer(stdscr, screen.y_max-2, 0, MSG_TS_SUB)
             if user_tasks.is_valid_number(number):
                 clear_line(stdscr, screen.y_max-2, 0)
@@ -680,79 +668,77 @@ def control_journal_screen(stdscr, screen, user_tasks, importer):
     # Otherwise, we check for user input:
     else:
         # If we need to select a task, change to selection mode:
-        selection_keys = ['t', 'T', 'h', 'l', 'v', 'u', 'i', 's', 'd', 'x', 'e', 'r', 'c', 'A', 'm', '.', 'f', 'F']
+        selection_keys = [KEY_TIMER, KEY_TIMER_RESET, KEY_IMPORTANT, KEY_LOW, KEY_UNMARK, KEY_DONE,
+                          KEY_SUBTASK_STATE, KEY_DELETE, KEY_EDIT, KEY_ADD_EXTRA, KEY_MOVE,
+                          KEY_PRIVACY_ITEM, KEY_DEADLINE, KEY_DEADLINE_REMOVE, "h", "v", "r", "c"]
         if screen.key in selection_keys and user_tasks.items:
             screen.selection_mode = True
 
         # Add single task:
-        if screen.key == "a":
+        if screen.key == KEY_ADD:
             clear_line(stdscr, len(user_tasks.items) + 2, screen.x_min)
             task_name = input_string(stdscr, len(user_tasks.items) + 2, screen.x_min, cf.TODO_ICON+' ', screen.x_max - 4)
             task_id = user_tasks.generate_id()
             user_tasks.add_item(Task(task_id, task_name, Status.NORMAL, Timer([]), False))
 
         # Bulk operations:
-        if screen.key in ["V", "D"]:
+        if screen.key in ["V", KEY_DONE_ALL]:
             confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.change_all_statuses(Status.DONE)
-        if screen.key == "U":
+        if screen.key == KEY_UNMARK_ALL:
             confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.change_all_statuses(Status.NORMAL)
-        if screen.key == "L":
+        if screen.key == KEY_LOW_ALL:
             confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.change_all_statuses(Status.UNIMPORTANT)
-        if screen.key in ["I", "H"]:
+        if screen.key in [KEY_IMPORTANT_ALL, "H"]:
             confirmed = ask_confirmation(stdscr, MSG_TS_EDT_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.change_all_statuses(Status.IMPORTANT)
-        if screen.key in ["X"]:
+        if screen.key == KEY_DELETE_ALL:
             confirmed = ask_confirmation(stdscr, MSG_TS_DEL_ALL, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 user_tasks.delete_all_items()
 
         # Imports:
-        if screen.key == "C":
+        if screen.key == KEY_IMPORT:
             confirmed = ask_confirmation(stdscr, MSG_TS_IM, cf.ASK_CONFIRMATIONS)
             if confirmed:
                 importer.import_tasks_from_calcurse()
-        # if screen.key == "W":
-            # confirmed = ask_confirmation(stdscr, MSG_TS_TW, cf.ASK_CONFIRMATIONS)
-            # if confirmed:
-                # importer.import_tasks_from_taskwarrior()
 
         # Toggle all active timers:
-        if screen.key == "P":
+        if screen.key == KEY_TIMERS_TOGGLE:
             user_tasks.toggle_all_timers()
 
         # Reload:
-        if screen.key in ["Q"]:
+        if screen.key == KEY_RELOAD:
             screen.reload_data = True
 
         # Other actions:
-        if screen.key == "*":
+        if screen.key == KEY_PRIVACY:
             screen.privacy = not screen.privacy
-        if screen.key == "-":
+        if screen.key == KEY_HIDE_DONE:
             user_tasks.done_hidden = not user_tasks.done_hidden
-        if screen.key in [" ", "KEY_BTAB"]:
+        if screen.key in [KEY_SWITCH, "KEY_BTAB"]:
             screen.state = AppState.CALENDAR
-        if screen.key == "?":
+        if screen.key == KEY_HELP:
             screen.state = AppState.HELP
-        if screen.key == "q":
+        if screen.key == KEY_QUIT:
             confirmed = ask_confirmation(stdscr, MSG_EXIT, cf.ASK_CONFIRMATION_TO_QUIT)
             screen.state = AppState.EXIT if confirmed else screen.state
-        if screen.key in ["/"]:
+        if screen.key == KEY_SPLIT:
             screen.split = not screen.split
 
 
 @safe_run
-@block_until_valid_input(accepted_keys=[" ", "?", "q", "^[", "\x7f"])
+@block_until_valid_input(accepted_keys=HELP_KEYS)
 def control_help_screen(stdscr, screen):
     """Process user input on the help screen"""
     # Handle keys to exit the help screen:
-    if screen.key in [" ", "?", "q", "^[", "\x7f"]:
+    if screen.key in [KEY_SWITCH, KEY_HELP, KEY_QUIT, "^[", "\x7f"]:
         screen.state = AppState.CALENDAR
 
 
@@ -763,7 +749,7 @@ def control_welcome_screen(stdscr, screen):
     screen.key = stdscr.getkey()
 
     # Handle key to call help screen:
-    if screen.key in ["?"]:
+    if screen.key == KEY_HELP:
         screen.state = AppState.HELP
 
     # Otherwise, just start the program:
