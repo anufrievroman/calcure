@@ -32,8 +32,8 @@ Repository = "https://github.com/anufrievroman/calcure"
 [project.scripts]
 calcure = "calcure.__main__:cli"
 
-[tool.setuptools.package-data]
-calcure = ["../calcure.1"]
+[tool.setuptools.data-files]
+"share/man/man1" = ["calcure.1"]
 
 [tool.setuptools.dynamic]
 version = { attr = "calcure.__main__.__version__" }
