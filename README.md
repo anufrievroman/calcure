@@ -76,7 +76,7 @@ On the first run, program will create a `config.ini` file where you can edit par
 
 ### Setting daily reminders
 
-You can try [this project](https://github.com/sponkurtus2/calcxporte_r) to recieve daily reminders of events in your Calcure.
+You can try [this project](https://github.com/sponkurtus2/calcxporte_r) to receive daily reminders of events in your Calcure.
 
 ### Troubleshooting
 
