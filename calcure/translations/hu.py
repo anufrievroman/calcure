@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "Feladat átnevezése",
         "   s   ": "Váltás feladat/alfeladat között",
         "   .   ": "Feladat privátként jelölése",
+        "   -   ": "Befejezett feladatok láthatóságának váltása",
         "  f(F) ": "Határidő módosítása (hozzáadása/törlése)",
         "   m   ": "Feladat áthelyezése",
         "   C   ": "Feladatok importálása Calcurse-ból",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "A nyilak és Vim gombok (j, k, ZZ, ZQ) is működnek!"
 MSG_INFO          = "További információért látogasd meg:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "A billentyűk testreszabásához lásd:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Valóban kilépsz? (y/n) "
 
 MSG_EVENT_HIGH    = "Esemény magas prioritásúvá tétele (sorszám): "
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "Alfeladat megadása: "
 MSG_TS_IM         = "Feladatok importálása Calcurse-ból? (y/n)"
 MSG_TS_TW         = "Feladatok importálása Taskwarriorból? (y/n)"
 MSG_TS_NOTHING    = "Semmi sem szerepel..."
+MSG_TS_DONE_COUNT = "Befejezett feladatok"
 MSG_TS_PRIVACY    = "Feladat privátként jelölése (sorszám): "
 MSG_TS_DEAD_ADD   = "Határidő hozzáadása feladathoz (sorszám): "
 MSG_TS_DEAD_DEL   = "Határidő eltávolítása feladathoz (sorszám): "

@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "Premenovať úlohu",
         "   s   ": "Prepnúť medzi úlohou a podúlohou",
         "   .   ": "Prepnúť viditeľnosť úlohy",
+        "   -   ": "Prepnúť viditeľnosť dokončených úloh",
         "  f(F) ": "Zmeniť (odstrániť) hraničný termín úlohy",
         "   m   ": "Presunúť úlohu",
         "   C   ": "Importovať úlohy z calcurse",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "Fungujú aj Vim klávesy (j, k, ZZ, ZQ)!"
 MSG_INFO          = "Pre viac informácií navštívte:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Pre prispôsobenie klávesových skratiek pozrite:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Naozaj ukončiť? (y/n) "
 
 MSG_EVENT_HIGH    = "Nastaviť vysokú prioritu udalosti číslo: "
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "Zadajte podúlohu: "
 MSG_TS_IM         = "Importovať úlohy z Calcurse? (y/n)"
 MSG_TS_TW         = "Importovať úlohy z Taskwarriora? (y/n)"
 MSG_TS_NOTHING    = "Nič nie je naplánované..."
+MSG_TS_DONE_COUNT = "Dokončené úlohy"
 MSG_TS_PRIVACY    = "Vypnúť/zapnúť viditeľnosť úlohy číslo: "
 MSG_TS_DEAD_ADD   = "Pridať hraničný termín úlohy číslo: "
 MSG_TS_DEAD_DEL   = "Odstrániť hraničný termín ulohy číslo: "

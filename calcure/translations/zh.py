@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "重命名任务",
         "   s   ": "切换任务和子任务",
         "   .   ": "切换任务隐私模式",
+        "   -   ": "切换已完成任务的可见性",
         "  f(F) ": "更改（删除）任务截止日期",
         "   m   ": "移动任务",
         "   C   ": "从 Calcurse 导入任务",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "方向键和 Vim 键 (j, k, ZZ, ZQ) 也可使用！"
 MSG_INFO          = "如需更多信息，请访问："
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "自定义快捷键，请参阅："
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "确认退出？(y/n) "
 
 MSG_EVENT_HIGH    = "标记事件为高优先级，事件编号："
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "输入子任务："
 MSG_TS_IM         = "从 Calcurse 导入任务？(y/n)"
 MSG_TS_TW         = "从 Taskwarrior 导入任务？(y/n)"
 MSG_TS_NOTHING    = "暂无计划任务..."
+MSG_TS_DONE_COUNT = "已完成的任务"
 MSG_TS_PRIVACY    = "切换任务隐私模式，任务编号："
 MSG_TS_DEAD_ADD   = "为任务编号添加截止日期："
 MSG_TS_DEAD_DEL   = "移除任务编号的截止日期："

@@ -90,24 +90,22 @@ def input_field(stdscr, y, x, field_length):
             elif key == curses.KEY_RIGHT and cursor_pos < len(input_str):
                 cursor_pos += 1
 
-        # Redraw input field:
-        stdscr.addstr(y, x, input_str + " ")
+        # Redraw input field, padding to field_length to erase deleted characters:
+        stdscr.addstr(y, x, input_str.ljust(field_length))
         stdscr.refresh()
 
 
 def input_string(stdscr, y, x, question, answer_length):
     """Ask user to input something and return it as a string"""
-    curses.echo()
+    curses.noecho()
     curses.curs_set(True)
     display_question(stdscr, y, x, question, Color.PROMPTS)
     stdscr.refresh()
     try:
-        # answer = stdscr.getstr(y, len(question) + x, answer_length).decode(encoding="utf-8")
         answer = input_field(stdscr, y, len(question) + x, answer_length)
     except (UnicodeDecodeError, KeyboardInterrupt):
         answer = ""
         logging.warning("Incorrect characters in user input.")
-    curses.noecho()
     curses.curs_set(False)
     return answer
 

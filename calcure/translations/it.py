@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "Modifica una attività",
         "   s   ": "Passa da attività a sottoattività (e viceversa)",
         "   .   ": "Imposta la privacy dell'attività",
+        "   -   ": "Attiva/disattiva visibilità delle attività completate",
         "  f(F) ": "Cambia (o rimuovi) la scadenza per una attività",
         "   m   ": "Sposta una attività",
         "   C   ": "Importa le attività da calcurse",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "È possibile usare i tasti di Vim (j, k, ZZ, ZQ)!"
 MSG_INFO          = "Per maggiori informazioni, visitare:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Per personalizzare i tasti, vedere:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Vuoi davvero uscire? (y/n) "
 
 MSG_EVENT_HIGH    = "Imposta ad alta priorità l'evento con numero: "
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "Inserisci la sottoattività: "
 MSG_TS_IM         = "Vuoi importare le attività da Calcurse? (y/n)"
 MSG_TS_TW         = "Vuoi importare le attività da Taskwarrior? (y/n)"
 MSG_TS_NOTHING    = "Nulla di pianificato..."
+MSG_TS_DONE_COUNT = "Attività completate"
 MSG_TS_PRIVACY    = "Attiva la privacy dell'attività con numero: "
 MSG_TS_DEAD_ADD   = "Aggiungi una scadenza per l'attività con numero: "
 MSG_TS_DEAD_DEL   = "Rimuovi la scadenza per l'attività con numero: "

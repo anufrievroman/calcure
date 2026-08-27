@@ -67,7 +67,7 @@ Run `calcure` in your terminal. You may need to restart your terminal after the 
 
 ### Key bindings
 
-[List of all key bindings](https://anufrievroman.gitbook.io/calcure/key-bindings) can be accessed in the wiki and via `?` key in the program.
+[List of all key bindings](https://anufrievroman.gitbook.io/calcure/keys) can be accessed in the wiki and via `?` key in the program. The keys can be customized by creating `keybindings.ini` file, as [explained in documentation](https://anufrievroman.gitbook.io/calcure/keys).
 
 ### Settings
 
@@ -76,7 +76,7 @@ On the first run, program will create a `config.ini` file where you can edit par
 
 ### Setting daily reminders
 
-You can try [this project](https://github.com/sponkurtus2/calcxporte_r) to recieve daily reminders of events in your Calcure.
+You can try [this project](https://github.com/sponkurtus2/calcxporte_r) to receive daily reminders of events in your Calcure.
 
 ### Troubleshooting
 

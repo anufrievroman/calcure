@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "Modifier une tâche",
         "   s   ": "Basculer entre tâche et sous-tâche",
         "   .   ": "Basculer la confidentialité des tâches",
+        "   -   ": "Basculer la visibilité des tâches terminées",
         "  f(F) ": "Modifier (supprimer) l'échéance de la tâche",
         "   m   ": "Déplacer une tâche",
         "   C   ": "Importer des tâches de calcurse",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "Les touches de Vim (j, k, ZZ, ZQ) et fléchées fonctionnent également!"
 MSG_INFO          = "Pour plus d'informations, visitez:"
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "Pour personnaliser les raccourcis, voir:"
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "Vraiment quitter ? (y/n) "
 
 MSG_EVENT_HIGH    = "Marquer comme hautement prioritaire l'événement numéro: "
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "Entrez la sous-tâche: "
 MSG_TS_IM         = "Importer des tâches depuis Calcurse ? (y/n)"
 MSG_TS_TW         = "Importer des tâches depuis Taskwarrior ? (y/n)"
 MSG_TS_NOTHING    = "Rien de prévu..."
+MSG_TS_DONE_COUNT = "Tâches terminées"
 MSG_TS_PRIVACY    = "Basculer la confidentialité du numéro de tâche: "
 MSG_TS_DEAD_ADD   = "Ajouter le deadline pour la tâche numéro: "
 MSG_TS_DEAD_DEL   = "Supprimer le deadline de la tâche numéro: "

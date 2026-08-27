@@ -50,6 +50,7 @@ KEYS_TODO = {
         "   r   ": "重新命名任務",
         "   s   ": "切換主任務與子任務",
         "   .   ": "切換任務隱私設定",
+        "   -   ": "切換已完成任務的可見性",
         "  f(F) ": "修改（移除）任務期限",
         "   m   ": "移動任務",
         "   C   ": "從 Calcurse 匯入任務",
@@ -59,6 +60,8 @@ MSG_NAME          = "CALCURE"
 MSG_VIM           = "方向鍵和 Vim 快捷鍵（j、k、ZZ、ZQ）也可以使用！"
 MSG_INFO          = "更多資訊，請造訪："
 MSG_SITE          = "https://anufrievroman.gitbook.io/calcure"
+MSG_KEYS_INFO     = "自訂快捷鍵，請參閱："
+MSG_KEYS_SITE     = "https://anufrievroman.gitbook.io/calcure/keys"
 MSG_EXIT          = "確定退出？(y/n)"
 
 MSG_EVENT_HIGH    = "標記為高優先級行程編號："
@@ -95,6 +98,7 @@ MSG_TS_TITLE      = "輸入子任務："
 MSG_TS_IM         = "從 Calcurse 匯入任務？(y/n)"
 MSG_TS_TW         = "從 Taskwarrior 匯入任務？(y/n)"
 MSG_TS_NOTHING    = "沒有計劃..."
+MSG_TS_DONE_COUNT = "已完成的任務"
 MSG_TS_PRIVACY    = "切換任務編號隱私設定："
 MSG_TS_DEAD_ADD   = "為任務編號新增截止日期："
 MSG_TS_DEAD_DEL   = "移除任務編號的截止日期："

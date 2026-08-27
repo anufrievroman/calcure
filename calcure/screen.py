@@ -25,7 +25,6 @@ class Screen:
         self.right_pane_percentage = cf.RIGHT_PANE_PERCENTAGE
         self.currently_drawn = self.state
         self.selection_mode = False
-        self.refresh_now = True
         self.reload_data = False
         self.key = None
         self.day = self.today.day

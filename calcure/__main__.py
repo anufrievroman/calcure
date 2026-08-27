@@ -59,7 +59,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "3.2.1"
+__version__ = "3.3"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -238,7 +238,7 @@ class JournalView(View):
         """Render the list of tasks"""
         if not self.user_tasks.items and not self.user_ics_tasks.items and cf.SHOW_NOTHING_PLANNED:
             self.display_line(self.y, self.x, MSG_TS_NOTHING, Color.UNIMPORTANT)
-        for index, task in enumerate(self.user_tasks.items):
+        for index, task in enumerate(self.user_tasks.visible_items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             if self.screen.selection_mode and self.screen.state == AppState.JOURNAL:
@@ -246,10 +246,15 @@ class JournalView(View):
             self.y += 1
 
         self.y += 1
-        for index, task in enumerate(self.user_ics_tasks.items):
+        for index, task in enumerate(self.user_ics_tasks.visible_items):
             task_view = TaskView(self.stdscr, self.y, self.x, task, self.screen)
             task_view.render()
             self.y += 1
+
+        hidden_count = (len(self.user_tasks.items) - len(self.user_tasks.visible_items) +
+                        len(self.user_ics_tasks.items) - len(self.user_ics_tasks.visible_items))
+        if hidden_count and cf.HIDDEN_DONE_COUNT:
+            self.display_line(self.screen.y_max - 3, self.x, f"{MSG_TS_DONE_COUNT}: {hidden_count}", Color.DONE)
 
 
 class EventView(View):
@@ -1087,6 +1092,8 @@ class HelpScreenView(View):
         self.display_line(d_y + 2, d_x, MSG_VIM, Color.ACTIVE_PANE)
         self.display_line(d_y + 4, d_x, MSG_INFO, Color.TODO)
         self.display_line(d_y + 5, d_x, MSG_SITE, Color.TITLE)
+        self.display_line(d_y + 7, d_x, MSG_KEYS_INFO, Color.TODO)
+        self.display_line(d_y + 8, d_x, MSG_KEYS_SITE, Color.TITLE)
 
 
 def main(stdscr) -> None:
@@ -1097,7 +1104,10 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         threading.Thread(target=weather.load_from_wttr).start()
 
+    # Initialise terminal screen:
+    initialize_colors(cf)
     stdscr.bkgd(" ", curses.color_pair(Color.DEFAULT.value))
+    curses.curs_set(False)
     screen = Screen(stdscr, cf)
 
     # Initialise loaders:
@@ -1122,12 +1132,6 @@ def main(stdscr) -> None:
     importer = Importer(user_tasks, user_events, cf)
 
     read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv)
-
-    # Initialise terminal screen:
-    stdscr = curses.initscr()
-    curses.noecho()
-    curses.curs_set(False)
-    initialize_colors(cf)
 
     # Initialise screen views:
     app_view = View(stdscr, 0, 0)
@@ -1219,10 +1223,8 @@ def main(stdscr) -> None:
         # If something has been changed, save the data:
         if user_events.changed:
             event_saver_csv.save()
-            screen.refresh_now = True
         if user_tasks.changed:
             task_saver_csv.save()
-            screen.refresh_now = True
 
         # If needed, reload the data:
         if screen.is_time_to_reload:
