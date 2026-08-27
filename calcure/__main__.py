@@ -1104,7 +1104,10 @@ def main(stdscr) -> None:
     if cf.SHOW_WEATHER:
         threading.Thread(target=weather.load_from_wttr).start()
 
+    # Initialise terminal screen:
+    initialize_colors(cf)
     stdscr.bkgd(" ", curses.color_pair(Color.DEFAULT.value))
+    curses.curs_set(False)
     screen = Screen(stdscr, cf)
 
     # Initialise loaders:
@@ -1129,12 +1132,6 @@ def main(stdscr) -> None:
     importer = Importer(user_tasks, user_events, cf)
 
     read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv)
-
-    # Initialise terminal screen:
-    stdscr = curses.initscr()
-    curses.noecho()
-    curses.curs_set(False)
-    initialize_colors(cf)
 
     # Initialise screen views:
     app_view = View(stdscr, 0, 0)
