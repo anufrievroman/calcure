@@ -407,7 +407,20 @@ class EventLoaderICS(LoaderICS):
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
         self.local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
-    def parse_event(self, component, index, calendar_number):
+    def _stored_date(self, dt):
+        """Convert an ICS date/datetime to the (year, month, day) used for storage.
+
+        Applies the same local-timezone and Persian conversions as DTSTART, so a
+        RECURRENCE-ID lines up with the master's generated occurrence dates.
+        """
+        if getattr(dt, "tzinfo", None) is not None:
+            dt = dt.astimezone(self.local_timezone)
+        year, month, day = dt.year, dt.month, dt.day
+        if self.use_persian_calendar:
+            year, month, day = convert_to_persian_date(year, month, day)
+        return (year, month, day)
+
+    def parse_event(self, component, index, calendar_number, overrides=None):
         """Parse single event and add it to user_ics_events"""
 
         # Default parameters:
@@ -469,10 +482,15 @@ class EventLoaderICS(LoaderICS):
                     frequency = Frequency.DAILY
 
         # Parsing recurring rules (independent of DTEND/DURATION being present):
+        recurrence_ids = set()
         if 'rrule' in component:
             rrule = component.get('rrule').to_ical().decode('utf-8')
             exdate = component.get('exdate')
             repetition = 0
+
+            # Instances of this series that a RECURRENCE-ID override replaces:
+            if overrides:
+                recurrence_ids = overrides.get(str(component.get('uid')), set())
 
         # Add start time to non-all-day events:
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
@@ -486,7 +504,8 @@ class EventLoaderICS(LoaderICS):
 
         # Add event:
         new_event = UserEvent(event_id, year, month, day, name, repetition, frequency,
-                              status, is_private, calendar_number, hour, minute, rrule, exdate)
+                              status, is_private, calendar_number, hour, minute, rrule, exdate,
+                              recurrence_ids)
         self.user_ics_events.add_item(new_event)
 
     def load(self):
@@ -504,11 +523,20 @@ class EventLoaderICS(LoaderICS):
             for ics_file in ics_files:
                 try:
                     cal = icalendar.Calendar.from_ical(ics_file)
-                    index = 0
-                    for component in cal.walk():
-                        if component.name == 'VEVENT':
-                            index += 1
-                            self.parse_event(component, index, calendar_number)
+                    vevents = [c for c in cal.walk() if c.name == 'VEVENT']
+
+                    # First pass: collect RECURRENCE-ID overrides per UID, so the
+                    # matching instance is dropped from the master's expansion:
+                    overrides = {}
+                    for component in vevents:
+                        recurrence_id = component.get('recurrence-id')
+                        if recurrence_id is not None:
+                            uid = str(component.get('uid'))
+                            overrides.setdefault(uid, set()).add(self._stored_date(recurrence_id.dt))
+
+                    # Second pass: parse each event:
+                    for index, component in enumerate(vevents, start=1):
+                        self.parse_event(component, index, calendar_number, overrides)
 
                 except Exception as e_message:
                     logging.error("Failed to parse %s. %s", filename, e_message)

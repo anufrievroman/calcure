@@ -72,7 +72,8 @@ class UserEvent(Event):
     """Events created by the user"""
 
     def __init__(self, item_id, year, month, day, name, repetition, frequency, status, privacy,
-                                                    calendar_number=None, hour=None, minute=None, rrule=None, exdate=None):
+                                                    calendar_number=None, hour=None, minute=None, rrule=None,
+                                                    exdate=None, recurrence_ids=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.repetition = repetition
@@ -84,6 +85,8 @@ class UserEvent(Event):
         self.minute = minute
         self.rrule = rrule
         self.exdate = exdate
+        # Dates (year, month, day) whose RRULE instance is replaced by a RECURRENCE-ID override:
+        self.recurrence_ids = recurrence_ids or set()
 
     def getDatetime(self):
         local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
@@ -93,12 +96,15 @@ class UserEvent(Event):
 class UserRepeatedEvent(Event):
     """Events that are repetitions of the original user events"""
 
-    def __init__(self, item_id, year, month, day, name, status, privacy, calendar_number=None):
+    def __init__(self, item_id, year, month, day, name, status, privacy, calendar_number=None,
+                 hour=None, minute=None):
         super().__init__(year, month, day, name)
         self.item_id = item_id
         self.status = status
         self.privacy = privacy
         self.calendar_number = calendar_number
+        self.hour = hour
+        self.minute = minute
 
 
 class Timer:
@@ -439,10 +445,16 @@ class RepeatedEvents(Events):
                             exdate_dt = datetime.datetime.combine(exdate.dt, datetime.time.min, tzinfo=dtstart.tzinfo) if not isinstance(exdate.dt, datetime.datetime) else exdate.dt
                             rset.exdate(exdate_dt)
 
-                # Create an event for each repetition and add to the list:
-                for date in list(rset)[1:]:
+                # Create an event for each occurrence and add to the list. The full
+                # series is generated (including the first occurrence) because the RRULE
+                # master itself is not rendered directly. Dates replaced by a
+                # RECURRENCE-ID override are skipped:
+                for date in list(rset):
+                    if (date.year, date.month, date.day) in event.recurrence_ids:
+                        continue
                     self.add_item(UserRepeatedEvent(event.item_id, date.year, date.month, date.day, event.name,
-                                                    event.status, event.privacy, event.calendar_number))
+                                                    event.status, event.privacy, event.calendar_number,
+                                                    event.hour, event.minute))
 
     def calculate_recurring_events(self, year, month, day, frequency):
         """Calculate the date of recurring events so that they occur in the next month or year"""

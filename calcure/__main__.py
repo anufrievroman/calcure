@@ -434,6 +434,8 @@ class DailyView(View):
         self.repeated_ics_events = repeated_ics_events.filter_events_that_day(screen)
         self.user_events = user_events.filter_events_that_day(screen)
         self.user_ics_events = user_ics_events.filter_events_that_day(screen)
+        # RRULE master events are templates expanded by RepeatedEvents; don't render them directly:
+        self.user_ics_events.items = [e for e in self.user_ics_events.items if not getattr(e, "rrule", None)]
         self.user_ics_events.items = sorted(self.user_ics_events.items, key=lambda x: (x.hour is None, x.hour))
         self.holidays = holidays.filter_events_that_day(screen)
         self.birthdays = birthdays.filter_events_that_day(screen)
