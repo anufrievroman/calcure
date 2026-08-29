@@ -11,7 +11,7 @@ from datetime import date
 
 import holidays
 
-from calcure.calendars import Calendar
+from calcure.calendars import Calendar, convert_to_gregorian_date
 from calcure.errors import Error
 from calcure.configuration import Config, get_args
 from calcure.weather import Weather
@@ -544,7 +544,12 @@ class DayNumberView(View):
     def is_holiday(self):
         """Check if current day is a holiday"""
         country_holiday_collections = [holidays.country_holidays(country) for country in cf.HOLIDAY_COUNTRY.split(",")]
-        self_date = date(self.screen.year, self.screen.month, self.screen.day)
+        # Holidays are Gregorian, so convert the displayed date back if using Persian calendar:
+        if cf.USE_PERSIAN_CALENDAR:
+            year, month, day = convert_to_gregorian_date(self.screen.year, self.screen.month, self.screen.day)
+        else:
+            year, month, day = self.screen.year, self.screen.month, self.screen.day
+        self_date = date(year, month, day)
         return any(self_date in holiday_collection for holiday_collection in country_holiday_collections)
 
 
