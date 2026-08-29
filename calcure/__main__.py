@@ -521,7 +521,12 @@ class DayNumberView(View):
     def moon_icon(self):
         """Get moon icon if needed"""
         if cf.SHOW_MOON_PHASES:
-            return get_moon_phase(self.screen.year, self.screen.month, self.screen.day)
+            # Moon phases are computed in the Gregorian calendar, so convert first:
+            if cf.USE_PERSIAN_CALENDAR:
+                year, month, day = convert_to_gregorian_date(self.screen.year, self.screen.month, self.screen.day)
+            else:
+                year, month, day = self.screen.year, self.screen.month, self.screen.day
+            return get_moon_phase(year, month, day)
         else:
             return ""
 
