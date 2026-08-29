@@ -435,13 +435,24 @@ class EventLoaderICS(LoaderICS):
         except AttributeError:
             year, month, day = 0, 1, 1
 
-        # See if this event takes multiple days:
+        # Determine the event's end from DTEND, or from DTSTART + DURATION if
+        # there is no DTEND (both are valid ways to express an end in iCalendar):
+        dt_end = None
         try:
-            dt_end = component.get('dtend').dt
+            if component.get('dtend') is not None:
+                dt_end = component.get('dtend').dt
 
-            # Convert to local timezone if it's provided:
-            if hasattr(dt_end, "tzinfo"):
-                dt_end = dt_end.astimezone(self.local_timezone)
+                # Convert to local timezone if it's provided:
+                if hasattr(dt_end, "tzinfo"):
+                    dt_end = dt_end.astimezone(self.local_timezone)
+
+            elif component.get('duration') is not None and dt is not None:
+                dt_end = dt + component.get('duration').dt
+        except (AttributeError, TypeError):
+            dt_end = None
+
+        # See if this event takes multiple days:
+        if dt_end is not None and dt is not None:
 
             # For events with time:
             try:
@@ -451,21 +462,17 @@ class EventLoaderICS(LoaderICS):
                     frequency = Frequency.DAILY
 
             # For all day events, last day does not count:
-            except:
+            except AttributeError:
                 dt_difference = dt_end - dt
                 if dt_difference.days > 0:
                     repetition = dt_difference.days
                     frequency = Frequency.DAILY
 
-            # Parsing recurring rules:
-            if 'rrule' in component:
-                rrule = component.get('rrule').to_ical().decode('utf-8')
-                exdate = component.get('exdate')
-                repetition = 0
-
-        except AttributeError:
-            logging.error("Failed to parse event %s on %s.", name, dt)
-            pass
+        # Parsing recurring rules (independent of DTEND/DURATION being present):
+        if 'rrule' in component:
+            rrule = component.get('rrule').to_ical().decode('utf-8')
+            exdate = component.get('exdate')
+            repetition = 0
 
         # Add start time to non-all-day events:
         all_day = component.get('dtstart').params.get('VALUE') == 'DATE' if component.get('dtstart') else False
