@@ -11,7 +11,7 @@ description = "Modern TUI calendar and task manager"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-dependencies = ["holidays", "jdatetime", "icalendar"]
+dependencies = ["holidays", "icalendar"]
 dynamic = ["version"]
 classifiers = [
     "Development Status :: 4 - Beta",

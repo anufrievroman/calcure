@@ -11,7 +11,7 @@ from datetime import date
 
 import holidays
 
-from calcure.calendars import Calendar, convert_to_gregorian_date
+from calcure.calendars import Calendar, convert_to_gregorian_date, PersianDate
 from calcure.errors import Error
 from calcure.configuration import Config, get_args
 from calcure.weather import Weather
@@ -59,7 +59,7 @@ else:
     from calcure.translations.en import *
 
 
-__version__ = "3.3"
+__version__ = "3.4"
 
 
 def read_items_from_user_arguments(screen, user_tasks, user_events, task_saver_csv, event_saver_csv):
@@ -936,14 +936,13 @@ class WeeklyScreenView(View):
     def week_dates(self):
         """Return list of 7 date objects for the week containing the current screen date"""
         import datetime as _dt
-        # Use jdatetime in Persian mode so the returned dates carry Persian
+        # Use PersianDate in Persian mode so the returned dates carry Persian
         # year/month/day, matching how events and the rest of the views store dates:
         if cf.USE_PERSIAN_CALENDAR:
-            import jdatetime
             try:
-                current = jdatetime.date(self.screen.year, self.screen.month, self.screen.day)
+                current = PersianDate(self.screen.year, self.screen.month, self.screen.day)
             except ValueError:
-                current = jdatetime.date.today()
+                current = PersianDate.today()
         else:
             try:
                 current = _dt.date(self.screen.year, self.screen.month, self.screen.day)

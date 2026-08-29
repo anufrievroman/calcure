@@ -4,7 +4,7 @@ import datetime
 import logging
 
 from calcure.data import Events, AppState, CalState
-from calcure.calendars import Calendar
+from calcure.calendars import Calendar, PersianDate
 
 
 class Screen:
@@ -76,8 +76,7 @@ class Screen:
     def date(self) -> datetime:
         """Return displayed date in datetime format"""
         if self.use_persian_calendar:
-            import jdatetime
-            return jdatetime.date(self.year, self.month, self.day)
+            return PersianDate(self.year, self.month, self.day)
         else:
             return datetime.date(self.year, self.month, self.day)
 
@@ -85,8 +84,7 @@ class Screen:
     def today(self) -> datetime:
         """Return todays's date in datetime format"""
         if self.use_persian_calendar:
-            import jdatetime
-            return jdatetime.date.today()
+            return PersianDate.today()
         else:
             return datetime.date.today()
 
@@ -154,12 +152,11 @@ class Screen:
     def _current_date_obj(self):
         """Return the current screen date as a date object matching the calendar mode.
 
-        In Persian mode this is a jdatetime.date carrying Persian year/month/day, so
+        In Persian mode this is a PersianDate carrying Persian year/month/day, so
         arithmetic and the resulting year/month/day stay in the Persian calendar.
         """
         if self.use_persian_calendar:
-            import jdatetime
-            return jdatetime.date(self.year, self.month, self.day)
+            return PersianDate(self.year, self.month, self.day)
         return datetime.date(self.year, self.month, self.day)
 
     def week_dates(self, start_week_day):

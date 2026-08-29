@@ -50,7 +50,7 @@ There are several ways to install:
 ### Dependencies
 
 - `python` 3.10 and higher (usually already installed)
-- `holidays`, `jdatetime`, and `icalendar` python libraries (should be installed automatically with the calcure).
+- `holidays` and `icalendar` python libraries (should be installed automatically with the calcure).
 - `windows-curses` on Windows
 
 ## Usage
