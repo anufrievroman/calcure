@@ -931,10 +931,19 @@ class WeeklyScreenView(View):
     def week_dates(self):
         """Return list of 7 date objects for the week containing the current screen date"""
         import datetime as _dt
-        try:
-            current = _dt.date(self.screen.year, self.screen.month, self.screen.day)
-        except ValueError:
-            current = _dt.date.today()
+        # Use jdatetime in Persian mode so the returned dates carry Persian
+        # year/month/day, matching how events and the rest of the views store dates:
+        if cf.USE_PERSIAN_CALENDAR:
+            import jdatetime
+            try:
+                current = jdatetime.date(self.screen.year, self.screen.month, self.screen.day)
+            except ValueError:
+                current = jdatetime.date.today()
+        else:
+            try:
+                current = _dt.date(self.screen.year, self.screen.month, self.screen.day)
+            except ValueError:
+                current = _dt.date.today()
         start_offset = (current.weekday() - (cf.START_WEEK_DAY - 1)) % 7
         week_start = current - _dt.timedelta(days=start_offset)
         return [week_start + _dt.timedelta(days=i) for i in range(7)]

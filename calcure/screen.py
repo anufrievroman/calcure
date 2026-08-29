@@ -151,23 +151,32 @@ class Screen:
                 self.year -= 1
             self.day = Calendar(0, self.use_persian_calendar).last_day(self.year, self.month)
 
+    def _current_date_obj(self):
+        """Return the current screen date as a date object matching the calendar mode.
+
+        In Persian mode this is a jdatetime.date carrying Persian year/month/day, so
+        arithmetic and the resulting year/month/day stay in the Persian calendar.
+        """
+        if self.use_persian_calendar:
+            import jdatetime
+            return jdatetime.date(self.year, self.month, self.day)
+        return datetime.date(self.year, self.month, self.day)
+
     def week_dates(self, start_week_day):
         """Return list of 7 date objects for the week containing the current screen date"""
-        current = datetime.date(self.year, self.month, self.day)
+        current = self._current_date_obj()
         start_offset = (current.weekday() - (start_week_day - 1)) % 7
         week_start = current - datetime.timedelta(days=start_offset)
         return [week_start + datetime.timedelta(days=i) for i in range(7)]
 
     def next_week(self):
         """Switch to the next week"""
-        current = datetime.date(self.year, self.month, self.day)
-        nxt = current + datetime.timedelta(days=7)
+        nxt = self._current_date_obj() + datetime.timedelta(days=7)
         self.year, self.month, self.day = nxt.year, nxt.month, nxt.day
 
     def previous_week(self):
         """Switch to the previous week"""
-        current = datetime.date(self.year, self.month, self.day)
-        prv = current - datetime.timedelta(days=7)
+        prv = self._current_date_obj() - datetime.timedelta(days=7)
         self.year, self.month, self.day = prv.year, prv.month, prv.day
 
     def reset_to_today(self):
