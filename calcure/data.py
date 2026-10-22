@@ -4,6 +4,7 @@ import datetime
 import logging
 import time
 import enum
+import re
 
 from dateutil.rrule import rruleset, rrulestr
 from calcure.calendars import Calendar
@@ -430,9 +431,10 @@ class RepeatedEvents(Events):
 
                 # Create a list of dates of repeated events:
                 try:
+                    event.rrule = self.normalize_until(event.rrule, dtstart.tzinfo)
                     rule = rrulestr(event.rrule, dtstart=dtstart)
                 except ValueError as e:
-                    logging.error("Problem occurred with event: '%s'.", event.name)
+                    logging.error("Problem occurred with event '%s': %s", event.name, e)
                     continue
                 rset = rruleset()
                 rset.rrule(rule)
@@ -489,3 +491,15 @@ class RepeatedEvents(Events):
                 new_year = year + (month - 1)//12
                 new_month = month - 12*(new_year - year)
         return new_year, new_month, new_day
+
+    def normalize_until(self, rrule, tz):
+    #Convert a non-UTC UNTIL to explicit UTC, interpreting it in local time.
+        def repl(m):
+            val = m.group(1)
+            if len(val) == 8:   # bare date: end of that local day
+                local = datetime.datetime.strptime(val, '%Y%m%d').replace(
+                    hour=23, minute=59, second=59, tzinfo=tz)
+            else:               # floating time: local time
+                local = datetime.datetime.strptime(val, '%Y%m%dT%H%M%S').replace(tzinfo=tz)
+            return 'UNTIL=' + local.astimezone(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+        return re.sub(r'UNTIL=(\d{8}(?:T\d{6})?)(?![\dTZ])', repl, rrule)
