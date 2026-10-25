@@ -317,7 +317,11 @@ class EventView(View):
         self.info = self.info[:self.screen.x_max - self.x + number_of_special]
         x_cell = self.screen.x_max // 7
         if (cf.CUT_TITLES or cf.SHOW_CALENDAR_BORDERS) and self.screen.calendar_state == CalState.MONTHLY:
-            self.info = self.info[:(x_cell - 1)]
+            cell_space = max(0, x_cell - 1)
+            if len(self.info.rstrip()) > cell_space:
+                self.info = self.info[:max(0, cell_space - 1)] + "…"
+            else:
+                self.info = self.info[:cell_space]
 
     def minimize_info(self):
         """Reduce the info to just icon if not much space if available"""
