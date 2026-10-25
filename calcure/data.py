@@ -263,6 +263,16 @@ class Tasks(Collection):
             return self.items
         return [t for t in self.items if t.status != Status.DONE]
 
+    def filter_events_that_day(self, screen):
+        """Filter visible tasks that have a deadline on the selected day"""
+        events_of_the_day = Events()
+        for task in self.visible_items:
+            if (task.year == screen.year
+                and task.month == screen.month
+                and task.day == screen.day):
+                events_of_the_day.add_item(task)
+        return events_of_the_day
+
     def is_valid_number(self, number):
         if number is None:
             return False
