@@ -11,6 +11,7 @@ import io
 import logging
 
 from pathlib import Path
+from dateutil import tz
 
 from calcure.data import *
 from calcure.calendars import convert_to_persian_date
@@ -405,7 +406,8 @@ class EventLoaderICS(LoaderICS):
         self.user_ics_events = Events()
         self.ics_event_files = cf.ICS_EVENT_FILES
         self.use_persian_calendar = cf.USE_PERSIAN_CALENDAR
-        self.local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+        # tzlocal follows DST; a fixed offset taken now is wrong for dates on the other side of a change
+        self.local_timezone = tz.tzlocal()
 
     def _stored_date(self, dt):
         """Convert an ICS date/datetime to the (year, month, day) used for storage.

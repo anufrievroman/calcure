@@ -6,6 +6,7 @@ import time
 import enum
 import re
 
+from dateutil import tz
 from dateutil.rrule import rruleset, rrulestr
 from calcure.calendars import Calendar
 
@@ -90,8 +91,7 @@ class UserEvent(Event):
         self.recurrence_ids = recurrence_ids or set()
 
     def getDatetime(self):
-        local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
-        return datetime.datetime(self.year, self.month, self.day, self.hour or 0, self.minute or 0, tzinfo=local_timezone)
+        return datetime.datetime(self.year, self.month, self.day, self.hour or 0, self.minute or 0, tzinfo=tz.tzlocal())
 
 
 class UserRepeatedEvent(Event):
